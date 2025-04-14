@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building Your First PC - Tyler's Tech Tips</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <h1><i class="fas fa-laptop-code"></i> Tyler's Tech Tips</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html#home"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="index.html#articles"><i class="fas fa-newspaper"></i> Articles</a></li>
+                <li><a href="index.html#projects"><i class="fas fa-certificate"></i> Projects</a></li>
+                <li><a href="index.html#community"><i class="fas fa-users"></i> Community</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Article Content -->
+    <section class="article-content">
+        <div class="article-header">
+            <h1><i class="fas fa-tools"></i> Building Your First PC</h1>
+            <p class="article-meta">Published on April 14, 2025 by Tyler</p>
+        </div>
+        <img src="images/pc-build-image.jpg" alt="PC build setup in progress" class="article-image">
+        <div class="article-body">
+            <p>Building your first PC can be a rewarding experience, and it’s easier than you think! In this guide, we’ll walk you through the essential steps to assemble a budget-friendly rig.</p>
+            <h2>Step 1: Gather Your Components</h2>
+            <p>You’ll need a CPU, motherboard, RAM, storage (SSD/HDD), GPU, power supply, case, and cooling. Stick to a budget of $500–$800 for a solid starter build.</p>
+            <h2>Step 2: Assemble the Core</h2>
+            <p>Install the CPU on the motherboard, add the RAM, and secure the motherboard in the case. Be gentle with the CPU pins!</p>
+            <h2>Step 3: Add Storage and Power</h2>
+            <p>Mount your SSD/HDD, connect the power supply, and cable-manage to keep things tidy. A clean build helps with airflow.</p>
+            <h2>Step 4: Boot and Install</h2>
+            <p>Connect a monitor, power on, and install your OS (like Windows or Linux). Update drivers, and you’re ready to go!</p>
+            <p>Enjoy your new PC, and don’t hesitate to upgrade as needed!</p>
+        </div>
+
+        <!-- Related Articles Section -->
+        <div class="related-articles">
+            <h2>Related Articles</h2>
+            <div class="article-grid">
+                <div class="article-card">
+                    <h3><i class="fas fa-microchip"></i> Understanding CPUs in 2025</h3>
+                    <p>A deep dive into the latest processor trends and what they mean for you.</p>
+                    <a href="cpu-2025.html" class="read-more">Read More</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comments Section -->
+        <div class="comments-section">
+            <h2><i class="fas fa-comments"></i> Comments</h2>
+            <form id="comment-form-pc" class="comment-form">
+                <input type="text" id="name-pc" placeholder="Your Name" required>
+                <textarea id="message-pc" placeholder="Your Comment" required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+            <div id="comments-list-pc" class="comments-list"></div>
+        </div>
+
+        <a href="index.html#articles" class="back-link"><i class="fas fa-arrow-left"></i> Back to Articles</a>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2025 Tyler's Tech Tips. All rights reserved.</p>
+        <div class="social-links">
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-github"></i></a>
+        </div>
+    </footer>
+
+    <!-- JavaScript for Comments -->
+    <script src="comments.js"></script>
+</body>
+</html>
