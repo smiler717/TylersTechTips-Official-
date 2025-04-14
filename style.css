@@ -75,24 +75,47 @@ body {
 
 /* Hero Section */
 .hero {
-    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://source.unsplash.com/random/1600x900/?technology');
-    background-size: cover;
-    background-position: center;
+    /* Use a fallback gradient if the image fails to load */
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
     height: 80vh;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle animation for the hero background */
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(0, 212, 255, 0.1), rgba(0, 0, 0, 0.7));
+    animation: gradientShift 10s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 .hero-content {
     max-width: 600px;
+    position: relative;
+    z-index: 1;
 }
 
 .hero h2 {
-    font-size: 3rem;
+    font-size: 2.5rem; /* Reduced from 3rem to fit better */
     margin-bottom: 1rem;
     color: var(--accent-color);
+    white-space: nowrap; /* Ensure the heading stays on one line */
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5); /* Add a glowing effect */
 }
 
 .hero p {
@@ -111,7 +134,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .cta-button i {
@@ -120,6 +143,7 @@ body {
 
 .cta-button:hover {
     background-color: #00b0d6;
+    transform: scale(1.05); /* Subtle zoom effect on hover */
 }
 
 /* Articles Section */
@@ -423,7 +447,8 @@ footer {
     }
 
     .hero h2 {
-        font-size: 2rem;
+        font-size: 2rem; /* Further reduce for smaller screens */
+        white-space: normal; /* Allow wrapping on small screens */
     }
 
     .hero p {
