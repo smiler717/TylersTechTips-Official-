@@ -475,3 +475,12 @@ footer {
         max-height: 300px;
     }
 }
+.cert-card {
+    overflow: visible !important; /* Disable overflow: hidden to see if the image is being clipped */
+}
+
+.cert-image {
+    max-width: none !important; /* Remove max-width constraint */
+    width: 100px; /* Set a fixed width instead */
+    height: auto;
+}
