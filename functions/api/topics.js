@@ -1,10 +1,10 @@
-import { json, error, readJson, getDeviceId, ensureSchema, checkRateLimit } from './_utils.js';
+import { json, error, readJson, getDeviceId, checkRateLimit } from './_utils.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
   const DB = env.DB;
   if (!DB) return error(500, 'Database binding DB is not configured');
-  await ensureSchema(DB);
+  // Schema is expected to be pre-initialized via schema.sql
 
   const url = new URL(request.url);
   const method = request.method.toUpperCase();
@@ -16,7 +16,7 @@ export async function onRequest(context) {
     const sort = (url.searchParams.get('sort') || 'new').toLowerCase();
 
     // Fetch topics
-    let topics = await DB.prepare('SELECT id, title, body, author, created_at, created_by FROM topics').all();
+  let topics = await DB.prepare('SELECT id, title, body, author, created_at, created_by FROM topics').all();
     topics = topics.results || [];
 
     // Filter

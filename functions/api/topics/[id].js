@@ -1,10 +1,10 @@
-import { json, error, getDeviceId, ensureSchema } from '../_utils.js';
+import { json, error, getDeviceId } from '../_utils.js';
 
 export async function onRequest(context) {
   const { request, env, params } = context;
   const DB = env.DB;
   if (!DB) return error(500, 'Database binding DB is not configured');
-  await ensureSchema(DB);
+  // Schema is expected to be pre-initialized via schema.sql
 
   const method = request.method.toUpperCase();
   const id = params.id;
