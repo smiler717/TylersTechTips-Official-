@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard - Tyler's Tech Tips</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="scripts/theme.js"></script>
+    <script defer src="scripts/search.js"></script>
+    <style>
+        .analytics-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--secondary-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-color);
+            box-shadow: 0 8px 20px var(--shadow-hover);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin: 0.5rem 0;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: var(--secondary-text);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .section-title {
+            color: var(--accent-color);
+            font-size: 2rem;
+            margin: 3rem 0 1.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .leaderboard {
+            background: var(--secondary-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            transition: all 0.2s ease;
+        }
+
+        .leaderboard-item:hover {
+            border-color: var(--accent-color);
+            transform: translateX(5px);
+        }
+
+        .leaderboard-rank {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            min-width: 50px;
+        }
+
+        .leaderboard-content {
+            flex: 1;
+            margin: 0 1rem;
+        }
+
+        .leaderboard-title {
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .leaderboard-meta {
+            color: var(--secondary-text);
+            font-size: 0.9rem;
+        }
+
+        .leaderboard-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--secondary-text);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .refresh-btn {
+            background: var(--accent-color);
+            color: var(--primary-bg);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.4);
+        }
+
+        .admin-notice {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .admin-notice i {
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <h1><i class="fas fa-laptop-code"></i> Tyler's Tech Tips</h1>
+            </div>
+            <div class="search-container">
+                <input type="text" class="search-bar" placeholder="Search articles...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html#home"><i class="fas fa-home"></i> Home</a></li>
+                <li class="dropdown">
+                    <a href="index.html#articles"><i class="fas fa-newspaper"></i> Articles</a>
+                    <div class="dropdown-content">
+                        <a href="build-pc.html"><i class="fas fa-tools"></i> Building Your First PC</a>
+                        <a href="cpu-2025.html"><i class="fas fa-microchip"></i> Understanding CPUs in 2025</a>
+                        <a href="how-to-install-ssd.html"><i class="fas fa-hdd"></i> How to Install an SSD</a>
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="index.html#projects"><i class="fas fa-project-diagram"></i> Projects</a>
+                    <div class="dropdown-content">
+                        <a href="windows-server-setup.html"><i class="fas fa-server"></i> Windows Server Setup</a>
+                        <a href="intune-setup.html"><i class="fas fa-mobile-alt"></i> Intune Implementation</a>
+                        <a href="network-monitoring.html"><i class="fas fa-chart-line"></i> Network Monitoring</a>
+                    </div>
+                </li>
+                <li><a href="community.html"><i class="fas fa-users"></i> Community</a></li>
+                <li><a href="cheat-sheet.html"><i class="fas fa-book"></i> Cheat Sheet</a></li>
+                <li><a href="about.html"><i class="fas fa-user"></i> About</a></li>
+            </ul>
+            <button id="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </nav>
+    </header>
+
+    <section class="analytics-container">
+        <div class="article-header">
+            <h1><i class="fas fa-chart-line"></i> Analytics Dashboard</h1>
+            <p class="article-meta">Real-time site statistics and insights</p>
+        </div>
+
+        <div class="admin-notice">
+            <i class="fas fa-info-circle"></i>
+            <strong>Note:</strong> This dashboard shows aggregated community data. Full analytics require backend integration.
+        </div>
+
+        <button class="refresh-btn" onclick="loadAnalytics()">
+            <i class="fas fa-sync-alt"></i> Refresh Data
+        </button>
+
+        <h2 class="section-title"><i class="fas fa-tachometer-alt"></i> Overview</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-comments"></i></div>
+                <div class="stat-value" id="total-topics">--</div>
+                <div class="stat-label">Community Topics</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-reply"></i></div>
+                <div class="stat-value" id="total-comments">--</div>
+                <div class="stat-label">Total Comments</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-eye"></i></div>
+                <div class="stat-value" id="total-views">--</div>
+                <div class="stat-label">Total Topic Views</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                <div class="stat-value" id="total-contributors">--</div>
+                <div class="stat-label">Contributors</div>
+            </div>
+        </div>
+
+        <h2 class="section-title"><i class="fas fa-fire"></i> Most Viewed Topics</h2>
+        <div class="leaderboard" id="top-viewed"></div>
+
+        <h2 class="section-title"><i class="fas fa-comments"></i> Most Discussed Topics</h2>
+        <div class="leaderboard" id="top-commented"></div>
+
+        <h2 class="section-title"><i class="fas fa-user-friends"></i> Top Contributors</h2>
+        <div class="leaderboard" id="top-contributors"></div>
+
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="community.html">Community</a></li>
+                    <li><a href="cheat-sheet.html">Cheat Sheet</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Popular Articles</h3>
+                <ul>
+                    <li><a href="build-pc.html">Building Your First PC</a></li>
+                    <li><a href="cpu-2025.html">CPU Guide 2025</a></li>
+                    <li><a href="how-to-install-ssd.html">SSD Installation</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p>Have questions? Reach out on the Community page!</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Tyler's Tech Tips. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        async function loadAnalytics() {
+            try {
+                const res = await fetch('/api/topics');
+                if (!res.ok) throw new Error('Failed to fetch topics');
+                
+                const topics = await res.json();
+                
+                // Calculate stats
+                const totalTopics = topics.length;
+                const totalComments = topics.reduce((sum, t) => sum + (t.comments?.length || 0), 0);
+                const totalViews = topics.reduce((sum, t) => sum + (t.views || 0), 0);
+                
+                // Get unique contributors
+                const contributors = new Set();
+                topics.forEach(t => {
+                    if (t.author) contributors.add(t.author);
+                    (t.comments || []).forEach(c => {
+                        if (c.author) contributors.add(c.author);
+                    });
+                });
+                
+                // Update overview stats
+                document.getElementById('total-topics').textContent = totalTopics;
+                document.getElementById('total-comments').textContent = totalComments;
+                document.getElementById('total-views').textContent = totalViews.toLocaleString();
+                document.getElementById('total-contributors').textContent = contributors.size;
+                
+                // Most viewed topics
+                const topViewed = [...topics]
+                    .sort((a, b) => (b.views || 0) - (a.views || 0))
+                    .slice(0, 5);
+                
+                document.getElementById('top-viewed').innerHTML = topViewed.length ? 
+                    topViewed.map((t, i) => `
+                        <div class="leaderboard-item">
+                            <div class="leaderboard-rank">#${i + 1}</div>
+                            <div class="leaderboard-content">
+                                <div class="leaderboard-title">${escapeHTML(t.title)}</div>
+                                <div class="leaderboard-meta">by ${escapeHTML(t.author || 'Anonymous')}</div>
+                            </div>
+                            <div class="leaderboard-value">${(t.views || 0).toLocaleString()} views</div>
+                        </div>
+                    `).join('') :
+                    '<div class="empty-state"><i class="fas fa-inbox"></i><p>No data yet</p></div>';
+                
+                // Most commented topics
+                const topCommented = [...topics]
+                    .sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0))
+                    .slice(0, 5);
+                
+                document.getElementById('top-commented').innerHTML = topCommented.length ?
+                    topCommented.map((t, i) => `
+                        <div class="leaderboard-item">
+                            <div class="leaderboard-rank">#${i + 1}</div>
+                            <div class="leaderboard-content">
+                                <div class="leaderboard-title">${escapeHTML(t.title)}</div>
+                                <div class="leaderboard-meta">by ${escapeHTML(t.author || 'Anonymous')}</div>
+                            </div>
+                            <div class="leaderboard-value">${t.comments?.length || 0} comments</div>
+                        </div>
+                    `).join('') :
+                    '<div class="empty-state"><i class="fas fa-inbox"></i><p>No data yet</p></div>';
+                
+                // Top contributors
+                const contributorStats = {};
+                topics.forEach(t => {
+                    const author = t.author || 'Anonymous';
+                    if (!contributorStats[author]) {
+                        contributorStats[author] = { topics: 0, comments: 0 };
+                    }
+                    contributorStats[author].topics++;
+                    
+                    (t.comments || []).forEach(c => {
+                        const cAuthor = c.author || 'Anonymous';
+                        if (!contributorStats[cAuthor]) {
+                            contributorStats[cAuthor] = { topics: 0, comments: 0 };
+                        }
+                        contributorStats[cAuthor].comments++;
+                    });
+                });
+                
+                const topContributors = Object.entries(contributorStats)
+                    .map(([name, stats]) => ({ name, ...stats, total: stats.topics + stats.comments }))
+                    .sort((a, b) => b.total - a.total)
+                    .slice(0, 5);
+                
+                document.getElementById('top-contributors').innerHTML = topContributors.length ?
+                    topContributors.map((c, i) => `
+                        <div class="leaderboard-item">
+                            <div class="leaderboard-rank">#${i + 1}</div>
+                            <div class="leaderboard-content">
+                                <div class="leaderboard-title">${escapeHTML(c.name)}</div>
+                                <div class="leaderboard-meta">${c.topics} topics • ${c.comments} comments</div>
+                            </div>
+                            <div class="leaderboard-value">${c.total} contributions</div>
+                        </div>
+                    `).join('') :
+                    '<div class="empty-state"><i class="fas fa-inbox"></i><p>No data yet</p></div>';
+                
+            } catch (err) {
+                console.error('Failed to load analytics:', err);
+                alert('Failed to load analytics. Please try again.');
+            }
+        }
+        
+        function escapeHTML(str) {
+            const div = document.createElement('div');
+            div.textContent = str || '';
+            return div.innerHTML;
+        }
+        
+        // Load analytics on page load
+        loadAnalytics();
+    </script>
+</body>
+</html>
