@@ -159,7 +159,12 @@
           alert(`Please wait ${Math.ceil((j.waitMs||20000)/1000)}s before posting again.`);
           return;
         }
-        if (!res.ok) throw new Error('Failed to post');
+        if (!res.ok) {
+          let msg = 'Failed to create topic on server';
+          try { const j = await res.json(); if (j?.error) msg = j.error; } catch {}
+          alert(msg);
+          return; // don't fall back silently; surface the error
+        }
         const j = await res.json();
         const topics = await loadRemote();
         f.reset();
@@ -167,7 +172,7 @@
         location.hash = `#t-${j.topic.id}`;
         return;
       } catch (_) {
-        // fallback to local
+        // network problem: fall back locally
       }
     }
     const rl = checkRateLimit('post');
@@ -199,13 +204,18 @@
           alert(`Please wait ${Math.ceil((j.waitMs||20000)/1000)}s before commenting again.`);
           return;
         }
-        if (!res.ok) throw new Error('Failed comment');
+        if (!res.ok) {
+          let msg = 'Failed to add comment on server';
+          try { const j = await res.json(); if (j?.error) msg = j.error; } catch {}
+          alert(msg);
+          return; // don't fall back silently; surface the error
+        }
         const topics = await loadRemote();
         e.target.reset();
         render(topics, currentView());
         return;
       } catch (_) {
-        // fallback to local
+        // network-only failure: fall back locally
       }
     }
     const rl = checkRateLimit('comment');
