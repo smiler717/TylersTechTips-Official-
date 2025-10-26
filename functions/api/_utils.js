@@ -78,6 +78,8 @@ export async function checkRateLimit(env, key, minIntervalMs = 20000) {
       return { ok: false, waitMs: minIntervalMs - (now - ts) };
     }
   }
-  await kv.put(key, String(now), { expirationTtl: Math.ceil(minIntervalMs / 1000) * 2 });
+  // Cloudflare KV requires TTL >= 60 seconds; keep the value for at least a minute
+  const ttlSeconds = Math.max(60, Math.ceil(minIntervalMs / 1000) * 2);
+  await kv.put(key, String(now), { expirationTtl: ttlSeconds });
   return { ok: true };
 }
