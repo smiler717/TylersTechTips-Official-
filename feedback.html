@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Send feedback to Tyler's Tech Tips - help us improve our content and community">
+  <meta property="og:title" content="Feedback - Tyler's Tech Tips">
+  <meta property="og:description" content="Send feedback to Tyler's Tech Tips">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://tylerstips.com/feedback.html">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@Tylers_TechTips">
+  <meta name="twitter:creator" content="@Tylers_TechTips">
+  <title>Feedback - Tyler's Tech Tips</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="alternate" type="application/rss+xml" title="Tyler's Tech Tips RSS Feed" href="/feed.xml">
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <h1><a href="index.html">Tyler's Tech Tips</a></h1>
+      <p>Your source for technology guides and tutorials</p>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="projects.html">Projects</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="community.html">Community</a></li>
+        <li><a href="analytics.html">Analytics</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <nav class="breadcrumb" aria-label="breadcrumb">
+    <ol class="breadcrumb-list">
+      <li class="breadcrumb-item"><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+      <li class="breadcrumb-separator" aria-hidden="true">/</li>
+      <li class="breadcrumb-item breadcrumb-active" aria-current="page">Feedback</li>
+    </ol>
+  </nav>
+
+  <main>
+    <section>
+      <h2><i class="fas fa-comments"></i> Send Us Feedback</h2>
+      <p>We value your input! Whether you have a suggestion, found a bug, want to request a topic, or just want to say hello, we'd love to hear from you.</p>
+      
+      <div id="feedback-message" style="display: none; margin: 1rem 0; padding: 1rem; border-radius: 4px;"></div>
+      
+      <form id="feedback-form" style="max-width: 600px;">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" placeholder="Your name (optional)" maxlength="60">
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Your email (optional)" maxlength="100">
+          <small style="color: var(--text-muted); font-size: 0.875rem;">We'll only use this to respond to your feedback</small>
+        </div>
+        
+        <div class="form-group">
+          <label for="type">Feedback Type <span style="color: var(--accent);">*</span></label>
+          <select id="type" name="type" required>
+            <option value="">Select type...</option>
+            <option value="suggestion">Suggestion</option>
+            <option value="bug">Bug Report</option>
+            <option value="topic-request">Topic Request</option>
+            <option value="question">Question</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="message">Message <span style="color: var(--accent);">*</span></label>
+          <textarea id="message" name="message" rows="6" placeholder="Tell us what's on your mind..." required maxlength="2000"></textarea>
+          <small style="color: var(--text-muted); font-size: 0.875rem;" id="char-count">0 / 2000 characters</small>
+        </div>
+        
+        <button type="submit" class="pill">
+          <i class="fas fa-paper-plane"></i> Send Feedback
+        </button>
+      </form>
+    </section>
+
+    <section style="margin-top: 3rem;">
+      <h3><i class="fas fa-question-circle"></i> Other Ways to Connect</h3>
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <a href="community.html" class="pill">
+          <i class="fas fa-users"></i> Join Community Forum
+        </a>
+        <a href="https://twitter.com/Tylers_TechTips" target="_blank" rel="noopener noreferrer" class="pill">
+          <i class="fab fa-twitter"></i> Follow on Twitter
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Tyler's Tech Tips. All rights reserved.</p>
+    <p>
+      <a href="index.html">Home</a> |
+      <a href="projects.html">Projects</a> |
+      <a href="about.html">About</a> |
+      <a href="community.html">Community</a> |
+      <a href="feedback.html">Feedback</a> |
+      <a href="feed.xml" target="_blank"><i class="fas fa-rss"></i> RSS Feed</a>
+    </p>
+  </footer>
+
+  <script src="scripts/reading-progress.js"></script>
+  <script>
+    const form = document.getElementById('feedback-form');
+    const messageArea = document.getElementById('message');
+    const charCount = document.getElementById('char-count');
+    const feedbackMessage = document.getElementById('feedback-message');
+
+    // Character counter
+    messageArea.addEventListener('input', () => {
+      const count = messageArea.value.length;
+      charCount.textContent = `${count} / 2000 characters`;
+    });
+
+    // Form submission
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const name = document.getElementById('name').value.trim() || 'Anonymous';
+      const email = document.getElementById('email').value.trim() || '';
+      const type = document.getElementById('type').value;
+      const message = messageArea.value.trim();
+
+      if (!type || !message) {
+        showMessage('Please fill out all required fields.', 'error');
+        return;
+      }
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+      try {
+        const res = await fetch('/api/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, type, message })
+        });
+
+        if (res.status === 429) {
+          const data = await res.json();
+          showMessage(`Please wait ${Math.ceil((data.waitMs || 60000) / 1000)}s before submitting again.`, 'error');
+          return;
+        }
+
+        if (!res.ok) {
+          throw new Error('Failed to submit feedback');
+        }
+
+        showMessage('Thank you for your feedback! We appreciate you taking the time to help us improve.', 'success');
+        form.reset();
+        charCount.textContent = '0 / 2000 characters';
+      } catch (err) {
+        console.error('Feedback error:', err);
+        showMessage('Network error. Please try again later.', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Feedback';
+      }
+    });
+
+    function showMessage(msg, type) {
+      feedbackMessage.textContent = msg;
+      feedbackMessage.style.display = 'block';
+      feedbackMessage.style.backgroundColor = type === 'success' ? 'var(--success-bg, #d4edda)' : 'var(--error-bg, #f8d7da)';
+      feedbackMessage.style.color = type === 'success' ? 'var(--success-text, #155724)' : 'var(--error-text, #721c24)';
+      feedbackMessage.style.border = `1px solid ${type === 'success' ? 'var(--success-border, #c3e6cb)' : 'var(--error-border, #f5c6cb)'}`;
+      
+      if (type === 'success') {
+        setTimeout(() => {
+          feedbackMessage.style.display = 'none';
+        }, 5000);
+      }
+    }
+  </script>
+</body>
+</html>

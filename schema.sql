@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS topics (
   title TEXT NOT NULL,
   body TEXT NOT NULL,
   author TEXT,
+  category TEXT DEFAULT 'General',
   created_at INTEGER NOT NULL,
   created_by TEXT
 );
@@ -18,6 +19,19 @@ CREATE TABLE IF NOT EXISTS comments (
   FOREIGN KEY(topic_id) REFERENCES topics(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS feedback (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT,
+  email TEXT,
+  type TEXT NOT NULL,
+  message TEXT NOT NULL,
+  device_id TEXT,
+  created_at INTEGER NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_comments_topic ON comments(topic_id);
 CREATE INDEX IF NOT EXISTS idx_topics_created ON topics(created_at);
+CREATE INDEX IF NOT EXISTS idx_topics_category ON topics(category);
 CREATE INDEX IF NOT EXISTS idx_comments_created ON comments(created_at);
+CREATE INDEX IF NOT EXISTS idx_feedback_created ON feedback(created_at);
+CREATE INDEX IF NOT EXISTS idx_feedback_type ON feedback(type);
