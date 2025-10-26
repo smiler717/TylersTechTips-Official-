@@ -1,0 +1,23 @@
+{
+  "slug": "windows-server-setup",
+  "title": "Setting Up Windows Server 2025",
+  "date": "October 24, 2025",
+  "author": "Tyler",
+    "image": "Images/windows-server.jpg",
+  "image_alt": "Windows Server Manager Dashboard",
+  "intro": [
+    "Setting up a Windows Server is a fundamental task for any IT professional. This guide walks through the basic setup and configuration of Windows Server 2025.",
+    "We'll cover initial installation, Active Directory setup, and basic role configuration."
+  ],
+  "steps": [
+    {"title": "Prepare for Installation", "text": "Download Windows Server 2025 ISO, prepare installation media, and ensure your hardware meets the requirements."},
+    {"title": "Initial Server Installation", "text": "Boot from installation media, select installation type (Desktop/Core), configure partitions, and complete the base OS install."},
+    {"title": "Post-Installation Configuration", "text": "Set computer name, configure network settings, and install Windows Updates."},
+    {"title": "Install Required Roles", "text": "Use Server Manager to add roles like Active Directory Domain Services, DNS, and DHCP as needed."},
+    {"title": "Configure Active Directory", "text": "Run AD DS configuration wizard, set up your first domain, and create organizational units."}
+  ],
+  "body": [
+    "Remember to document all configuration changes and keep your server updated.",
+    "This is a basic template - customize the setup based on your organization's needs."
+  ]
+}

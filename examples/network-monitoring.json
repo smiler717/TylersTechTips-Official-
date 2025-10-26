@@ -1,0 +1,23 @@
+{
+  "slug": "network-monitoring",
+  "title": "Setting Up Network Monitoring Tools",
+  "date": "October 24, 2025",
+  "author": "Tyler",
+    "image": "Images/network-monitoring.jpg",
+  "image_alt": "Network Monitoring Dashboard with Performance Graphs",
+  "intro": [
+    "Effective network monitoring is crucial for maintaining a healthy IT infrastructure.",
+    "Learn how to set up and configure popular monitoring tools to keep track of your network's health and performance."
+  ],
+  "steps": [
+    {"title": "Choose Monitoring Tools", "text": "Select appropriate tools like Nagios, PRTG, or Zabbix based on your requirements and scale."},
+    {"title": "Install Monitoring Server", "text": "Set up the core monitoring server and configure basic system settings."},
+    {"title": "Configure Monitoring Targets", "text": "Add devices, servers, and services to monitor. Set up SNMP and other protocols."},
+    {"title": "Set Up Alerts", "text": "Configure thresholds and notification rules for various metrics and events."},
+    {"title": "Create Dashboards", "text": "Design meaningful dashboards to visualize network health and performance metrics."}
+  ],
+  "body": [
+    "Regular maintenance of your monitoring system is important.",
+    "Consider adding custom scripts and sensors for specific monitoring needs."
+  ]
+}

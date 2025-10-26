@@ -1,0 +1,23 @@
+{
+  "slug": "intune-setup",
+  "title": "Microsoft Intune Implementation Guide",
+  "date": "October 24, 2025",
+  "author": "Tyler",
+    "image": "Images/intune-mgmt.jpg",
+  "image_alt": "Microsoft Intune Device Management Console",
+  "intro": [
+    "Microsoft Intune is a cloud-based service that focuses on mobile device management (MDM) and mobile application management (MAM).",
+    "This guide covers the initial setup and configuration of Intune for your organization."
+  ],
+  "steps": [
+    {"title": "License and Access Setup", "text": "Ensure you have the correct Microsoft 365 licenses and assign admin roles in Azure AD."},
+    {"title": "Configure Intune Portal", "text": "Access Endpoint Manager admin center, set up MDM authority, and configure basic settings."},
+    {"title": "Create Device Policies", "text": "Set up compliance policies, configuration profiles, and security baselines for your devices."},
+    {"title": "App Deployment Setup", "text": "Configure app deployment settings, upload or link to required applications."},
+    {"title": "Enrollment Configuration", "text": "Set up enrollment restrictions, configure Azure AD integration, and prepare enrollment guides for users."}
+  ],
+  "body": [
+    "Test your configuration with pilot devices before full deployment.",
+    "Regular monitoring and policy updates are key to maintaining security."
+  ]
+}

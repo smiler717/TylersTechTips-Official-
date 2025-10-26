@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Building Your First PC - Tyler's Tech Tips</title>
+    <title>Community - Tyler's Tech Tips</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Font Awesome CDN for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script defer src="scripts/search.js"></script>
+    <script defer src="scripts/community.js"></script>
+    <meta name="description" content="Ask questions, share tips, and discuss tech with the Tyler's Tech Tips community.">
 </head>
 <body>
-    <!-- Navigation Bar -->
     <header>
         <nav class="navbar">
             <div class="logo">
@@ -44,67 +44,60 @@
         </nav>
     </header>
 
-    <!-- Article Content -->
-    <section class="article-content">
-        <div class="article-header">
-            <h1><i class="fas fa-tools"></i> Building Your First PC</h1>
-            <p class="article-meta">Published on April 14, 2025 by Tyler</p>
-        </div>
-    <img src="Images/pc-build-image.jpg" alt="PC build setup in progress" class="article-image" onerror="this.src='https://images.unsplash.com/photo-1593640495278-5b5b2e2f2e5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';">
-        <div class="article-body">
-            <p>Building your first PC can be a rewarding experience — follow these steps and you'll have a working system in no time.</p>
-
-            <ol class="steps">
-                <li class="step">
-                    <h3>Gather your components</h3>
-                    <p>CPU, motherboard, RAM, storage (SSD/HDD), GPU (optional for some CPUs), power supply, case, and cooling. For a starter build aim for $500–$800.</p>
-                </li>
-
-                <li class="step">
-                    <h3>Prepare the motherboard</h3>
-                    <p>Install the CPU and CPU cooler on the motherboard, then insert the RAM into the correct DIMM slots. Double-check the CPU cooler orientation and that the RAM clicks into place.</p>
-                </li>
-
-                <li class="step">
-                    <h3>Mount the motherboard and storage</h3>
-                    <p>Install the I/O shield into the case, then secure the motherboard to the standoffs. Mount your SSD/HDD and connect SATA or NVMe as needed.</p>
-                </li>
-
-                <li class="step">
-                    <h3>Install GPU and connect power</h3>
-                    <p>If you have a discrete GPU, install it into the PCIe slot. Connect all power cables from the PSU to the motherboard (24-pin, CPU 8-pin) and GPU (6/8-pin) where required.</p>
-                </li>
-
-                <li class="step">
-                    <h3>Cable management & final checks</h3>
-                    <p>Route cables for good airflow, check that all connectors are seated, and verify fans are plugged in. Close the case panels.</p>
-                </li>
-
-                <li class="step">
-                    <h3>First boot & OS install</h3>
-                    <p>Connect a monitor and keyboard, power on, enter BIOS/UEFI to check component detection, set boot order, and install your operating system. Install drivers and Windows updates (or distro updates for Linux).</p>
-                </li>
-            </ol>
-
-            <p>Enjoy your new PC! Upgrade components later as your needs change.</p>
+    <section class="article-content community-page">
+        <div class="article-header" style="text-align:left;">
+            <h1><i class="fas fa-users"></i> Community</h1>
+            <p class="article-meta">Post questions, share tips, and help others. Posts are saved in your browser.</p>
         </div>
 
-        <!-- Related Articles Section -->
-        <div class="related-articles">
-            <h2>Related Articles</h2>
-            <div class="article-grid">
-                <div class="article-card">
-                    <h3><i class="fas fa-microchip"></i> Understanding CPUs in 2025</h3>
-                    <p>A deep dive into the latest processor trends and what they mean for you.</p>
-                    <a href="cpu-2025.html" class="read-more">Read More</a>
+        <div class="community-intro">
+            <p class="note">Note: This is a lightweight, client-side forum. Posts are stored locally in your browser with no server. To contribute globally, export and share JSON.</p>
+        </div>
+
+        <div class="topic-form" aria-label="Create a new topic">
+            <h2><i class="fas fa-plus-circle"></i> Create a Topic</h2>
+            <form id="new-topic-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="author">Name</label>
+                        <input type="text" id="author" name="author" placeholder="Your name" required maxlength="60">
+                    </div>
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <input type="text" id="title" name="title" placeholder="What's your question or topic?" required maxlength="120">
+                    </div>
                 </div>
+                <div class="form-group">
+                    <label for="body">Details</label>
+                    <textarea id="body" name="body" placeholder="Describe your issue or share details..." rows="5" required maxlength="2000"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="cta-button"><i class="fas fa-paper-plane"></i> Post Topic</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="topic-tools">
+            <div class="tool-left">
+                <input id="topic-search" type="search" placeholder="Search topics..." aria-label="Search topics" />
+                <select id="topic-sort" aria-label="Sort topics">
+                    <option value="new">Newest</option>
+                    <option value="old">Oldest</option>
+                    <option value="comments">Most commented</option>
+                </select>
+            </div>
+            <div class="tool-right">
+                <button id="export-json" class="pill"><i class="fas fa-file-export"></i> Export</button>
+                <button id="import-json" class="pill"><i class="fas fa-file-import"></i> Import</button>
+                <input type="file" id="import-file" accept="application/json" style="display:none;" />
+                <label class="pill" style="cursor:default;"><i class="fas fa-database"></i> Local-only</label>
             </div>
         </div>
 
-        <a href="index.html#articles" class="back-link"><i class="fas fa-arrow-left"></i> Back to Articles</a>
+        <div class="topic-list" id="topic-list" aria-live="polite"></div>
+        <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true" hidden>Copied link</div>
     </section>
 
-    <!-- Footer -->
     <footer>
         <div class="footer-content">
             <div class="footer-section">
@@ -113,7 +106,7 @@
                     <li><a href="index.html">Home</a></li>
                     <li><a href="about.html">About</a></li>
                     <li><a href="index.html#articles">Articles</a></li>
-                    <li><a href="index.html#projects">Projects</a></li>
+                    <li><a href="community.html">Community</a></li>
                 </ul>
             </div>
             <div class="footer-section">
@@ -143,10 +136,7 @@
         </div>
     </footer>
 
-    <!-- Back to Top Button -->
-    <div class="back-to-top">
-        <i class="fas fa-arrow-up"></i>
-    </div>
+    <div class="back-to-top"><i class="fas fa-arrow-up"></i></div>
 
     <script>
     // Back to Top Button
@@ -158,10 +148,9 @@
             backToTop.classList.remove('visible');
         }
     };
-
     document.querySelector('.back-to-top').onclick = function() {
-        document.body.scrollTop = 0; // For Safari
-        document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
     };
     </script>
 </body>

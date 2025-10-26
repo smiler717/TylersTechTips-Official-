@@ -1,0 +1,21 @@
+{
+  "slug": "how-to-install-ssd",
+  "title": "How to Install an SSD",
+  "date": "October 24, 2025",
+  "author": "Tyler",
+  "image": "https://www.pcworld.com/wp-content/uploads/2023/07/how-to-install-ssd-100902300-orig.jpg",
+  "image_alt": "Step by step SSD installation in desktop PC",
+  "intro": [
+    "Adding an SSD is one of the fastest upgrades you can do to improve responsiveness and boot times.",
+    "This guide walks you through the simple steps to install a 2.5\" or M.2 SSD depending on your system.",
+    "Always ground yourself to avoid static discharge."
+  ],
+  "steps": [
+    {"title": "Identify your SSD type", "text": "Determine if you're installing a SATA 2.5\" SSD or an M.2 NVMe drive. Check your motherboard manual for supported slots."},
+    {"title": "Power down & open the case", "text": "Shut down, unplug the PC, and open the case. Use a wrist strap if available."},
+    {"title": "Mount the SSD", "text": "For 2.5\" drives: secure in a drive bay or bracket and connect a SATA cable. For M.2: insert at an angle and fasten with the screw."},
+    {"title": "Connect power and data", "text": "Connect SATA power from the PSU and the SATA data cable to the motherboard (skip for M.2)."},
+    {"title": "Boot and initialize", "text": "Power on, enter BIOS to confirm detection, then in your OS initialize and format the drive as needed."}
+  ],
+  "body": ["If you run into issues, recheck connections and consult your motherboard manual.", "Enjoy the faster load times!"]
+}

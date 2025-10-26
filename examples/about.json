@@ -1,0 +1,21 @@
+{
+  "slug": "about",
+  "title": "About Me",
+  "date": "October 24, 2025",
+  "author": "Tyler",
+  "image": "https://img.freepik.com/premium-photo/modern-workplace-with-laptop-gadgets-office-supplies-wooden-desk-developer-workspace_236854-23352.jpg",
+  "image_alt": "Professional IT Support Desk Setup with Multiple Monitors",
+  "intro": [
+    "Welcome to my corner of the tech world! I'm passionate about IT, cybersecurity, and sharing knowledge with others.",
+    "This page chronicles my journey in tech, from my first computer build to my current role in IT."
+  ],
+  "steps": [],
+  "body": [
+    "This space is ready for you to write about:",
+    "• Your journey into tech",
+    "• Education and certifications",
+    "• Professional experience",
+    "• Current projects and interests",
+    "• Future goals and aspirations"
+  ]
+}

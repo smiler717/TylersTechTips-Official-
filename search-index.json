@@ -1,0 +1,66 @@
+[
+  {
+    "title": "How to Install an SSD",
+    "url": "how-to-install-ssd.html",
+    "keywords": [
+      "how",
+      "to",
+      "install",
+      "an",
+      "ssd"
+    ],
+    "excerpt": "Adding an SSD is one of the fastest upgrades you can do to improve responsiveness and boot times."
+  },
+  {
+    "title": "Setting Up Windows Server 2025",
+    "url": "windows-server-setup.html",
+    "keywords": [
+      "setting",
+      "up",
+      "windows",
+      "server",
+      "2025",
+      "setup"
+    ],
+    "excerpt": "Setting up a Windows Server is a fundamental task for any IT professional. This guide walks through the basic setup and configuration of Windows Server 2025."
+  },
+  {
+    "title": "Microsoft Intune Implementation Guide",
+    "url": "intune-setup.html",
+    "keywords": [
+      "microsoft",
+      "intune",
+      "implementation",
+      "guide",
+      "setup"
+    ],
+    "excerpt": "Microsoft Intune is a cloud-based service that focuses on mobile device management (MDM) and mobile application management (MAM)."
+  },
+  {
+    "title": "Setting Up Network Monitoring Tools",
+    "url": "network-monitoring.html",
+    "keywords": [
+      "setting",
+      "up",
+      "network",
+      "monitoring",
+      "tools"
+    ],
+    "excerpt": "Effective network monitoring is crucial for maintaining a healthy IT infrastructure."
+  },
+  {
+    "title": "About Me",
+    "url": "about.html",
+    "keywords": [
+      "about",
+      "me"
+    ],
+    "excerpt": "Welcome to my corner of the tech world! I'm passionate about IT, cybersecurity, and sharing knowledge with others."
+  },
+  {
+    "title": "Community",
+    "url": "community.html",
+    "keywords": ["community", "forum", "questions", "topics", "help", "discussion"],
+    "excerpt": "Ask questions, share tips, and help others in the Tyler's Tech Tips community. Posts are saved in your browser."
+  }
+]
