@@ -1,4 +1,4 @@
-import { isAdmin, getDeviceId } from '../_utils.js';
+import { isAdmin, getDeviceId } from '../../_utils.js';
 
 export async function onRequest(context) {
   const { request, env, params } = context;
