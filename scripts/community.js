@@ -370,9 +370,31 @@
         alert(j?.error || 'Failed to vote');
         return;
       }
-      // Reload topics to update vote counts and UI
-      const topics = await loadRemote();
-      render(topics, currentView());
+      // Optimistically update the UI using response payload
+      const payload = await res.json().catch(() => null);
+      const card = document.getElementById(`t-${topicId}`);
+      if (payload && card) {
+        const { upvotes = 0, downvotes = 0, userVote = null } = payload;
+        const score = (parseInt(upvotes, 10) || 0) - (parseInt(downvotes, 10) || 0);
+        const scoreEl = card.querySelector('.vote-count');
+        if (scoreEl) {
+          scoreEl.textContent = `${score > 0 ? '+' : ''}${score}`;
+          scoreEl.classList.toggle('positive', score > 0);
+          scoreEl.classList.toggle('negative', score < 0);
+        }
+        const upBtn = card.querySelector('.vote-btn.upvote');
+        const downBtn = card.querySelector('.vote-btn.downvote');
+        if (upBtn && downBtn) {
+          upBtn.classList.toggle('active', userVote === 'up');
+          downBtn.classList.toggle('active', userVote === 'down');
+          upBtn.setAttribute('aria-pressed', userVote === 'up' ? 'true' : 'false');
+          downBtn.setAttribute('aria-pressed', userVote === 'down' ? 'true' : 'false');
+        }
+      } else {
+        // Fallback: reload topics if we couldn't update inline
+        const topics = await loadRemote();
+        render(topics, currentView());
+      }
     } catch (err) {
       console.error('Vote error:', err);
       alert('Network error voting');
