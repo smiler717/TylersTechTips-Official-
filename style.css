@@ -876,74 +876,40 @@ body {
 }
 
 
-/* Home: Top Topics showcase */
+/* Home: Top Topics showcase - matching Community page card style */
 .top-topics { max-width: 1200px; margin: 0 auto; padding: 0 1rem; text-align: left; }
-.top-topics h3 { color: var(--accent-color); margin: 1.5rem 0 1rem; font-size: 1.8rem; display: flex; align-items: center; gap: 0.5rem; }
-.topic-pair-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; }
+.top-topics h3 { color: var(--accent-color); margin: 1.5rem 0 1rem; font-size: 1.8rem; display: flex; align-items: center; gap: 0.5rem; justify-content: center; }
+.topic-pair-grid { display: grid; gap: 1rem; }
 
-.home-topic-card { 
+/* Reuse the topic-card styles from community page for home page cards */
+.top-topics .topic-card { 
     background: var(--card-bg); 
     border: 1px solid var(--accent-color); 
     border-radius: 10px; 
-    padding: 1.25rem; 
+    padding: 1rem;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.home-topic-card:hover { 
-    transform: translateY(-5px); 
-    box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2); 
+.top-topics .topic-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
 }
-
-.home-topic-header { margin-bottom: 0.75rem; }
-.home-topic-title { margin: 0 0 0.5rem 0; font-size: 1.3rem; }
-.home-topic-title a { color: var(--accent-color); text-decoration: none; transition: color 0.3s ease; }
-.home-topic-title a:hover { color: #00b0d6; }
-.home-topic-meta { 
-    color: var(--secondary-text); 
-    font-size: 0.9rem; 
-    display: flex; 
-    gap: 1rem; 
-    flex-wrap: wrap; 
-}
-.home-topic-meta .meta-item { display: flex; align-items: center; gap: 0.4rem; }
-.home-topic-meta .meta-item i { color: var(--accent-color); }
-
-.home-topic-body { 
-    color: var(--text-color); 
-    margin-bottom: 1rem; 
-    white-space: pre-wrap; 
-    line-height: 1.6; 
-}
-
-.home-topic-comment { 
-    background: var(--secondary-bg); 
-    border: 1px solid var(--card-bg); 
-    border-radius: 8px; 
-    padding: 0.75rem 1rem; 
-    margin-top: 0.75rem;
-}
-.comment-badge { 
-    color: var(--secondary-text); 
-    font-size: 0.85rem; 
-    margin-bottom: 0.5rem; 
-    display: flex; 
-    align-items: center; 
-    gap: 0.4rem; 
-}
-.comment-badge i { color: var(--accent-color); }
-.comment-content { 
-    color: var(--text-color); 
-    font-style: italic; 
-    margin-bottom: 0.5rem; 
-    line-height: 1.5; 
-}
-.comment-author { 
-    color: var(--secondary-text); 
-    font-size: 0.9rem; 
-    text-align: right; 
-}
+.top-topics .topic-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.top-topics .topic-title { color: var(--accent-color); font-size: 1.2rem; margin: 0; }
+.top-topics .topic-title a { color: var(--accent-color); text-decoration: none; transition: color 0.3s ease; }
+.top-topics .topic-title a:hover { color: #00b0d6; }
+.top-topics .topic-meta { color: var(--secondary-text); font-size: 0.9rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+.top-topics .topic-body { margin-top: 0.5rem; white-space: pre-wrap; color: var(--text-color); }
+.top-topics .comment-section { margin-top: 0.75rem; }
+.top-topics .comment-section details { background: var(--secondary-bg); border-radius: 8px; padding: 0.5rem 0.75rem; border: 1px solid var(--card-bg); }
+.top-topics .comment-section summary { cursor: pointer; color: var(--accent-color); }
+.top-topics .comments { display: grid; gap: 0.5rem; margin-top: 0.5rem; }
+.top-topics .comment { background: var(--card-bg); border: 1px solid var(--card-bg); border-radius: 6px; padding: 0.6rem 0.75rem; }
+.top-topics .comment-meta { color: var(--secondary-text); display: flex; gap: 1rem; font-size: 0.85rem; margin-bottom: 0.25rem; }
+.top-topics .comment-body { color: var(--text-color); white-space: pre-wrap; }
 
 @media (max-width: 820px) {
     .topic-pair-grid { grid-template-columns: 1fr; }
+    .top-topics .topic-header { flex-direction: column; align-items: flex-start; }
 }/* Back to Top Button */
 .back-to-top {
     position: fixed;

@@ -251,6 +251,7 @@
         const grid = document.getElementById('top-topics-grid');
         if (!grid) return;
         function esc(s){ const d=document.createElement('div'); d.textContent=String(s||''); return d.innerHTML; }
+        function formatDate(ts) { return new Date(ts).toLocaleString(); }
         try {
             const res = await fetch('/api/topics', { headers: { 'x-device-id': (localStorage.getItem('ttt_device_id_v1')||'anon') } });
             if (!res.ok) throw new Error('failed');
@@ -264,29 +265,36 @@
             }
             const toHtml = (t) => {
                 const comments = Array.isArray(t.comments) ? t.comments : [];
-                const topComment = comments.length > 0 ? comments[comments.length - 1] : null;
-                const commentSnippet = topComment?.body ? 
-                    (topComment.body.length > 120 ? topComment.body.slice(0, 117) + '…' : topComment.body) : 
-                    'No comments yet—be the first to comment!';
+                const commentsHtml = comments.map(c => `
+                    <div class="comment">
+                        <div class="comment-meta">
+                            <span><i class="fas fa-user"></i> ${esc(c.author || 'Anonymous')}</span>
+                            <span><i class="fas fa-clock"></i> ${formatDate(c.createdAt)}</span>
+                        </div>
+                        <div class="comment-body">${esc(c.body)}</div>
+                    </div>
+                `).join('');
                 
                 return `
-                <article class="home-topic-card">
-                    <header class="home-topic-header">
-                        <h4 class="home-topic-title"><a href="community.html#t-${t.id}">${esc(t.title)}</a></h4>
-                        <div class="home-topic-meta">
+                <article class="topic-card" id="ht-${t.id}">
+                    <header class="topic-header">
+                        <h3 class="topic-title"><a href="community.html#t-${t.id}">${esc(t.title)}</a></h3>
+                        <div class="topic-meta">
                             <span class="meta-item"><i class="fas fa-user"></i> ${esc(t.author || 'Anonymous')}</span>
-                            <span class="meta-item"><i class="fas fa-eye"></i> ${t.views || 0} views</span>
+                            <span class="meta-item"><i class="fas fa-clock"></i> ${formatDate(t.createdAt)}</span>
+                            <span class="meta-item"><i class="fas fa-eye"></i> ${t.views || 0}</span>
                             <span class="meta-item"><i class="fas fa-comment"></i> ${comments.length}</span>
                         </div>
                     </header>
-                    <div class="home-topic-body">${esc(t.body.length > 200 ? t.body.slice(0, 197) + '…' : t.body)}</div>
-                    ${topComment ? `
-                    <div class="home-topic-comment">
-                        <div class="comment-badge"><i class="fas fa-quote-left"></i> Latest comment</div>
-                        <div class="comment-content">"${esc(commentSnippet)}"</div>
-                        <div class="comment-author">— ${esc(topComment.author || 'Anonymous')}</div>
+                    <div class="topic-body">${esc(t.body)}</div>
+                    <div class="comment-section">
+                        <details ${comments.length ? 'open' : ''}>
+                            <summary><i class="fas fa-comments"></i> Comments (${comments.length})</summary>
+                            <div class="comments">
+                                ${comments.length ? commentsHtml : '<div class="no-results">No comments yet.</div>'}
+                            </div>
+                        </details>
                     </div>
-                    ` : ''}
                 </article>`;
             };
             grid.innerHTML = top.map(toHtml).join('');
