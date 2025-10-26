@@ -407,6 +407,8 @@
         
         // Load analytics on page load
         loadAnalytics();
+        // Auto-refresh every 60 seconds
+        setInterval(loadAnalytics, 60000);
     </script>
 </body>
 </html>
