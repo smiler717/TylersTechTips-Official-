@@ -2,7 +2,7 @@ import { isAdmin, getDeviceId } from '../../_utils.js';
 
 export async function onRequest(context) {
   const { request, env, params } = context;
-  const topicId = parseInt(params.id);
+  const topicId = params.id; // Use string ID (UUID)
   
   if (request.method === 'POST') {
     return handleVote(request, env, topicId);
