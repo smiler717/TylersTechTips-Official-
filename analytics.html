@@ -298,14 +298,14 @@
             try {
                 const res = await fetch('/api/topics');
                 if (!res.ok) throw new Error('Failed to fetch topics');
-                
-                const topics = await res.json();
-                
+                // Parse topics from API response
+                const data = await res.json();
+                const topics = data.topics;
+                // ...existing code...
                 // Calculate stats
                 const totalTopics = topics.length;
                 const totalComments = topics.reduce((sum, t) => sum + (t.comments?.length || 0), 0);
                 const totalViews = topics.reduce((sum, t) => sum + (t.views || 0), 0);
-                
                 // Get unique contributors
                 const contributors = new Set();
                 topics.forEach(t => {
@@ -314,18 +314,15 @@
                         if (c.author) contributors.add(c.author);
                     });
                 });
-                
                 // Update overview stats
                 document.getElementById('total-topics').textContent = totalTopics;
                 document.getElementById('total-comments').textContent = totalComments;
                 document.getElementById('total-views').textContent = totalViews.toLocaleString();
                 document.getElementById('total-contributors').textContent = contributors.size;
-                
                 // Most viewed topics
                 const topViewed = [...topics]
                     .sort((a, b) => (b.views || 0) - (a.views || 0))
                     .slice(0, 5);
-                
                 document.getElementById('top-viewed').innerHTML = topViewed.length ? 
                     topViewed.map((t, i) => `
                         <div class="leaderboard-item">
@@ -338,12 +335,10 @@
                         </div>
                     `).join('') :
                     '<div class="empty-state"><i class="fas fa-inbox"></i><p>No data yet</p></div>';
-                
                 // Most commented topics
                 const topCommented = [...topics]
                     .sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0))
                     .slice(0, 5);
-                
                 document.getElementById('top-commented').innerHTML = topCommented.length ?
                     topCommented.map((t, i) => `
                         <div class="leaderboard-item">
@@ -356,7 +351,6 @@
                         </div>
                     `).join('') :
                     '<div class="empty-state"><i class="fas fa-inbox"></i><p>No data yet</p></div>';
-                
                 // Top contributors
                 const contributorStats = {};
                 topics.forEach(t => {
@@ -365,7 +359,6 @@
                         contributorStats[author] = { topics: 0, comments: 0 };
                     }
                     contributorStats[author].topics++;
-                    
                     (t.comments || []).forEach(c => {
                         const cAuthor = c.author || 'Anonymous';
                         if (!contributorStats[cAuthor]) {
@@ -374,12 +367,10 @@
                         contributorStats[cAuthor].comments++;
                     });
                 });
-                
                 const topContributors = Object.entries(contributorStats)
                     .map(([name, stats]) => ({ name, ...stats, total: stats.topics + stats.comments }))
                     .sort((a, b) => b.total - a.total)
                     .slice(0, 5);
-                
                 document.getElementById('top-contributors').innerHTML = topContributors.length ?
                     topContributors.map((c, i) => `
                         <div class="leaderboard-item">
@@ -392,7 +383,6 @@
                         </div>
                     `).join('') :
                     '<div class="empty-state"><i class="fas fa-inbox"></i><p>No data yet</p></div>';
-                
             } catch (err) {
                 console.error('Failed to load analytics:', err);
                 alert('Failed to load analytics. Please try again.');
