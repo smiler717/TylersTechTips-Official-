@@ -139,6 +139,19 @@ body {
 
 .result-title {
     font-weight: 500;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.result-type {
+    display: inline-block;
+    font-size: 0.75rem;
+    color: var(--accent-color);
+    background: rgba(0, 212, 255, 0.15);
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+    border: 1px solid var(--accent-color);
 }
 
 .search-result-item.selected {

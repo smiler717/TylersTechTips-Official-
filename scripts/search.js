@@ -10,27 +10,117 @@ document.addEventListener('DOMContentLoaded', function() {
     searchBar.parentNode.style.position = 'relative';
     searchBar.parentNode.appendChild(searchResults);
 
-    let articles = [];
+    let searchIndex = [];
 
-    // Fetch the generated search index
-    fetch('/search-index.json')
-        .then(res => res.json())
-        .then(data => { articles = data; })
-        .catch(() => { articles = []; });
+    // Build comprehensive search index from multiple sources
+    async function buildSearchIndex() {
+        const index = [];
+        
+        // 1. Load static search index (articles/projects)
+        try {
+            const res = await fetch('/search-index.json');
+            const articles = await res.json();
+            index.push(...articles);
+        } catch (_) {}
+
+        // 2. Load community topics
+        try {
+            const res = await fetch('/api/topics', { 
+                headers: { 'x-device-id': localStorage.getItem('ttt_device_id_v1') || 'anon' } 
+            });
+            if (res.ok) {
+                const data = await res.json();
+                const topics = (data.topics || []).map(t => ({
+                    title: t.title,
+                    excerpt: t.body?.slice(0, 150) + (t.body?.length > 150 ? '…' : ''),
+                    url: `community.html#t-${t.id}`,
+                    keywords: ['community', 'forum', 'discussion', t.author],
+                    type: 'Community Topic'
+                }));
+                index.push(...topics);
+            }
+        } catch (_) {}
+
+        // 3. Add static pages
+        index.push(
+            {
+                title: 'About Tyler',
+                excerpt: 'Learn about Tyler\'s journey in IT, certifications, and expertise',
+                url: 'about.html',
+                keywords: ['about', 'bio', 'certifications', 'contact'],
+                type: 'Page'
+            },
+            {
+                title: 'Community Forum',
+                excerpt: 'Join discussions, ask questions, and share tech tips',
+                url: 'community.html',
+                keywords: ['community', 'forum', 'discussion', 'help'],
+                type: 'Page'
+            },
+            {
+                title: 'IT Cheat Sheet - CMD Commands',
+                excerpt: 'Windows CMD commands for file operations, system info, and more',
+                url: 'cheat-sheet.html',
+                keywords: ['cmd', 'command', 'windows', 'terminal', 'cheat sheet'],
+                type: 'Cheat Sheet'
+            },
+            {
+                title: 'IT Cheat Sheet - PowerShell',
+                excerpt: 'PowerShell commands for system management and automation',
+                url: 'cheat-sheet.html',
+                keywords: ['powershell', 'command', 'windows', 'script', 'cheat sheet'],
+                type: 'Cheat Sheet'
+            },
+            {
+                title: 'IT Cheat Sheet - Linux/Bash',
+                excerpt: 'Linux and Bash commands for file operations and system tasks',
+                url: 'cheat-sheet.html',
+                keywords: ['linux', 'bash', 'unix', 'terminal', 'command', 'cheat sheet'],
+                type: 'Cheat Sheet'
+            },
+            {
+                title: 'IT Cheat Sheet - Networking',
+                excerpt: 'Network diagnostic commands and troubleshooting tools',
+                url: 'cheat-sheet.html',
+                keywords: ['network', 'ping', 'dns', 'ip', 'troubleshoot', 'cheat sheet'],
+                type: 'Cheat Sheet'
+            },
+            {
+                title: 'IT Cheat Sheet - Git',
+                excerpt: 'Git commands for version control and repository management',
+                url: 'cheat-sheet.html',
+                keywords: ['git', 'github', 'version control', 'repository', 'cheat sheet'],
+                type: 'Cheat Sheet'
+            },
+            {
+                title: 'IT Cheat Sheet - Solutions',
+                excerpt: 'Common IT problems and step-by-step solutions',
+                url: 'cheat-sheet.html',
+                keywords: ['troubleshooting', 'solutions', 'fix', 'problem', 'help', 'cheat sheet'],
+                type: 'Cheat Sheet'
+            }
+        );
+
+        return index;
+    }
+
+    // Initialize search index
+    buildSearchIndex().then(idx => { searchIndex = idx; });
 
     let selectedIndex = -1;
 
     function renderResults(matches) {
         if (!matches || matches.length === 0) {
-            searchResults.innerHTML = '<div class="no-results">No matching articles found</div>';
+            searchResults.innerHTML = '<div class="no-results">No results found</div>';
             searchResults.style.display = 'block';
             return;
         }
 
-        searchResults.innerHTML = matches.map((article, i) => `
-            <a href="${article.url}" class="search-result-item" data-index="${i}">
-                <span class="result-title">${article.title}</span>
-                <div class="result-excerpt">${article.excerpt || ''}</div>
+        searchResults.innerHTML = matches.map((item, i) => `
+            <a href="${item.url}" class="search-result-item" data-index="${i}">
+                <span class="result-title">${item.title}</span>
+                ${item.type ? `<span class="result-type">${item.type}</span>` : ''}
+                <div class="result-excerpt">${item.excerpt || ''}</div>
             </a>
         `).join('');
         searchResults.style.display = 'block';
@@ -43,13 +133,13 @@ document.addEventListener('DOMContentLoaded', function() {
             searchResults.style.display = 'none';
             return;
         }
-        const matches = articles.filter(a => {
-            const title = (a.title || '').toLowerCase();
+        const matches = searchIndex.filter(item => {
+            const title = (item.title || '').toLowerCase();
             if (title.includes(query)) return true;
-            if ((a.excerpt || '').toLowerCase().includes(query)) return true;
-            if (Array.isArray(a.keywords) && a.keywords.some(k => k.includes(query))) return true;
+            if ((item.excerpt || '').toLowerCase().includes(query)) return true;
+            if (Array.isArray(item.keywords) && item.keywords.some(k => k.toLowerCase().includes(query))) return true;
             return false;
-        }).slice(0, 10);
+        }).slice(0, 12);
         renderResults(matches);
     }
 
@@ -74,6 +164,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (sel) {
                 window.location.href = sel.getAttribute('href');
             }
+        } else if (e.key === 'Escape') {
+            searchResults.style.display = 'none';
+            searchBar.value = '';
         }
     });
 
