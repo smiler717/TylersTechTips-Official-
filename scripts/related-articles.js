@@ -47,9 +47,25 @@
     };
 
     function getCurrentArticle() {
-        const path = window.location.pathname;
-        const filename = path.substring(path.lastIndexOf('/') + 1);
-        return filename || 'index.html';
+        // Normalize current path to a known key, tolerating pretty URLs without .html
+        const path = decodeURIComponent(window.location.pathname);
+        const last = path.substring(path.lastIndexOf('/') + 1) || 'index.html';
+        if (articles[last]) return last;
+        // Try adding .html if missing
+        if (!last.includes('.')) {
+            const withHtml = `${last}.html`;
+            if (articles[withHtml]) return withHtml;
+        }
+        // Try index.html in a folder
+        if (last === '' && articles['index.html']) return 'index.html';
+        // As a final fallback, try matching by title text
+        const h1 = document.querySelector('.article-header h1, h1');
+        const text = h1 ? h1.textContent.trim().toLowerCase() : '';
+        if (text) {
+            const match = Object.entries(articles).find(([, a]) => (a.title || '').toLowerCase() === text);
+            if (match) return match[0];
+        }
+        return last;
     }
 
     function calculateSimilarity(tags1, tags2) {
@@ -84,10 +100,8 @@
         const currentFile = getCurrentArticle();
         const related = getRelatedArticles(currentFile, 3);
 
-        if (related.length === 0) {
-            container.style.display = 'none';
-            return;
-        }
+        // If nothing computed, keep any existing static content visible
+        if (related.length === 0) return;
 
         const grid = container.querySelector('.article-grid');
         if (!grid) return;
