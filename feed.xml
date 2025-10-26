@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tyler's Tech Tips</title>
+    <link>https://tylerstechtips.com/</link>
+    <description>Expert tech tutorials, guides, and tips for IT professionals and enthusiasts</description>
+    <language>en-us</language>
+    <atom:link href="https://tylerstechtips.com/feed.xml" rel="self" type="application/rss+xml"/>
+    
+    <item>
+      <title>Building Your First PC</title>
+      <link>https://tylerstechtips.com/build-pc.html</link>
+      <description>A comprehensive guide to building your first PC from scratch, including component selection and assembly tips.</description>
+      <pubDate>Mon, 01 Jan 2025 00:00:00 GMT</pubDate>
+      <guid>https://tylerstechtips.com/build-pc.html</guid>
+    </item>
+    
+    <item>
+      <title>Understanding CPUs in 2025</title>
+      <link>https://tylerstechtips.com/cpu-2025.html</link>
+      <description>Everything you need to know about modern CPUs, including architecture, performance metrics, and buying guides for 2025.</description>
+      <pubDate>Mon, 01 Jan 2025 00:00:00 GMT</pubDate>
+      <guid>https://tylerstechtips.com/cpu-2025.html</guid>
+    </item>
+    
+    <item>
+      <title>How to Install an SSD</title>
+      <link>https://tylerstechtips.com/how-to-install-ssd.html</link>
+      <description>Step-by-step instructions for installing an SSD in your computer, including BIOS configuration and data migration tips.</description>
+      <pubDate>Mon, 01 Jan 2025 00:00:00 GMT</pubDate>
+      <guid>https://tylerstechtips.com/how-to-install-ssd.html</guid>
+    </item>
+    
+    <item>
+      <title>Windows Server Setup Guide</title>
+      <link>https://tylerstechtips.com/windows-server-setup.html</link>
+      <description>Complete guide to setting up and configuring Windows Server for your organization or home lab.</description>
+      <pubDate>Mon, 01 Jan 2025 00:00:00 GMT</pubDate>
+      <guid>https://tylerstechtips.com/windows-server-setup.html</guid>
+    </item>
+    
+    <item>
+      <title>Intune Implementation Guide</title>
+      <link>https://tylerstechtips.com/intune-setup.html</link>
+      <description>Implementing Microsoft Intune for modern device management and security in your environment.</description>
+      <pubDate>Mon, 01 Jan 2025 00:00:00 GMT</pubDate>
+      <guid>https://tylerstechtips.com/intune-setup.html</guid>
+    </item>
+    
+    <item>
+      <title>Network Monitoring Best Practices</title>
+      <link>https://tylerstechtips.com/network-monitoring.html</link>
+      <description>Essential network monitoring strategies, tools, and configurations to keep your infrastructure running smoothly.</description>
+      <pubDate>Mon, 01 Jan 2025 00:00:00 GMT</pubDate>
+      <guid>https://tylerstechtips.com/network-monitoring.html</guid>
+    </item>
+    
+  </channel>
+</rss>
