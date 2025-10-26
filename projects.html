@@ -1,281 +1,142 @@
-<!DOCTYPE html><!DOCTYPE html>
-
-<html lang="en"><html lang="en">
-
-<head><head>
-
-    <meta charset="UTF-8">    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Projects - Tyler's Tech Tips</title>    <title>Projects - Tyler's Tech Tips</title>
-
-    <link rel="stylesheet" href="style.css">    <link rel="stylesheet" href="style.css">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-    <script src="scripts/theme.js"></script>    <script defer src="scripts/search.js"></script>
-
-    <script defer src="scripts/search.js"></script></head>
-
-    <meta name="description" content="Browse all tech projects and implementations on Tyler's Tech Tips."><body>
-
-</head>    <header>
-
-<body>        <nav class="navbar">
-
-    <header>            <div class="logo">
-
-        <nav class="navbar">                <h1><i class="fas fa-laptop-code"></i> Tyler's Tech Tips</h1>
-
-            <div class="logo">            </div>
-
-                <h1><i class="fas fa-laptop-code"></i> Tyler's Tech Tips</h1>            <div class="search-container">
-
-            </div>                <input type="text" class="search-bar" placeholder="Search articles...">
-
-            <div class="search-container">                <i class="fas fa-search search-icon"></i>
-
-                <input type="text" class="search-bar" placeholder="Search articles...">            </div>
-
-                <i class="fas fa-search search-icon"></i>            <ul class="nav-links">
-
-            </div>                <li><a href="index.html#home"><i class="fas fa-home"></i> Home</a></li>
-
-            <ul class="nav-links">                <li class="dropdown">
-
-                <li><a href="index.html#home"><i class="fas fa-home"></i> Home</a></li>                    <a href="articles.html"><i class="fas fa-newspaper"></i> Articles</a>
-
-                <li class="dropdown">                    <div class="dropdown-content">
-
-                    <a href="articles.html"><i class="fas fa-newspaper"></i> Articles</a>                        <a href="build-pc.html"><i class="fas fa-tools"></i> Building Your First PC</a>
-
-                    <div class="dropdown-content">                        <a href="cpu-2025.html"><i class="fas fa-microchip"></i> Understanding CPUs in 2025</a>
-
-                        <a href="build-pc.html"><i class="fas fa-tools"></i> Building Your First PC</a>                        <a href="how-to-install-ssd.html"><i class="fas fa-hdd"></i> How to Install an SSD</a>
-
-                        <a href="cpu-2025.html"><i class="fas fa-microchip"></i> Understanding CPUs in 2025</a>                    </div>
-
-                        <a href="how-to-install-ssd.html"><i class="fas fa-hdd"></i> How to Install an SSD</a>                </li>
-
-                    </div>                <li class="dropdown">
-
-                </li>                    <a href="projects.html"><i class="fas fa-project-diagram"></i> Projects</a>
-
-                <li class="dropdown">                    <div class="dropdown-content">
-
-                    <a href="projects.html"><i class="fas fa-project-diagram"></i> Projects</a>                        <a href="windows-server-setup.html"><i class="fas fa-server"></i> Windows Server Setup</a>
-
-                    <div class="dropdown-content">                        <a href="intune-setup.html"><i class="fas fa-mobile-alt"></i> Intune Implementation</a>
-
-                        <a href="windows-server-setup.html"><i class="fas fa-server"></i> Windows Server Setup</a>                        <a href="network-monitoring.html"><i class="fas fa-chart-line"></i> Network Monitoring</a>
-
-                        <a href="intune-setup.html"><i class="fas fa-mobile-alt"></i> Intune Implementation</a>                    </div>
-
-                        <a href="network-monitoring.html"><i class="fas fa-chart-line"></i> Network Monitoring</a>                </li>
-
-                    </div>                <li><a href="index.html#community"><i class="fas fa-users"></i> Community</a></li>
-
-                </li>                <li><a href="about.html"><i class="fas fa-user"></i> About</a></li>
-
-                <li><a href="community.html"><i class="fas fa-users"></i> Community</a></li>            </ul>
-
-                <li><a href="cheat-sheet.html"><i class="fas fa-book"></i> Cheat Sheet</a></li>        </nav>
-
-                <li><a href="about.html"><i class="fas fa-user"></i> About</a></li>    </header>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - Tyler's Tech Tips</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="scripts/theme.js"></script>
+    <script defer src="scripts/search.js"></script>
+    <meta name="description" content="Browse all tech projects and implementations on Tyler's Tech Tips.">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <h1><i class="fas fa-laptop-code"></i> Tyler's Tech Tips</h1>
+            </div>
+            <div class="search-container">
+                <input type="text" class="search-bar" placeholder="Search articles...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html#home"><i class="fas fa-home"></i> Home</a></li>
+                <li class="dropdown">
+                    <a href="articles.html"><i class="fas fa-newspaper"></i> Articles</a>
+                    <div class="dropdown-content">
+                        <a href="build-pc.html"><i class="fas fa-tools"></i> Building Your First PC</a>
+                        <a href="cpu-2025.html"><i class="fas fa-microchip"></i> Understanding CPUs in 2025</a>
+                        <a href="how-to-install-ssd.html"><i class="fas fa-hdd"></i> How to Install an SSD</a>
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="projects.html"><i class="fas fa-project-diagram"></i> Projects</a>
+                    <div class="dropdown-content">
+                        <a href="windows-server-setup.html"><i class="fas fa-server"></i> Windows Server Setup</a>
+                        <a href="intune-setup.html"><i class="fas fa-mobile-alt"></i> Intune Implementation</a>
+                        <a href="network-monitoring.html"><i class="fas fa-chart-line"></i> Network Monitoring</a>
+                    </div>
+                </li>
+                <li><a href="community.html"><i class="fas fa-users"></i> Community</a></li>
+                <li><a href="cheat-sheet.html"><i class="fas fa-book"></i> Cheat Sheet</a></li>
+                <li><a href="about.html"><i class="fas fa-user"></i> About</a></li>
             </ul>
+            <button id="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon"></span>
+            </button>
+        </nav>
+    </header>
 
-            <button id="theme-toggle" aria-label="Toggle theme">    <section class="projects" style="padding:4rem 2rem;">
+    <section class="article-content">
+        <div class="article-header" style="text-align:left;">
+            <h1><i class="fas fa-project-diagram"></i> Projects</h1>
+            <p class="article-meta">Explore our collection of enterprise IT projects and implementations</p>
+        </div>
 
-                <span class="theme-icon">🌙</span>        <h2>Featured Projects</h2>
-
-            </button>        <div class="project-grid">
-
-        </nav>            <div class="project-card">
-
-    </header>                <h3><i class="fas fa-server"></i> Windows Server Setup Guide</h3>
-
-                <p>A comprehensive guide to setting up and configuring Windows Server 2025 for business environments.</p>
-
-    <section class="article-content">                <div class="project-tech">
-
-        <div class="article-header" style="text-align:left;">                    <span class="tech-tag">Windows Server</span>
-
-            <h1><i class="fas fa-project-diagram"></i> Projects</h1>                    <span class="tech-tag">Active Directory</span>
-
-            <p class="article-meta">Explore our collection of enterprise IT projects and implementations</p>                    <span class="tech-tag">System Admin</span>
-
-        </div>                </div>
-
-                <a href="windows-server-setup.html" class="read-more">View Project <i class="fas fa-arrow-right"></i></a>
-
-        <div class="article-grid" style="margin-top: 2rem;">            </div>
-
-            <div class="article-card">            <div class="project-card">
-
-                <h3><i class="fas fa-server"></i> Windows Server Setup</h3>                <h3><i class="fas fa-mobile-alt"></i> Intune Implementation</h3>
-
-                <p>Complete guide to setting up Windows Server 2025, including installation, Active Directory, DNS, and DHCP configuration.</p>                <p>Step-by-step implementation guide for Microsoft Intune device management and security.</p>
-
-                <div class="card-meta">                <div class="project-tech">
-
-                    <span><i class="fas fa-calendar"></i> October 24, 2025</span>                    <span class="tech-tag">Microsoft 365</span>
-
-                    <span><i class="fas fa-tag"></i> Enterprise</span>                    <span class="tech-tag">MDM</span>
-
-                </div>                    <span class="tech-tag">Security</span>
-
-                <a href="windows-server-setup.html" class="read-more">Read More <i class="fas fa-arrow-right"></i></a>                </div>
-
-            </div>                <a href="intune-setup.html" class="read-more">View Project <i class="fas fa-arrow-right"></i></a>
-
+        <div class="article-grid" style="margin-top: 2rem;">
+            <div class="article-card">
+                <h3><i class="fas fa-server"></i> Windows Server Setup</h3>
+                <p>Complete guide to setting up Windows Server 2025, including installation, Active Directory, DNS, and DHCP configuration.</p>
+                <div class="card-meta">
+                    <span><i class="fas fa-calendar"></i> October 24, 2025</span>
+                    <span><i class="fas fa-tag"></i> Enterprise</span>
+                </div>
+                <a href="windows-server-setup.html" class="read-more">Read More <i class="fas fa-arrow-right"></i></a>
             </div>
 
-            <div class="article-card">            <div class="project-card">
-
-                <h3><i class="fas fa-mobile-alt"></i> Microsoft Intune Implementation</h3>                <h3><i class="fas fa-chart-line"></i> Network Monitoring Setup</h3>
-
-                <p>Implementing Microsoft Intune for cloud-based mobile device management (MDM) and mobile application management (MAM).</p>                <p>Setting up comprehensive network monitoring tools for better infrastructure management.</p>
-
-                <div class="card-meta">                <div class="project-tech">
-
-                    <span><i class="fas fa-calendar"></i> October 24, 2025</span>                    <span class="tech-tag">Networking</span>
-
-                    <span><i class="fas fa-tag"></i> Cloud</span>                    <span class="tech-tag">Monitoring</span>
-
-                </div>                    <span class="tech-tag">Infrastructure</span>
-
-                <a href="intune-setup.html" class="read-more">Read More <i class="fas fa-arrow-right"></i></a>                </div>
-
-            </div>                <a href="network-monitoring.html" class="read-more">View Project <i class="fas fa-arrow-right"></i></a>
-
+            <div class="article-card">
+                <h3><i class="fas fa-mobile-alt"></i> Microsoft Intune Implementation</h3>
+                <p>Implementing Microsoft Intune for cloud-based mobile device management (MDM) and mobile application management (MAM).</p>
+                <div class="card-meta">
+                    <span><i class="fas fa-calendar"></i> October 24, 2025</span>
+                    <span><i class="fas fa-tag"></i> Cloud</span>
+                </div>
+                <a href="intune-setup.html" class="read-more">Read More <i class="fas fa-arrow-right"></i></a>
             </div>
 
-            <div class="article-card">        </div>
-
-                <h3><i class="fas fa-chart-line"></i> Network Monitoring Tools</h3>    </section>
-
+            <div class="article-card">
+                <h3><i class="fas fa-chart-line"></i> Network Monitoring Tools</h3>
                 <p>Setting up network monitoring and analysis tools to maintain a healthy IT infrastructure. Includes Nagios, PRTG, and Zabbix.</p>
+                <div class="card-meta">
+                    <span><i class="fas fa-calendar"></i> October 24, 2025</span>
+                    <span><i class="fas fa-tag"></i> Networking</span>
+                </div>
+                <a href="network-monitoring.html" class="read-more">Read More <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
 
-                <div class="card-meta">    <footer>
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
+    </section>
 
-                    <span><i class="fas fa-calendar"></i> October 24, 2025</span>        <div class="footer-content">
-
-                    <span><i class="fas fa-tag"></i> Networking</span>            <div class="footer-section">
-
-                </div>                <h3>Quick Links</h3>
-
-                <a href="network-monitoring.html" class="read-more">Read More <i class="fas fa-arrow-right"></i></a>                <ul>
-
-            </div>                    <li><a href="index.html">Home</a></li>
-
-        </div>                    <li><a href="about.html">About</a></li>
-
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
                     <li><a href="articles.html">Articles</a></li>
-
-        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>                    <li><a href="projects.html">Projects</a></li>
-
-    </section>                </ul>
-
+                    <li><a href="projects.html">Projects</a></li>
+                </ul>
             </div>
-
-    <footer>            <div class="footer-section">
-
-        <div class="footer-content">                <h3>Popular Articles</h3>
-
-            <div class="footer-section">                <ul>
-
-                <h3>Quick Links</h3>                    <li><a href="build-pc.html">Building Your First PC</a></li>
-
-                <ul>                    <li><a href="cpu-2025.html">CPU Guide 2025</a></li>
-
-                    <li><a href="index.html">Home</a></li>                    <li><a href="how-to-install-ssd.html">SSD Installation</a></li>
-
-                    <li><a href="about.html">About</a></li>                </ul>
-
-                    <li><a href="articles.html">Articles</a></li>            </div>
-
-                    <li><a href="projects.html">Projects</a></li>            <div class="footer-section">
-
-                </ul>                <h3>Contact & Follow</h3>
-
-            </div>                <ul>
-
-            <div class="footer-section">                    <li><a href="mailto:contact@tylerstech.tips"><i class="fas fa-envelope"></i> Email</a></li>
-
-                <h3>Popular Articles</h3>                    <li><a href="#"><i class="fab fa-github"></i> GitHub</a></li>
-
-                <ul>                    <li><a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a></li>
-
-                    <li><a href="build-pc.html">Building Your First PC</a></li>                </ul>
-
-                    <li><a href="cpu-2025.html">CPU Guide 2025</a></li>            </div>
-
-                    <li><a href="how-to-install-ssd.html">SSD Installation</a></li>        </div>
-
-                </ul>        <div class="social-links">
-
-            </div>            <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
-
-            <div class="footer-section">            <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
-
-                <h3>Contact & Follow</h3>            <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
-
-                <ul>        </div>
-
-                    <li><a href="mailto:contact@tylerstech.tips"><i class="fas fa-envelope"></i> Email</a></li>        <div class="copyright">
-
-                    <li><a href="https://github.com/smiler717"><i class="fab fa-github"></i> GitHub</a></li>            <p>© 2025 Tyler's Tech Tips. All rights reserved.</p>
-
-                    <li><a href="https://x.com/Tylers_TechTips"><i class="fab fa-x-twitter"></i> X (Twitter)</a></li>        </div>
-
-                </ul>    </footer>
-
+            <div class="footer-section">
+                <h3>Popular Articles</h3>
+                <ul>
+                    <li><a href="build-pc.html">Building Your First PC</a></li>
+                    <li><a href="cpu-2025.html">CPU Guide 2025</a></li>
+                    <li><a href="how-to-install-ssd.html">SSD Installation</a></li>
+                </ul>
             </div>
-
-        </div>    <div class="back-to-top">
-
-        <div class="social-links">        <i class="fas fa-arrow-up"></i>
-
-            <a href="https://x.com/Tylers_TechTips" title="X (Twitter)"><i class="fab fa-x-twitter"></i></a>    </div>
-
+            <div class="footer-section">
+                <h3>Contact & Follow</h3>
+                <ul>
+                    <li><a href="mailto:contact@tylerstech.tips"><i class="fas fa-envelope"></i> Email</a></li>
+                    <li><a href="https://github.com/smiler717"><i class="fab fa-github"></i> GitHub</a></li>
+                    <li><a href="https://x.com/Tylers_TechTips"><i class="fab fa-x-twitter"></i> X (Twitter)</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="social-links">
+            <a href="https://x.com/Tylers_TechTips" title="X (Twitter)"><i class="fab fa-x-twitter"></i></a>
             <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            <a href="https://github.com/smiler717" title="GitHub"><i class="fab fa-github"></i></a>
+        </div>
+        <div class="copyright">
+            <p> 2025 Tyler's Tech Tips. All rights reserved.</p>
+        </div>
+    </footer>
 
-            <a href="https://github.com/smiler717" title="GitHub"><i class="fab fa-github"></i></a>    <script>
-
-        </div>    window.onscroll = function() {
-
-        <div class="copyright">        const backToTop = document.querySelector('.back-to-top');
-
-            <p>© 2025 Tyler's Tech Tips. All rights reserved.</p>        if (document.body.scrollTop > 500 || document.documentElement.scrollTop > 500) {
-
-        </div>            backToTop.classList.add('visible');
-
-    </footer>        } else {
-
-            backToTop.classList.remove('visible');
-
-    <div class="back-to-top"><i class="fas fa-arrow-up"></i></div>        }
-
-    };
+    <div class="back-to-top"><i class="fas fa-arrow-up"></i></div>
 
     <script>
-
-    window.onscroll = function() {    document.querySelector('.back-to-top').onclick = function() {
-
-        const backToTop = document.querySelector('.back-to-top');        document.body.scrollTop = 0; // For Safari
-
-        if (document.body.scrollTop > 500 || document.documentElement.scrollTop > 500) {        document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-
-            backToTop.classList.add('visible');    };
-
-        } else {    </script>
-
-            backToTop.classList.remove('visible');</body>
-
-        }</html>
-
+    window.onscroll = function() {
+        const backToTop = document.querySelector('.back-to-top');
+        if (document.body.scrollTop > 500 || document.documentElement.scrollTop > 500) {
+            backToTop.classList.add('visible');
+        } else {
+            backToTop.classList.remove('visible');
+        }
     };
     document.querySelector('.back-to-top').onclick = function() {
         document.body.scrollTop = 0;
