@@ -7,7 +7,9 @@
     <link rel="stylesheet" href="style.css">
     <!-- Font Awesome CDN for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="scripts/theme.js"></script>
     <script defer src="scripts/search.js"></script>
+    <script defer src="scripts/share.js"></script>
 </head>
 <body>
     <!-- Navigation Bar -->
@@ -39,8 +41,12 @@
                     </div>
                 </li>
                 <li><a href="community.html"><i class="fas fa-users"></i> Community</a></li>
+                <li><a href="cheat-sheet.html"><i class="fas fa-book"></i> Cheat Sheet</a></li>
                 <li><a href="about.html"><i class="fas fa-user"></i> About</a></li>
             </ul>
+            <button id="theme-toggle" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
         </nav>
     </header>
 
@@ -50,6 +56,24 @@
             <h1><i class="fas fa-tools"></i> Building Your First PC</h1>
             <p class="article-meta">Published on April 14, 2025 by Tyler</p>
         </div>
+
+        <!-- Share Buttons -->
+        <div class="share-buttons">
+            <span class="share-label">Share this article:</span>
+            <a href="#" class="share-btn share-twitter" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-twitter"></i> Twitter
+            </a>
+            <a href="#" class="share-btn share-facebook" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-facebook-f"></i> Facebook
+            </a>
+            <a href="#" class="share-btn share-linkedin" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-linkedin-in"></i> LinkedIn
+            </a>
+            <a href="#" class="share-btn share-copy">
+                <i class="fas fa-link"></i> Copy Link
+            </a>
+        </div>
+
     <img src="Images/pc-build-image.jpg" alt="PC build setup in progress" class="article-image" onerror="this.src='https://images.unsplash.com/photo-1593640495278-5b5b2e2f2e5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';">
         <div class="article-body">
             <p>Building your first PC can be a rewarding experience — follow these steps and you'll have a working system in no time.</p>

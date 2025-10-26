@@ -1,12 +1,33 @@
-/* CSS Variables for Dark Theme */
+/* CSS Variables - Light Theme (Default) */
 :root {
+    --primary-bg: #ffffff;
+    --secondary-bg: #f5f5f5;
+    --accent-color: #0066cc;
+    --text-color: #333333;
+    --secondary-text: #666666;
+    --card-bg: #ffffff;
+    --card-border: #e0e0e0;
+    --cert-highlight: #e3f2fd;
+    --hover-bg: #f0f0f0;
+    --code-bg: #f4f4f4;
+    --shadow: rgba(0, 0, 0, 0.1);
+    --shadow-hover: rgba(0, 0, 0, 0.15);
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
     --primary-bg: #1a1a1a;
     --secondary-bg: #2c2c2c;
     --accent-color: #00d4ff;
     --text-color: #e0e0e0;
     --secondary-text: #a0a0a0;
     --card-bg: #252525;
-    --cert-highlight: #1e4d5a; /* Subtle background for certs */
+    --card-border: #3c3c3c;
+    --cert-highlight: #1e4d5a;
+    --hover-bg: #333333;
+    --code-bg: #1e1e1e;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --shadow-hover: rgba(0, 0, 0, 0.5);
 }
 
 /* Global Reset */
@@ -71,6 +92,32 @@ body {
 .nav-links i {
     margin-right: 0.4rem;
     font-size: 0.9rem;
+}
+
+/* Theme Toggle Button */
+#theme-toggle {
+    background: var(--card-bg);
+    border: 2px solid var(--card-border);
+    color: var(--text-color);
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    margin-left: 1rem;
+}
+
+#theme-toggle:hover {
+    background: var(--hover-bg);
+    transform: scale(1.05);
+}
+
+#theme-toggle .theme-icon {
+    font-size: 1.3rem;
+    line-height: 1;
 }
 
 .nav-links a:hover {
@@ -520,6 +567,91 @@ body {
 .article-meta {
     color: var(--secondary-text);
     font-style: italic;
+}
+
+/* Social Share Buttons */
+.share-buttons {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: var(--secondary-bg);
+    border-radius: 10px;
+    border: 1px solid var(--card-border);
+}
+
+.share-label {
+    font-weight: 600;
+    color: var(--text-color);
+    margin-right: 0.5rem;
+}
+
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.share-twitter {
+    background: #1DA1F2;
+    color: white;
+}
+
+.share-twitter:hover {
+    background: #1a8cd8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(29, 161, 242, 0.4);
+}
+
+.share-facebook {
+    background: #4267B2;
+    color: white;
+}
+
+.share-facebook:hover {
+    background: #365899;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(66, 103, 178, 0.4);
+}
+
+.share-linkedin {
+    background: #0077B5;
+    color: white;
+}
+
+.share-linkedin:hover {
+    background: #006097;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 119, 181, 0.4);
+}
+
+.share-copy {
+    background: var(--card-bg);
+    color: var(--text-color);
+    border: 2px solid var(--accent-color);
+    cursor: pointer;
+}
+
+.share-copy:hover {
+    background: var(--accent-color);
+    color: var(--primary-bg);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.4);
+}
+
+.share-copy.copied {
+    background: #4caf50;
+    border-color: #4caf50;
+    color: white;
 }
 
 .article-image {
@@ -1097,6 +1229,51 @@ body {
     border: 1px solid rgba(0, 255, 136, 0.3);
     word-break: break-all;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.command-code-wrapper {
+    position: relative;
+}
+
+.copy-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: var(--accent-color);
+    color: var(--primary-bg);
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    opacity: 0;
+    z-index: 10;
+}
+
+.command-card:hover .copy-btn,
+.solution-card:hover .copy-btn {
+    opacity: 1;
+}
+
+.copy-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3);
+}
+
+.copy-btn:active {
+    transform: scale(0.95);
+}
+
+.copy-btn.copied {
+    background: #4caf50;
+    opacity: 1 !important;
+}
+
+.copy-btn.copied::after {
+    content: " ✓";
 }
 
 .command-desc {
