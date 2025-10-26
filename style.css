@@ -248,6 +248,23 @@ button,
     margin-right: 0.5rem;
 }
 
+/* Ensure the logo remains styled the same when wrapped in a link */
+.logo h1 a {
+    color: var(--accent-color);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.logo h1 a:visited,
+.logo h1 a:hover,
+.logo h1 a:active,
+.logo h1 a:focus,
+.logo h1 a:focus-visible {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
 .nav-links {
     display: flex;
     list-style: none;
