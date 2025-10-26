@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Cheat Sheet - Tyler's Tech Tips</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script defer src="scripts/search.js"></script>
+    <meta name="description" content="Quick reference guide for CMD, PowerShell, Linux commands, and common IT solutions.">
+</head>
+<body>
+    <div class="progress-container">
+        <div class="progress-bar"></div>
+    </div>
+    
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <h1><i class="fas fa-laptop-code"></i> Tyler's Tech Tips</h1>
+            </div>
+            <div class="search-container">
+                <input type="text" class="search-bar" placeholder="Search articles...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html#home"><i class="fas fa-home"></i> Home</a></li>
+                <li class="dropdown">
+                    <a href="index.html#articles"><i class="fas fa-newspaper"></i> Articles</a>
+                    <div class="dropdown-content">
+                        <a href="build-pc.html"><i class="fas fa-tools"></i> Building Your First PC</a>
+                        <a href="cpu-2025.html"><i class="fas fa-microchip"></i> Understanding CPUs in 2025</a>
+                        <a href="how-to-install-ssd.html"><i class="fas fa-hdd"></i> How to Install an SSD</a>
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="index.html#projects"><i class="fas fa-project-diagram"></i> Projects</a>
+                    <div class="dropdown-content">
+                        <a href="windows-server-setup.html"><i class="fas fa-server"></i> Windows Server Setup</a>
+                        <a href="intune-setup.html"><i class="fas fa-mobile-alt"></i> Intune Implementation</a>
+                        <a href="network-monitoring.html"><i class="fas fa-chart-line"></i> Network Monitoring</a>
+                    </div>
+                </li>
+                <li><a href="community.html"><i class="fas fa-users"></i> Community</a></li>
+                <li><a href="cheat-sheet.html"><i class="fas fa-book"></i> Cheat Sheet</a></li>
+                <li><a href="about.html"><i class="fas fa-user"></i> About</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="article-content cheat-sheet-page">
+        <div class="article-header">
+            <h1><i class="fas fa-terminal"></i> IT Cheat Sheet</h1>
+            <p class="article-meta">Quick reference guide for commands, solutions, and troubleshooting</p>
+        </div>
+
+        <!-- Search/Filter Bar -->
+        <div class="cheat-filter-bar">
+            <input type="text" id="cheat-search" placeholder="Search commands or solutions..." aria-label="Search cheat sheet">
+            <select id="cheat-category" aria-label="Filter by category">
+                <option value="all">All Categories</option>
+                <option value="cmd">CMD</option>
+                <option value="powershell">PowerShell</option>
+                <option value="linux">Linux/Bash</option>
+                <option value="networking">Networking</option>
+                <option value="troubleshooting">Troubleshooting</option>
+                <option value="git">Git</option>
+            </select>
+        </div>
+
+        <!-- CMD Commands -->
+        <div class="cheat-section" data-category="cmd">
+            <h2><i class="fas fa-terminal"></i> Windows CMD Commands</h2>
+            
+            <div class="cheat-group">
+                <h3>File & Directory Operations</h3>
+                <div class="command-grid">
+                    <div class="command-card">
+                        <div class="command-title">List Directory Contents</div>
+                        <div class="command-code">dir</div>
+                        <div class="command-desc">Display files and folders in current directory</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Change Directory</div>
+                        <div class="command-code">cd [path]</div>
+                        <div class="command-desc">Navigate to specified directory</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Create Directory</div>
+                        <div class="command-code">mkdir [name]</div>
+                        <div class="command-desc">Create a new folder</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Delete File</div>
+                        <div class="command-code">del [filename]</div>
+                        <div class="command-desc">Remove a file</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Copy File</div>
+                        <div class="command-code">copy [source] [dest]</div>
+                        <div class="command-desc">Copy files to another location</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Move File</div>
+                        <div class="command-code">move [source] [dest]</div>
+                        <div class="command-desc">Move or rename files</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cheat-group">
+                <h3>System Information</h3>
+                <div class="command-grid">
+                    <div class="command-card">
+                        <div class="command-title">System Info</div>
+                        <div class="command-code">systeminfo</div>
+                        <div class="command-desc">Display detailed system configuration</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">IP Configuration</div>
+                        <div class="command-code">ipconfig /all</div>
+                        <div class="command-desc">Show network adapter settings</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Task List</div>
+                        <div class="command-code">tasklist</div>
+                        <div class="command-desc">Display running processes</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Kill Process</div>
+                        <div class="command-code">taskkill /IM [name] /F</div>
+                        <div class="command-desc">Force terminate a process</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PowerShell Commands -->
+        <div class="cheat-section" data-category="powershell">
+            <h2><i class="fas fa-code"></i> PowerShell Commands</h2>
+            
+            <div class="cheat-group">
+                <h3>File & Directory Operations</h3>
+                <div class="command-grid">
+                    <div class="command-card">
+                        <div class="command-title">List Items</div>
+                        <div class="command-code">Get-ChildItem</div>
+                        <div class="command-desc">List files and folders (alias: ls, dir)</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Set Location</div>
+                        <div class="command-code">Set-Location [path]</div>
+                        <div class="command-desc">Change directory (alias: cd)</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Create Item</div>
+                        <div class="command-code">New-Item -ItemType Directory -Name [name]</div>
+                        <div class="command-desc">Create new folder or file</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Remove Item</div>
+                        <div class="command-code">Remove-Item [path]</div>
+                        <div class="command-desc">Delete files or folders</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Copy Item</div>
+                        <div class="command-code">Copy-Item [source] [dest]</div>
+                        <div class="command-desc">Copy files or folders</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Move Item</div>
+                        <div class="command-code">Move-Item [source] [dest]</div>
+                        <div class="command-desc">Move or rename items</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cheat-group">
+                <h3>System Management</h3>
+                <div class="command-grid">
+                    <div class="command-card">
+                        <div class="command-title">Get Process</div>
+                        <div class="command-code">Get-Process</div>
+                        <div class="command-desc">List running processes</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Stop Process</div>
+                        <div class="command-code">Stop-Process -Name [name]</div>
+                        <div class="command-desc">Terminate a process by name</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Get Service</div>
+                        <div class="command-code">Get-Service</div>
+                        <div class="command-desc">List all Windows services</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Restart Service</div>
+                        <div class="command-code">Restart-Service [name]</div>
+                        <div class="command-desc">Restart a Windows service</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Get Computer Info</div>
+                        <div class="command-code">Get-ComputerInfo</div>
+                        <div class="command-desc">Display system information</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Test Connection</div>
+                        <div class="command-code">Test-Connection [host]</div>
+                        <div class="command-desc">Ping a host (like ping command)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Linux/Bash Commands -->
+        <div class="cheat-section" data-category="linux">
+            <h2><i class="fab fa-linux"></i> Linux/Bash Commands</h2>
+            
+            <div class="cheat-group">
+                <h3>File Operations</h3>
+                <div class="command-grid">
+                    <div class="command-card">
+                        <div class="command-title">List Files</div>
+                        <div class="command-code">ls -la</div>
+                        <div class="command-desc">List all files with details</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Change Directory</div>
+                        <div class="command-code">cd [path]</div>
+                        <div class="command-desc">Navigate to directory</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Create Directory</div>
+                        <div class="command-code">mkdir -p [path]</div>
+                        <div class="command-desc">Create directory (including parents)</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Remove File/Dir</div>
+                        <div class="command-code">rm -rf [path]</div>
+                        <div class="command-desc">Force remove files/folders recursively</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Copy Files</div>
+                        <div class="command-code">cp -r [source] [dest]</div>
+                        <div class="command-desc">Copy files/folders recursively</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Move/Rename</div>
+                        <div class="command-code">mv [source] [dest]</div>
+                        <div class="command-desc">Move or rename files</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cheat-group">
+                <h3>System Operations</h3>
+                <div class="command-grid">
+                    <div class="command-card">
+                        <div class="command-title">Disk Usage</div>
+                        <div class="command-code">df -h</div>
+                        <div class="command-desc">Show disk space in human-readable format</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Directory Size</div>
+                        <div class="command-code">du -sh [path]</div>
+                        <div class="command-desc">Show size of directory</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Process List</div>
+                        <div class="command-code">ps aux</div>
+                        <div class="command-desc">List all running processes</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Kill Process</div>
+                        <div class="command-code">kill -9 [PID]</div>
+                        <div class="command-desc">Force kill process by ID</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">System Info</div>
+                        <div class="command-code">uname -a</div>
+                        <div class="command-desc">Display system information</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Check Permissions</div>
+                        <div class="command-code">chmod 755 [file]</div>
+                        <div class="command-desc">Set file permissions</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Networking Commands -->
+        <div class="cheat-section" data-category="networking">
+            <h2><i class="fas fa-network-wired"></i> Networking Commands</h2>
+            
+            <div class="cheat-group">
+                <h3>Network Diagnostics</h3>
+                <div class="command-grid">
+                    <div class="command-card">
+                        <div class="command-title">Ping Host</div>
+                        <div class="command-code">ping [host]</div>
+                        <div class="command-desc">Test connectivity to host</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Trace Route</div>
+                        <div class="command-code">tracert [host]</div>
+                        <div class="command-desc">Trace network path to host</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">DNS Lookup</div>
+                        <div class="command-code">nslookup [domain]</div>
+                        <div class="command-desc">Query DNS records</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Network Statistics</div>
+                        <div class="command-code">netstat -ano</div>
+                        <div class="command-desc">Show active connections and ports</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Flush DNS</div>
+                        <div class="command-code">ipconfig /flushdns</div>
+                        <div class="command-desc">Clear DNS resolver cache</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Release/Renew IP</div>
+                        <div class="command-code">ipconfig /release && ipconfig /renew</div>
+                        <div class="command-desc">Refresh DHCP IP address</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Git Commands -->
+        <div class="cheat-section" data-category="git">
+            <h2><i class="fab fa-git-alt"></i> Git Commands</h2>
+            
+            <div class="cheat-group">
+                <h3>Common Operations</h3>
+                <div class="command-grid">
+                    <div class="command-card">
+                        <div class="command-title">Clone Repository</div>
+                        <div class="command-code">git clone [url]</div>
+                        <div class="command-desc">Clone a remote repository</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Check Status</div>
+                        <div class="command-code">git status</div>
+                        <div class="command-desc">Show working tree status</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Stage Changes</div>
+                        <div class="command-code">git add .</div>
+                        <div class="command-desc">Stage all changes</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Commit Changes</div>
+                        <div class="command-code">git commit -m "[message]"</div>
+                        <div class="command-desc">Commit staged changes</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Push Changes</div>
+                        <div class="command-code">git push</div>
+                        <div class="command-desc">Push commits to remote</div>
+                    </div>
+                    <div class="command-card">
+                        <div class="command-title">Pull Changes</div>
+                        <div class="command-code">git pull</div>
+                        <div class="command-desc">Fetch and merge remote changes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Common Solutions -->
+        <div class="cheat-section" data-category="troubleshooting">
+            <h2><i class="fas fa-wrench"></i> Common Solutions & Troubleshooting</h2>
+            
+            <div class="solution-group">
+                <div class="solution-card">
+                    <h3><i class="fas fa-wifi"></i> Fix Network Connectivity Issues</h3>
+                    <div class="solution-steps">
+                        <ol>
+                            <li>Reset TCP/IP stack: <code>netsh int ip reset</code></li>
+                            <li>Reset Winsock: <code>netsh winsock reset</code></li>
+                            <li>Flush DNS: <code>ipconfig /flushdns</code></li>
+                            <li>Release and renew IP: <code>ipconfig /release && ipconfig /renew</code></li>
+                            <li>Restart computer</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="solution-card">
+                    <h3><i class="fas fa-hdd"></i> Check Disk Health</h3>
+                    <div class="solution-steps">
+                        <ol>
+                            <li>Run CHKDSK: <code>chkdsk C: /f /r</code></li>
+                            <li>Check SMART status: <code>wmic diskdrive get status</code></li>
+                            <li>SFC scan: <code>sfc /scannow</code></li>
+                            <li>DISM repair: <code>DISM /Online /Cleanup-Image /RestoreHealth</code></li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="solution-card">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Windows Update Stuck</h3>
+                    <div class="solution-steps">
+                        <ol>
+                            <li>Stop Windows Update service: <code>net stop wuauserv</code></li>
+                            <li>Clear update cache: Delete contents of <code>C:\Windows\SoftwareDistribution</code></li>
+                            <li>Restart service: <code>net start wuauserv</code></li>
+                            <li>Run troubleshooter or try manual update</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="solution-card">
+                    <h3><i class="fas fa-lock"></i> Reset Windows Password (Local Account)</h3>
+                    <div class="solution-steps">
+                        <ol>
+                            <li>Boot from Windows installation media</li>
+                            <li>Press Shift+F10 for command prompt</li>
+                            <li>Replace Utilman: <code>move C:\Windows\System32\Utilman.exe C:\Windows\System32\Utilman.exe.bak</code></li>
+                            <li><code>copy C:\Windows\System32\cmd.exe C:\Windows\System32\Utilman.exe</code></li>
+                            <li>Reboot, click accessibility icon, run: <code>net user [username] [newpassword]</code></li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="solution-card">
+                    <h3><i class="fas fa-download"></i> Windows 11 Bypass TPM/Secure Boot Requirement</h3>
+                    <div class="solution-steps">
+                        <ol>
+                            <li>At setup screen, press Shift+F10</li>
+                            <li>Run: <code>reg add HKLM\SYSTEM\Setup\LabConfig /v BypassTPMCheck /t REG_DWORD /d 1 /f</code></li>
+                            <li>Run: <code>reg add HKLM\SYSTEM\Setup\LabConfig /v BypassSecureBootCheck /t REG_DWORD /d 1 /f</code></li>
+                            <li>Close command prompt and continue installation</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <div class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="index.html#articles">Articles</a></li>
+                    <li><a href="community.html">Community</a></li>
+                    <li><a href="cheat-sheet.html">Cheat Sheet</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Popular Articles</h3>
+                <ul>
+                    <li><a href="build-pc.html">Building Your First PC</a></li>
+                    <li><a href="cpu-2025.html">CPU Guide 2025</a></li>
+                    <li><a href="how-to-install-ssd.html">SSD Installation</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact & Follow</h3>
+                <ul>
+                    <li><a href="mailto:contact@tylerstech.tips"><i class="fas fa-envelope"></i> Email</a></li>
+                    <li><a href="#"><i class="fab fa-github"></i> GitHub</a></li>
+                    <li><a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="social-links">
+            <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
+        </div>
+        <div class="copyright">
+            <p>© 2025 Tyler's Tech Tips. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+    // Back to Top Button
+    window.onscroll = function() {
+        const backToTop = document.querySelector('.back-to-top');
+        const progressBar = document.querySelector('.progress-bar');
+        
+        if (document.body.scrollTop > 500 || document.documentElement.scrollTop > 500) {
+            backToTop.classList.add('visible');
+        } else {
+            backToTop.classList.remove('visible');
+        }
+        
+        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (winScroll / height) * 100;
+        progressBar.style.width = scrolled + "%";
+    };
+
+    document.querySelector('.back-to-top').onclick = function() {
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+    };
+
+    // Cheat Sheet Search and Filter
+    const searchInput = document.getElementById('cheat-search');
+    const categorySelect = document.getElementById('cheat-category');
+    const sections = document.querySelectorAll('.cheat-section');
+
+    function filterCheatSheet() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const category = categorySelect.value;
+
+        sections.forEach(section => {
+            const sectionCategory = section.dataset.category;
+            const matchesCategory = category === 'all' || sectionCategory === category;
+            
+            if (!matchesCategory) {
+                section.style.display = 'none';
+                return;
+            }
+
+            if (searchTerm === '') {
+                section.style.display = 'block';
+                const cards = section.querySelectorAll('.command-card, .solution-card');
+                cards.forEach(card => card.style.display = 'block');
+                return;
+            }
+
+            const text = section.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                section.style.display = 'block';
+                
+                // Filter individual cards
+                const cards = section.querySelectorAll('.command-card, .solution-card');
+                cards.forEach(card => {
+                    const cardText = card.textContent.toLowerCase();
+                    card.style.display = cardText.includes(searchTerm) ? 'block' : 'none';
+                });
+            } else {
+                section.style.display = 'none';
+            }
+        });
+    }
+
+    searchInput.addEventListener('input', filterCheatSheet);
+    categorySelect.addEventListener('change', filterCheatSheet);
+    </script>
+</body>
+</html>
