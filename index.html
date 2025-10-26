@@ -247,45 +247,53 @@
     });
 
     // Load Most Viewed Topics for Community section
-        (async function loadTopTopics(){
-                const grid = document.getElementById('top-topics-grid');
-                if (!grid) return;
-                try {
-                        const res = await fetch('/api/topics', { headers: { 'x-device-id': (localStorage.getItem('ttt_device_id_v1')||'anon') } });
-                        if (!res.ok) throw new Error('failed');
-                        const data = await res.json();
-                        const topics = (data.topics||[]);
-                        topics.sort((a,b) => (b.views||0) - (a.views||0));
-                        const top = topics.slice(0, 6);
-                        if (!top.length) { grid.innerHTML = '<div class="no-results">No topics yet. Be the first to post!</div>'; return; }
-                        function esc(s){ const d=document.createElement('div'); d.textContent=String(s||''); return d.innerHTML; }
-                        const toHtml = (t) => {
-                                const comments = Array.isArray(t.comments) ? t.comments.slice().sort((a,b)=> (b.createdAt||0)-(a.createdAt||0)) : [];
-                                const c = comments[0];
-                                const snippet = c?.body ? (c.body.length > 160 ? c.body.slice(0,157)+'…' : c.body) : 'No comments yet—join the discussion!';
-                                const author = c?.author || 'Someone';
-                                const when = c?.createdAt ? new Date(c.createdAt).toLocaleString() : '';
-                                return `
-                                <a class="topic-pair-card" href="community.html#t-${t.id}" aria-label="View topic ${esc(t.title)}">
-                                    <div class="topic-info">
-                                        <h4 class="topic-link"><i class="fas fa-comment-dots"></i> ${esc(t.title)}</h4>
-                                        <div class="topic-stats">
-                                            <span class="stat"><i class="fas fa-eye"></i> ${t.views||0}</span>
-                                            <span class="stat"><i class="fas fa-comments"></i> ${(t.comments||[]).length}</span>
-                                        </div>
-                                    </div>
-                                    <div class="topic-comment">
-                                        <div class="comment-label"><i class="fas fa-quote-left"></i> Top comment</div>
-                                        <div class="comment-snippet">${esc(snippet)}</div>
-                                        <div class="comment-meta">${when ? `<i class=\"fas fa-clock\"></i> ${when} · ` : ''}<i class="fas fa-user"></i> ${esc(author)}</div>
-                                    </div>
-                                </a>`;
-                        };
-                        grid.innerHTML = top.map(toHtml).join('');
-                } catch (_) {
-                        grid.innerHTML = '<div class="no-results">Unable to load topics right now.</div>';
-                }
-        })();
+    (async function loadTopTopics(){
+        const grid = document.getElementById('top-topics-grid');
+        if (!grid) return;
+        function esc(s){ const d=document.createElement('div'); d.textContent=String(s||''); return d.innerHTML; }
+        try {
+            const res = await fetch('/api/topics', { headers: { 'x-device-id': (localStorage.getItem('ttt_device_id_v1')||'anon') } });
+            if (!res.ok) throw new Error('failed');
+            const data = await res.json();
+            const topics = (data.topics||[]);
+            topics.sort((a,b) => (b.views||0) - (a.views||0));
+            const top = topics.slice(0, 6);
+            if (!top.length) { 
+                grid.innerHTML = '<div class="no-results">No topics yet. Be the first to post!</div>'; 
+                return; 
+            }
+            const toHtml = (t) => {
+                const comments = Array.isArray(t.comments) ? t.comments : [];
+                const topComment = comments.length > 0 ? comments[comments.length - 1] : null;
+                const commentSnippet = topComment?.body ? 
+                    (topComment.body.length > 120 ? topComment.body.slice(0, 117) + '…' : topComment.body) : 
+                    'No comments yet—be the first to comment!';
+                
+                return `
+                <article class="home-topic-card">
+                    <header class="home-topic-header">
+                        <h4 class="home-topic-title"><a href="community.html#t-${t.id}">${esc(t.title)}</a></h4>
+                        <div class="home-topic-meta">
+                            <span class="meta-item"><i class="fas fa-user"></i> ${esc(t.author || 'Anonymous')}</span>
+                            <span class="meta-item"><i class="fas fa-eye"></i> ${t.views || 0} views</span>
+                            <span class="meta-item"><i class="fas fa-comment"></i> ${comments.length}</span>
+                        </div>
+                    </header>
+                    <div class="home-topic-body">${esc(t.body.length > 200 ? t.body.slice(0, 197) + '…' : t.body)}</div>
+                    ${topComment ? `
+                    <div class="home-topic-comment">
+                        <div class="comment-badge"><i class="fas fa-quote-left"></i> Latest comment</div>
+                        <div class="comment-content">"${esc(commentSnippet)}"</div>
+                        <div class="comment-author">— ${esc(topComment.author || 'Anonymous')}</div>
+                    </div>
+                    ` : ''}
+                </article>`;
+            };
+            grid.innerHTML = top.map(toHtml).join('');
+        } catch (_) {
+            grid.innerHTML = '<div class="no-results">Unable to load topics right now.</div>';
+        }
+    })();
     </script>
 </body>
 </html>
