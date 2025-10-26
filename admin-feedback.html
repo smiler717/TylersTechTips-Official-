@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feedback Admin - Tyler's Tech Tips</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    .feedback-filters {
+      display: flex;
+      gap: 1rem;
+      margin: 1rem 0;
+      flex-wrap: wrap;
+    }
+    .feedback-item {
+      background: var(--card-bg);
+      border: 1px solid var(--secondary-bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+    }
+    .feedback-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .feedback-meta {
+      display: flex;
+      gap: 1rem;
+      color: var(--secondary-text);
+      font-size: 0.9rem;
+      flex-wrap: wrap;
+    }
+    .feedback-type {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .type-suggestion { background: #28a745; color: white; }
+    .type-bug { background: #dc3545; color: white; }
+    .type-topic-request { background: #17a2b8; color: white; }
+    .type-question { background: #ffc107; color: #000; }
+    .type-other { background: #6c757d; color: white; }
+    .feedback-message {
+      background: var(--secondary-bg);
+      padding: 1rem;
+      border-radius: 6px;
+      margin-top: 1rem;
+      white-space: pre-wrap;
+    }
+    .admin-key-prompt {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      z-index: 1000;
+      max-width: 400px;
+      width: 90%;
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 999;
+    }
+  </style>
+</head>
+<body>
+  <div id="auth-overlay" class="overlay"></div>
+  <div id="admin-key-prompt" class="admin-key-prompt">
+    <h2><i class="fas fa-lock"></i> Admin Access Required</h2>
+    <p>Enter your admin key to view feedback submissions.</p>
+    <input type="password" id="admin-key-input" placeholder="Admin key" style="width: 100%; padding: 0.75rem; margin: 1rem 0; background: var(--secondary-bg); border: 1px solid var(--card-bg); border-radius: 6px; color: var(--text-color);">
+    <button onclick="authenticate()" class="pill" style="width: 100%; padding: 0.75rem;">
+      <i class="fas fa-sign-in-alt"></i> Access Dashboard
+    </button>
+    <p id="auth-error" style="color: #dc3545; margin-top: 1rem; display: none;"></p>
+  </div>
+
+  <main id="main-content" style="display: none; max-width: 1200px; margin: 2rem auto; padding: 0 1rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+      <h1><i class="fas fa-comments"></i> Feedback Submissions</h1>
+      <button onclick="location.href='index.html'" class="pill">
+        <i class="fas fa-home"></i> Back to Home
+      </button>
+    </div>
+
+    <div class="feedback-filters">
+      <select id="type-filter" onchange="loadFeedback()">
+        <option value="">All Types</option>
+        <option value="suggestion">Suggestions</option>
+        <option value="bug">Bug Reports</option>
+        <option value="topic-request">Topic Requests</option>
+        <option value="question">Questions</option>
+        <option value="other">Other</option>
+      </select>
+      
+      <button onclick="loadFeedback()" class="pill">
+        <i class="fas fa-sync"></i> Refresh
+      </button>
+      
+      <div style="flex: 1;"></div>
+      
+      <span id="feedback-count" style="color: var(--secondary-text);"></span>
+    </div>
+
+    <div id="feedback-list"></div>
+    
+    <div id="loading" style="text-align: center; padding: 2rem; display: none;">
+      <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--accent-color);"></i>
+    </div>
+    
+    <div id="no-feedback" style="text-align: center; padding: 3rem; color: var(--secondary-text); display: none;">
+      <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+      <p>No feedback submissions yet.</p>
+    </div>
+  </main>
+
+  <script>
+    let adminKey = localStorage.getItem('admin-key');
+
+    function authenticate() {
+      const key = document.getElementById('admin-key-input').value.trim();
+      if (!key) {
+        showAuthError('Please enter an admin key');
+        return;
+      }
+      
+      // Try to access with this key
+      adminKey = key;
+      localStorage.setItem('admin-key', key);
+      
+      loadFeedback();
+    }
+
+    function showAuthError(msg) {
+      const errorEl = document.getElementById('auth-error');
+      errorEl.textContent = msg;
+      errorEl.style.display = 'block';
+    }
+
+    function hideAuthPrompt() {
+      document.getElementById('auth-overlay').style.display = 'none';
+      document.getElementById('admin-key-prompt').style.display = 'none';
+      document.getElementById('main-content').style.display = 'block';
+    }
+
+    function showAuthPrompt() {
+      document.getElementById('auth-overlay').style.display = 'block';
+      document.getElementById('admin-key-prompt').style.display = 'block';
+      document.getElementById('main-content').style.display = 'none';
+    }
+
+    async function loadFeedback() {
+      if (!adminKey) {
+        showAuthPrompt();
+        return;
+      }
+
+      const typeFilter = document.getElementById('type-filter')?.value || '';
+      const url = typeFilter ? `/api/feedback?type=${encodeURIComponent(typeFilter)}` : '/api/feedback';
+
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('feedback-list').innerHTML = '';
+      document.getElementById('no-feedback').style.display = 'none';
+
+      try {
+        const res = await fetch(url, {
+          headers: { 'x-admin-key': adminKey }
+        });
+
+        if (res.status === 403) {
+          showAuthError('Invalid admin key. Please try again.');
+          showAuthPrompt();
+          return;
+        }
+
+        if (!res.ok) {
+          throw new Error('Failed to load feedback');
+        }
+
+        const data = await res.json();
+        const feedbackList = data.feedback || [];
+
+        document.getElementById('loading').style.display = 'none';
+        hideAuthPrompt();
+
+        if (feedbackList.length === 0) {
+          document.getElementById('no-feedback').style.display = 'block';
+          document.getElementById('feedback-count').textContent = '0 submissions';
+          return;
+        }
+
+        document.getElementById('feedback-count').textContent = `${feedbackList.length} submission${feedbackList.length !== 1 ? 's' : ''}`;
+
+        const html = feedbackList.map(item => {
+          const date = new Date(item.created_at);
+          const typeClass = `type-${item.type.replace('_', '-')}`;
+          return `
+            <div class="feedback-item">
+              <div class="feedback-header">
+                <div>
+                  <strong style="font-size: 1.1rem;">${escapeHTML(item.name || 'Anonymous')}</strong>
+                  ${item.email ? `<div style="color: var(--secondary-text); font-size: 0.9rem; margin-top: 0.25rem;">${escapeHTML(item.email)}</div>` : ''}
+                </div>
+                <span class="feedback-type ${typeClass}">${formatType(item.type)}</span>
+              </div>
+              <div class="feedback-meta">
+                <span><i class="fas fa-calendar"></i> ${date.toLocaleDateString()}</span>
+                <span><i class="fas fa-clock"></i> ${date.toLocaleTimeString()}</span>
+                <span><i class="fas fa-fingerprint"></i> ${item.device_id?.substring(0, 12) || 'N/A'}...</span>
+              </div>
+              <div class="feedback-message">${escapeHTML(item.message)}</div>
+            </div>
+          `;
+        }).join('');
+
+        document.getElementById('feedback-list').innerHTML = html;
+
+      } catch (err) {
+        console.error('Error loading feedback:', err);
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('feedback-list').innerHTML = `
+          <div style="text-align: center; padding: 2rem; color: #dc3545;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+            <p>Failed to load feedback. Please try again.</p>
+          </div>
+        `;
+      }
+    }
+
+    function formatType(type) {
+      return type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
+
+    function escapeHTML(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // Load on page load
+    if (adminKey) {
+      loadFeedback();
+    } else {
+      showAuthPrompt();
+    }
+
+    // Enter key to authenticate
+    document.getElementById('admin-key-input')?.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') authenticate();
+    });
+  </script>
+</body>
+</html>
