@@ -16,21 +16,49 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="alternate" type="application/rss+xml" title="Tyler's Tech Tips RSS Feed" href="/feed.xml">
+  <script src="scripts/theme.js"></script>
 </head>
 <body>
+  <!-- Reading Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar"></div>
+  </div>
+  
   <header>
-    <div class="logo">
-      <h1><a href="index.html">Tyler's Tech Tips</a></h1>
-      <p>Your source for technology guides and tutorials</p>
-    </div>
-    <nav>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="projects.html">Projects</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="community.html">Community</a></li>
-        <li><a href="analytics.html">Analytics</a></li>
+    <nav class="navbar">
+      <div class="logo">
+        <h1><a href="index.html"><i class="fas fa-laptop-code"></i> Tyler's Tech Tips</a></h1>
+      </div>
+      <div class="search-container">
+        <input type="text" class="search-bar" placeholder="Search articles...">
+        <i class="fas fa-search search-icon"></i>
+      </div>
+      <ul class="nav-links">
+        <li><a href="index.html#home"><i class="fas fa-home"></i> Home</a></li>
+        <li class="dropdown">
+          <a href="articles.html"><i class="fas fa-newspaper"></i> Articles</a>
+          <div class="dropdown-content">
+            <a href="build-pc.html"><i class="fas fa-tools"></i> Building Your First PC</a>
+            <a href="cpu-2025.html"><i class="fas fa-microchip"></i> Understanding CPUs in 2025</a>
+            <a href="how-to-install-ssd.html"><i class="fas fa-hdd"></i> How to Install an SSD</a>
+          </div>
+        </li>
+        <li class="dropdown">
+          <a href="projects.html"><i class="fas fa-project-diagram"></i> Projects</a>
+          <div class="dropdown-content">
+            <a href="windows-server-setup.html"><i class="fas fa-server"></i> Windows Server Setup</a>
+            <a href="intune-setup.html"><i class="fas fa-mobile-alt"></i> Intune Implementation</a>
+            <a href="network-monitoring.html"><i class="fas fa-chart-line"></i> Network Monitoring</a>
+          </div>
+        </li>
+        <li><a href="community.html"><i class="fas fa-users"></i> Community</a></li>
+        <li><a href="feedback.html" class="active"><i class="fas fa-comments"></i> Feedback</a></li>
+        <li><a href="cheat-sheet.html"><i class="fas fa-book"></i> Cheat Sheet</a></li>
+        <li><a href="about.html"><i class="fas fa-user"></i> About</a></li>
       </ul>
+      <button id="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon">🌙</span>
+      </button>
     </nav>
   </header>
 
@@ -112,6 +140,16 @@
 
   <script src="scripts/reading-progress.js"></script>
   <script>
+    // Generate device ID for rate limiting
+    function getDeviceId() {
+      let id = localStorage.getItem('device-id');
+      if (!id) {
+        id = 'dev-' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+        localStorage.setItem('device-id', id);
+      }
+      return id;
+    }
+
     const form = document.getElementById('feedback-form');
     const messageArea = document.getElementById('message');
     const charCount = document.getElementById('char-count');
@@ -144,7 +182,10 @@
       try {
         const res = await fetch('/api/feedback', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'x-device-id': getDeviceId()
+          },
           body: JSON.stringify({ name, email, type, message })
         });
 
