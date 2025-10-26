@@ -1,4 +1,4 @@
-import { json, error, readJson, getDeviceId, checkRateLimit } from '../../_utils.js';
+import { json, error, readJson, getDeviceId, checkRateLimit, isAdmin } from '../../_utils.js';
 
 export async function onRequest(context) {
   const { request, env, params } = context;
@@ -9,12 +9,13 @@ export async function onRequest(context) {
   const method = request.method.toUpperCase();
   const topicId = params.id;
   const deviceId = getDeviceId(request);
+  const admin = isAdmin(request, env);
 
   if (!topicId) return error(400, 'Missing topic id');
 
   if (method === 'GET') {
     const res = await DB.prepare('SELECT id, author, body, created_at, created_by FROM comments WHERE topic_id = ? ORDER BY created_at ASC').bind(topicId).all();
-    const comments = (res.results || []).map(c => ({ id: c.id, author: c.author, body: c.body, createdAt: c.created_at, canDelete: deviceId && c.created_by === deviceId }));
+    const comments = (res.results || []).map(c => ({ id: c.id, author: c.author, body: c.body, createdAt: c.created_at, canDelete: admin }));
     return json({ comments });
   }
 
@@ -38,7 +39,7 @@ export async function onRequest(context) {
 
     await DB.prepare('INSERT INTO comments (id, topic_id, author, body, created_at, created_by) VALUES (?, ?, ?, ?, ?, ?)')
       .bind(id, topicId, author, content, createdAt, deviceId).run();
-    return json({ comment: { id, author, body: content, createdAt, canDelete: true } }, { status: 201 });
+    return json({ comment: { id, author, body: content, createdAt, canDelete: admin } }, { status: 201 });
   }
 
   return error(405, 'Method Not Allowed');

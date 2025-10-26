@@ -36,6 +36,16 @@ export function getDeviceId(request) {
 }
 
 /**
+ * Admin check via secret header and Pages env secret
+ */
+export function isAdmin(request, env) {
+  const header = request.headers.get('x-admin-key');
+  const key = header && header.trim();
+  const secret = env && env.ADMIN_KEY;
+  return Boolean(secret && key && key === secret);
+}
+
+/**
  * Ensure D1 schema exists (idempotent)
  */
 export async function ensureSchema(DB) {
@@ -82,4 +92,25 @@ export async function checkRateLimit(env, key, minIntervalMs = 20000) {
   const ttlSeconds = Math.max(60, Math.ceil(minIntervalMs / 1000) * 2);
   await kv.put(key, String(now), { expirationTtl: ttlSeconds });
   return { ok: true };
+}
+
+/**
+ * Views helpers using KV (same namespace as rate limit)
+ */
+export async function getViews(env, topicId) {
+  const kv = env && env.RATE_LIMIT;
+  if (!kv) return 0;
+  const val = await kv.get(`views:topic:${topicId}`);
+  const n = parseInt(val || '0', 10);
+  return Number.isFinite(n) ? n : 0;
+}
+
+export async function incrementViews(env, topicId, by = 1) {
+  const kv = env && env.RATE_LIMIT;
+  if (!kv) return 0;
+  const key = `views:topic:${topicId}`;
+  const cur = parseInt((await kv.get(key)) || '0', 10) || 0;
+  const next = cur + (Number.isFinite(by) ? by : 1);
+  await kv.put(key, String(next));
+  return next;
 }

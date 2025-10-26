@@ -4,8 +4,11 @@
   const LS_KEY = 'ttt_community_topics_v1';
   const DEVICE_KEY = 'ttt_device_id_v1';
   const RL_KEY = 'ttt_rate_limit_v1';
+  const ADMIN_KEY_KEY = 'ttt_admin_key_v1';
   const MIN_POST_INTERVAL_MS = 20000; // 20s between posts/comments
   let SERVER_MODE = false;
+  const VIEWED_KEY = 'ttt_viewed_topics_session_v1';
+  let viewed = new Set();
 
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
@@ -43,6 +46,22 @@
     return id;
   }
 
+  function getAdminKey() {
+    return localStorage.getItem(ADMIN_KEY_KEY) || '';
+  }
+
+  function ensureAdminKey() {
+    let key = getAdminKey();
+    if (key) return key;
+    key = prompt('Enter admin key to manage posts:') || '';
+    if (key) localStorage.setItem(ADMIN_KEY_KEY, key);
+    return key;
+  }
+
+  function isAdmin() {
+    return !!getAdminKey();
+  }
+
   function checkRateLimit(kind) {
     // kind: 'post' | 'comment'
     let obj = {};
@@ -67,6 +86,27 @@
   function formatDate(ts) {
     const d = new Date(ts);
     return d.toLocaleString();
+  }
+
+  function loadViewed() {
+    try { viewed = new Set(JSON.parse(sessionStorage.getItem(VIEWED_KEY) || '[]')); } catch(_) { viewed = new Set(); }
+  }
+
+  function saveViewed() {
+    try { sessionStorage.setItem(VIEWED_KEY, JSON.stringify([...viewed])); } catch(_) {}
+  }
+
+  async function recordView(id) {
+    if (!id || viewed.has(id)) return;
+    viewed.add(id);
+    saveViewed();
+    if (!SERVER_MODE) return; // only record views on server
+    try {
+      await fetch(`/api/topics/${encodeURIComponent(id)}/view`, {
+        method: 'POST',
+        headers: { 'x-device-id': getDeviceId() }
+      });
+    } catch (_) {}
   }
 
   function render(topics, { query = '', sort = 'new' } = {}) {
@@ -96,7 +136,7 @@
         (t) => `
       <article class="topic-card" id="t-${t.id}" data-id="${t.id}">
         <header class="topic-header">
-          <h3 class="topic-title">${escapeHTML(t.title)}</h3>
+          <h3 class="topic-title" data-id="${t.id}">${escapeHTML(t.title)}</h3>
           <div class="topic-meta">
             <span class="meta-item"><i class="fas fa-user"></i> ${escapeHTML(t.author || 'Anonymous')}</span>
             <span class="meta-item"><i class="fas fa-clock"></i> ${formatDate(t.createdAt)}</span>
@@ -107,7 +147,7 @@
         </header>
         <div class="topic-body">${escapeHTML(t.body)}</div>
         <div class="comment-section">
-          <details ${t.comments?.length ? 'open' : ''}>
+          <details data-id="${t.id}" ${t.comments?.length ? 'open' : ''}>
             <summary><i class="fas fa-comments"></i> Comments (${(t.comments || []).length})</summary>
             <div class="comments">
               ${(t.comments || [])
@@ -234,11 +274,12 @@
     if (!confirm('Delete this topic?')) return;
     if (SERVER_MODE) {
       try {
+        const adminKey = getAdminKey() || ensureAdminKey();
         const res = await fetch(`/api/topics/${encodeURIComponent(id)}`, {
           method: 'DELETE',
-          headers: { 'x-device-id': getDeviceId() }
+          headers: { 'x-device-id': getDeviceId(), ...(adminKey ? { 'x-admin-key': adminKey } : {}) }
         });
-        if (res.status === 403) { alert('You can only delete your own topic from the same device.'); return; }
+        if (res.status === 403) { alert('Admin access required to delete topics.'); return; }
         if (res.status === 404) { /* ignore */ }
         if (!res.ok && res.status !== 204) throw new Error('Failed');
         const topics = await loadRemote();
@@ -249,8 +290,11 @@
       }
     }
     const topics = loadLocal();
+    // Admin-only delete in local mode as well
+    const adminKey = getAdminKey() || ensureAdminKey();
+    if (!adminKey) { alert('Admin access required to delete topics.'); return; }
     const t = topics.find((x) => x.id === id);
-    if (!t || t.createdBy !== getDeviceId()) return;
+    if (!t) return;
     const next = topics.filter((x) => x.id !== id);
     saveLocal(next);
     render(next, currentView());
@@ -260,11 +304,12 @@
     if (!confirm('Delete this comment?')) return;
     if (SERVER_MODE) {
       try {
+        const adminKey = getAdminKey() || ensureAdminKey();
         const res = await fetch(`/api/topics/${encodeURIComponent(topicId)}/comments/${encodeURIComponent(commentId)}`, {
           method: 'DELETE',
-          headers: { 'x-device-id': getDeviceId() }
+          headers: { 'x-device-id': getDeviceId(), ...(adminKey ? { 'x-admin-key': adminKey } : {}) }
         });
-        if (res.status === 403) { alert('You can only delete your own comment from the same device.'); return; }
+        if (res.status === 403) { alert('Admin access required to delete comments.'); return; }
         if (!res.ok && res.status !== 204) throw new Error('Failed');
         const topics = await loadRemote();
         render(topics, currentView());
@@ -274,10 +319,13 @@
       }
     }
     const topics = loadLocal();
+    // Admin-only delete in local mode as well
+    const adminKey = getAdminKey() || ensureAdminKey();
+    if (!adminKey) { alert('Admin access required to delete comments.'); return; }
     const t = topics.find((x) => x.id === topicId);
     if (!t) return;
     const c = (t.comments || []).find((y) => y.id === commentId);
-    if (!c || c.createdBy !== getDeviceId()) return;
+    if (!c) return;
     t.comments = (t.comments || []).filter((y) => y.id !== commentId);
     saveLocal(topics);
     render(topics, currentView());
@@ -359,7 +407,10 @@
   }
 
   async function loadRemoteRaw() {
-    const res = await fetch('/api/topics', { headers: { 'x-device-id': getDeviceId() } });
+    const adminKey = getAdminKey();
+    const headers = { 'x-device-id': getDeviceId() };
+    if (adminKey) headers['x-admin-key'] = adminKey;
+    const res = await fetch('/api/topics', { headers });
     if (!res.ok) throw new Error('Failed');
     return res.json();
   }
@@ -370,6 +421,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
+    loadViewed();
     // Try server first
     try {
       const topics = await loadRemote();
@@ -378,8 +430,9 @@
     } catch (_) {
       const topics = loadLocal();
       SERVER_MODE = false;
-      // For local items, set canDelete from createdBy
-      topics.forEach(t => { t.canDelete = t.createdBy === getDeviceId(); (t.comments||[]).forEach(c => c.canDelete = c.createdBy === getDeviceId()); });
+      // In local mode, only admin sees delete buttons
+      const admin = isAdmin();
+      topics.forEach(t => { t.canDelete = admin; (t.comments||[]).forEach(c => c.canDelete = admin); });
       render(topics, currentView());
     }
     const form = $('#new-topic-form');
@@ -389,12 +442,7 @@
       if (e.target?.classList?.contains('comment-form')) onNewComment(e);
     });
 
-    const exportBtn = $('#export-json');
-    const importBtn = $('#import-json');
-    const importFile = $('#import-file');
-    exportBtn && exportBtn.addEventListener('click', exportJSON);
-    importBtn && importBtn.addEventListener('click', () => importFile && importFile.click());
-    importFile && importFile.addEventListener('change', (e) => importJSON(e.target.files));
+  // Export/Import UI removed in server mode cleanup
 
     // Search and sort events
     $('#topic-search')?.addEventListener('input', async () => {
@@ -410,14 +458,25 @@
     document.body.addEventListener('click', (e) => {
       const copyBtn = e.target.closest?.('.copy-link');
       if (copyBtn) { copyLink(copyBtn.getAttribute('data-id')); return; }
+      const title = e.target.closest?.('.topic-title');
+      if (title) { recordView(title.getAttribute('data-id')); return; }
       const delTopic = e.target.closest?.('.delete-topic');
       if (delTopic) { onDeleteTopic(delTopic.getAttribute('data-id')); return; }
       const delComment = e.target.closest?.('.delete-comment');
       if (delComment) { onDeleteComment(delComment.getAttribute('data-topic'), delComment.getAttribute('data-id')); return; }
     });
 
+    // Record a view when comments are expanded
+    document.body.addEventListener('toggle', (e) => {
+      if (e.target?.matches?.('details[data-id]') && e.target.open) {
+        recordView(e.target.getAttribute('data-id'));
+      }
+    }, true);
+
     // Handle deep link to a topic by hash
     scrollToHash();
+    const m = location.hash.match(/^#t-(.+)$/);
+    if (m && m[1]) recordView(m[1]);
     window.addEventListener('hashchange', scrollToHash);
   });
 })();

@@ -149,8 +149,12 @@
     <section id="community" class="community">
         <h2><i class="fas fa-comments"></i> Join the Tyler's Tech Tips Community</h2>
         <p>Discuss the latest in tech and share your projects with others!</p>
-        <div class="forum-placeholder">
-            <p>Coming Soon: Interactive forum for tech enthusiasts!</p>
+        <div class="forum-actions" style="margin: 12px 0 20px;">
+            <a href="community.html" class="cta-button"><i class="fas fa-users"></i> Visit Community</a>
+        </div>
+        <div class="top-topics">
+            <h3><i class="fas fa-fire"></i> Most Viewed Topics</h3>
+            <ul id="top-topics-list" class="topics-list"></ul>
         </div>
     </section>
 
@@ -241,6 +245,24 @@
             });
         }
     });
+
+    // Load Most Viewed Topics for Community section
+    (async function loadTopTopics(){
+        const list = document.getElementById('top-topics-list');
+        if (!list) return;
+        try {
+            const res = await fetch('/api/topics', { headers: { 'x-device-id': (localStorage.getItem('ttt_device_id_v1')||'anon') } });
+            if (!res.ok) throw new Error('failed');
+            const data = await res.json();
+            const topics = (data.topics||[]).map(t => ({ id: t.id, title: t.title, views: t.views || 0 }));
+            topics.sort((a,b) => (b.views||0) - (a.views||0));
+            const top = topics.slice(0, 5);
+            if (!top.length) { list.innerHTML = '<li>No topics yet. Be the first to post!</li>'; return; }
+            list.innerHTML = top.map(t => `<li><a href="community.html#t-${t.id}"><i class="fas fa-link"></i> ${t.title}</a> <span class="tag">${t.views||0} views</span></li>`).join('');
+        } catch (_) {
+            list.innerHTML = '<li>Unable to load topics right now.</li>';
+        }
+    })();
     </script>
 </body>
 </html>

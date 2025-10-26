@@ -1,4 +1,4 @@
-import { json, error, readJson, getDeviceId, checkRateLimit } from './_utils.js';
+import { json, error, readJson, getDeviceId, checkRateLimit, isAdmin, getViews } from './_utils.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -9,13 +9,14 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const method = request.method.toUpperCase();
   const deviceId = getDeviceId(request);
+  const admin = isAdmin(request, env);
 
   if (method === 'GET') {
     // Optional: server-side filtering/sorting
     const query = (url.searchParams.get('query') || '').trim().toLowerCase();
     const sort = (url.searchParams.get('sort') || 'new').toLowerCase();
 
-    // Fetch topics
+  // Fetch topics
   let topics = await DB.prepare('SELECT id, title, body, author, created_at, created_by FROM topics').all();
     topics = topics.results || [];
 
@@ -32,7 +33,7 @@ export async function onRequest(context) {
     if (sort === 'old') topics.sort((a, b) => a.created_at - b.created_at);
     else topics.sort((a, b) => b.created_at - a.created_at);
 
-    // Fetch comments per topic and attach counts
+    // Fetch comments per topic and attach counts and views
     for (const t of topics) {
       const res = await DB.prepare('SELECT id, author, body, created_at, created_by FROM comments WHERE topic_id = ? ORDER BY created_at ASC').bind(t.id).all();
       const comments = res.results || [];
@@ -41,10 +42,11 @@ export async function onRequest(context) {
         author: c.author,
         body: c.body,
         createdAt: c.created_at,
-        canDelete: deviceId && c.created_by === deviceId
+        canDelete: admin
       }));
       t.createdAt = t.created_at;
-      t.canDelete = deviceId && t.created_by === deviceId;
+      t.canDelete = admin;
+      t.views = await getViews(env, t.id);
       delete t.created_at;
       delete t.created_by;
     }
@@ -70,7 +72,7 @@ export async function onRequest(context) {
       await DB.prepare('INSERT INTO topics (id, title, body, author, created_at, created_by) VALUES (?, ?, ?, ?, ?, ?)')
         .bind(id, title, content, author, createdAt, deviceId).run();
       return json({
-        topic: { id, title, body: content, author, createdAt, comments: [], canDelete: true }
+        topic: { id, title, body: content, author, createdAt, comments: [], canDelete: admin }
       }, { status: 201 });
     } catch (e) {
       return error(500, 'Failed to create topic');
