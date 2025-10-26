@@ -58,6 +58,17 @@
     </header>
 
     <section class="article-content">
+        <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <ul class="breadcrumb-list">
+                <li class="breadcrumb-item"><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                <li class="breadcrumb-separator">/</li>
+                <li class="breadcrumb-item"><a href="{{section_link}}">{{section_name}}</a></li>
+                <li class="breadcrumb-separator">/</li>
+                <li class="breadcrumb-item active">{{title}}</li>
+            </ul>
+        </nav>
+
         <div class="article-header">
             <h1>{{title}}</h1>
             <p class="article-meta">Published on {{date}} by {{author}}</p>
