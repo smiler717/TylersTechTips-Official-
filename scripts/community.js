@@ -140,6 +140,7 @@
           <div class="topic-meta">
             <span class="meta-item"><i class="fas fa-user"></i> ${escapeHTML(t.author || 'Anonymous')}</span>
             <span class="meta-item"><i class="fas fa-clock"></i> ${formatDate(t.createdAt)}</span>
+            <span class="meta-item"><i class="fas fa-eye"></i> ${t.views || 0}</span>
             <span class="meta-item"><i class="fas fa-comment"></i> ${(t.comments || []).length}</span>
             <button class="pill tiny copy-link" data-id="${t.id}" title="Copy link"><i class="fas fa-link"></i></button>
             ${t.canDelete ? `<button class="pill tiny delete-topic" data-id="${t.id}" title="Delete topic"><i class="fas fa-trash"></i></button>` : ''}
