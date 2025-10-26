@@ -140,6 +140,7 @@
       <article class="topic-card" id="t-${t.id}" data-id="${t.id}">
         <header class="topic-header">
           <h3 class="topic-title" data-id="${t.id}">${escapeHTML(t.title)}</h3>
+          ${t.category ? `<span class="pill tiny" style="margin-left: 8px;"><i class="fas fa-tag"></i> ${escapeHTML(t.category)}</span>` : ''}
           <div class="topic-meta">
             <div class="vote-controls">
               <button class="vote-btn upvote ${t.userVote === 'up' ? 'active' : ''}" data-id="${t.id}" data-vote="up" title="Upvote">
@@ -200,13 +201,14 @@
     const author = f.author.value.trim() || 'Anonymous';
     const title = f.title.value.trim();
     const body = f.body.value.trim();
+    const category = f.category?.value || 'General';
     if (!title || !body) return;
     if (SERVER_MODE) {
       try {
         const res = await fetch('/api/topics', {
           method: 'POST',
           headers: { 'content-type': 'application/json', 'x-device-id': getDeviceId() },
-          body: JSON.stringify({ author, title, body })
+          body: JSON.stringify({ author, title, body, category })
         });
         if (res.status === 429) {
           const j = await res.json();
@@ -220,7 +222,8 @@
           return; // don't fall back silently; surface the error
         }
         const j = await res.json();
-        const topics = await loadRemote();
+        const { category: filterCategory } = currentView();
+        const topics = await loadRemote(filterCategory);
         f.reset();
         render(topics, currentView());
         location.hash = `#t-${j.topic.id}`;
@@ -232,7 +235,7 @@
     const rl = checkRateLimit('post');
     if (!rl.ok) { alert(`Please wait ${Math.ceil(rl.waitMs/1000)}s before posting again.`); return; }
     const topics = loadLocal();
-    const topic = { id: uid(), author, title, body, createdAt: Date.now(), comments: [], createdBy: getDeviceId(), canDelete: true };
+    const topic = { id: uid(), author, title, body, category, createdAt: Date.now(), comments: [], createdBy: getDeviceId(), canDelete: true };
     topics.push(topic);
     saveLocal(topics);
     f.reset();
@@ -264,7 +267,8 @@
           alert(msg);
           return; // don't fall back silently; surface the error
         }
-        const topics = await loadRemote();
+        const { category } = currentView();
+        const topics = await loadRemote(category);
         e.target.reset();
         render(topics, currentView());
         return;
@@ -296,7 +300,8 @@
         if (res.status === 403) { alert('Admin access required to delete topics.'); return; }
         if (res.status === 404) { /* ignore */ }
         if (!res.ok && res.status !== 204) throw new Error('Failed');
-        const topics = await loadRemote();
+        const { category } = currentView();
+        const topics = await loadRemote(category);
         render(topics, currentView());
         return;
       } catch (_) {
@@ -325,7 +330,8 @@
         });
         if (res.status === 403) { alert('Admin access required to delete comments.'); return; }
         if (!res.ok && res.status !== 204) throw new Error('Failed');
-        const topics = await loadRemote();
+        const { category } = currentView();
+        const topics = await loadRemote(category);
         render(topics, currentView());
         return;
       } catch (_) {
@@ -392,7 +398,8 @@
         }
       } else {
         // Fallback: reload topics if we couldn't update inline
-        const topics = await loadRemote();
+        const { category } = currentView();
+        const topics = await loadRemote(category);
         render(topics, currentView());
       }
     } catch (err) {
@@ -419,8 +426,9 @@
 
   function currentView() {
     const query = $('#topic-search')?.value || '';
+    const category = $('#topic-category')?.value || '';
     const sort = $('#topic-sort')?.value || 'new';
-    return { query, sort };
+    return { query, category, sort };
   }
 
   async function exportJSON() {
@@ -467,17 +475,18 @@
     reader.readAsText(file);
   }
 
-  async function loadRemoteRaw() {
+  async function loadRemoteRaw(category = '') {
     const adminKey = getAdminKey();
     const headers = { 'x-device-id': getDeviceId() };
     if (adminKey) headers['x-admin-key'] = adminKey;
-    const res = await fetch('/api/topics', { headers });
+    const url = category ? `/api/topics?category=${encodeURIComponent(category)}` : '/api/topics';
+    const res = await fetch(url, { headers });
     if (!res.ok) throw new Error('Failed');
     return res.json();
   }
 
-  async function loadRemote() {
-    const j = await loadRemoteRaw();
+  async function loadRemote(category = '') {
+    const j = await loadRemoteRaw(category);
     return j.topics || [];
   }
 
@@ -507,11 +516,18 @@
 
     // Search and sort events
     $('#topic-search')?.addEventListener('input', async () => {
-      const topics = SERVER_MODE ? await loadRemote() : loadLocal();
+      const { category } = currentView();
+      const topics = SERVER_MODE ? await loadRemote(category) : loadLocal();
       render(topics, currentView());
     });
     $('#topic-sort')?.addEventListener('change', async () => {
-      const topics = SERVER_MODE ? await loadRemote() : loadLocal();
+      const { category } = currentView();
+      const topics = SERVER_MODE ? await loadRemote(category) : loadLocal();
+      render(topics, currentView());
+    });
+    $('#topic-category')?.addEventListener('change', async () => {
+      const { category } = currentView();
+      const topics = SERVER_MODE ? await loadRemote(category) : loadLocal();
       render(topics, currentView());
     });
 
