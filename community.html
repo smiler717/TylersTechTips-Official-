@@ -40,6 +40,7 @@
                     </div>
                 </li>
                 <li><a href="community.html"><i class="fas fa-users"></i> Community</a></li>
+                <li><a href="feedback.html"><i class="fas fa-comments"></i> Feedback</a></li>
                 <li><a href="cheat-sheet.html"><i class="fas fa-book"></i> Cheat Sheet</a></li>
                 <li><a href="about.html"><i class="fas fa-user"></i> About</a></li>
             </ul>
@@ -70,6 +71,21 @@
                         <input type="text" id="title" name="title" placeholder="What's your question or topic?" required maxlength="120">
                     </div>
                 </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" name="category">
+                            <option value="General">General</option>
+                            <option value="Hardware">Hardware</option>
+                            <option value="Software">Software</option>
+                            <option value="Networking">Networking</option>
+                            <option value="Security">Security</option>
+                            <option value="Cloud">Cloud</option>
+                            <option value="Programming">Programming</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label for="body">Details</label>
                     <textarea id="body" name="body" placeholder="Describe your issue or share details..." rows="5" required maxlength="2000"></textarea>
@@ -83,6 +99,17 @@
         <div class="topic-tools">
             <div class="tool-left">
                 <input id="topic-search" type="search" placeholder="Search topics..." aria-label="Search topics" />
+                <select id="topic-category" aria-label="Filter by category">
+                    <option value="">All Categories</option>
+                    <option value="General">General</option>
+                    <option value="Hardware">Hardware</option>
+                    <option value="Software">Software</option>
+                    <option value="Networking">Networking</option>
+                    <option value="Security">Security</option>
+                    <option value="Cloud">Cloud</option>
+                    <option value="Programming">Programming</option>
+                    <option value="Other">Other</option>
+                </select>
                 <select id="topic-sort" aria-label="Sort topics">
                     <option value="new">Newest</option>
                     <option value="old">Oldest</option>
@@ -105,6 +132,7 @@
                     <li><a href="about.html">About</a></li>
                     <li><a href="index.html#articles">Articles</a></li>
                     <li><a href="community.html">Community</a></li>
+                    <li><a href="feedback.html">Feedback</a></li>
                     <li><a href="analytics.html">Analytics Dashboard</a></li>
                 </ul>
             </div>
@@ -129,7 +157,6 @@
             <a href="https://x.com/Tylers_TechTips" title="X (Twitter)"><i class="fab fa-x-twitter"></i></a>
             <a href="#" title="Instagram" aria-label="Instagram (link coming soon)"><i class="fab fa-instagram"></i></a>
             <a href="#" title="Facebook" aria-label="Facebook (link coming soon)"><i class="fab fa-facebook"></i></a>
-            <a href="feed.xml" target="_blank" rel="noopener noreferrer" title="Subscribe via RSS"><i class="fas fa-rss"></i></a>
         </div>
         <div class="copyright">
             <p>© 2025 Tyler's Tech Tips. All rights reserved.</p>

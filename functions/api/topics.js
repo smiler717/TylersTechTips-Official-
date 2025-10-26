@@ -14,13 +14,19 @@ export async function onRequest(context) {
   if (method === 'GET') {
     // Optional: server-side filtering/sorting
     const query = (url.searchParams.get('query') || '').trim().toLowerCase();
+    const category = (url.searchParams.get('category') || '').trim();
     const sort = (url.searchParams.get('sort') || 'new').toLowerCase();
 
   // Fetch topics
-  let topics = await DB.prepare('SELECT id, title, body, author, created_at, created_by FROM topics').all();
+  let topics = await DB.prepare('SELECT id, title, body, author, category, created_at, created_by FROM topics').all();
     topics = topics.results || [];
 
-    // Filter
+    // Filter by category
+    if (category) {
+      topics = topics.filter(t => t.category === category);
+    }
+
+    // Filter by query
     if (query) {
       topics = topics.filter(t =>
         (t.title || '').toLowerCase().includes(query) ||
@@ -71,6 +77,7 @@ export async function onRequest(context) {
     const title = (body.title || '').trim();
     const content = (body.body || '').trim();
     const author = (body.author || 'Anonymous').trim();
+    const category = (body.category || 'General').trim();
     if (!title || !content) return error(400, 'Title and body are required');
     if (!deviceId) return error(400, 'Missing X-Device-Id');
 
@@ -80,10 +87,10 @@ export async function onRequest(context) {
     const id = crypto.randomUUID();
     const createdAt = Date.now();
     try {
-      await DB.prepare('INSERT INTO topics (id, title, body, author, created_at, created_by) VALUES (?, ?, ?, ?, ?, ?)')
-        .bind(id, title, content, author, createdAt, deviceId).run();
+      await DB.prepare('INSERT INTO topics (id, title, body, author, category, created_at, created_by) VALUES (?, ?, ?, ?, ?, ?, ?)')
+        .bind(id, title, content, author, category, createdAt, deviceId).run();
       return json({
-        topic: { id, title, body: content, author, createdAt, comments: [], canDelete: admin }
+        topic: { id, title, body: content, author, category, createdAt, comments: [], canDelete: admin }
       }, { status: 201 });
     } catch (e) {
       return error(500, 'Failed to create topic');
