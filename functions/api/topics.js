@@ -47,6 +47,17 @@ export async function onRequest(context) {
       t.createdAt = t.created_at;
       t.canDelete = admin;
       t.views = await getViews(env, t.id);
+      
+      // Get vote counts
+      const upvotesKey = `votes:topic:${t.id}:up`;
+      const downvotesKey = `votes:topic:${t.id}:down`;
+      t.upvotes = parseInt(await env.RATE_LIMIT.get(upvotesKey) || '0');
+      t.downvotes = parseInt(await env.RATE_LIMIT.get(downvotesKey) || '0');
+      
+      // Check user's vote
+      const voteKey = `vote:topic:${t.id}:${deviceId}`;
+      t.userVote = await env.RATE_LIMIT.get(voteKey);
+      
       delete t.created_at;
       delete t.created_by;
     }

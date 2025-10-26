@@ -133,11 +133,23 @@
     }
     list.innerHTML = items
       .map(
-        (t) => `
+        (t) => {
+          const score = (t.upvotes || 0) - (t.downvotes || 0);
+          const scoreClass = score > 0 ? 'positive' : score < 0 ? 'negative' : '';
+          return `
       <article class="topic-card" id="t-${t.id}" data-id="${t.id}">
         <header class="topic-header">
           <h3 class="topic-title" data-id="${t.id}">${escapeHTML(t.title)}</h3>
           <div class="topic-meta">
+            <div class="vote-controls">
+              <button class="vote-btn upvote ${t.userVote === 'up' ? 'active' : ''}" data-id="${t.id}" data-vote="up" title="Upvote">
+                <i class="fas fa-arrow-up"></i>
+              </button>
+              <span class="vote-count vote-score ${scoreClass}">${score > 0 ? '+' : ''}${score}</span>
+              <button class="vote-btn downvote ${t.userVote === 'down' ? 'active' : ''}" data-id="${t.id}" data-vote="down" title="Downvote">
+                <i class="fas fa-arrow-down"></i>
+              </button>
+            </div>
             <span class="meta-item"><i class="fas fa-user"></i> ${escapeHTML(t.author || 'Anonymous')}</span>
             <span class="meta-item"><i class="fas fa-clock"></i> ${formatDate(t.createdAt)}</span>
             <span class="meta-item"><i class="fas fa-eye"></i> ${t.views || 0}</span>
@@ -176,7 +188,8 @@
           </details>
         </div>
       </article>
-    `
+    `;
+        }
       )
       .join('');
   }
@@ -341,6 +354,31 @@
     setTimeout(() => { el.classList.remove('show'); el.hidden = true; }, 1400);
   }
 
+  async function handleVote(topicId, voteType) {
+    if (!SERVER_MODE) return; // Voting only works in server mode
+    try {
+      const res = await fetch(`/api/topics/${encodeURIComponent(topicId)}/vote`, {
+        method: 'POST',
+        headers: { 
+          'content-type': 'application/json',
+          'x-device-id': getDeviceId() 
+        },
+        body: JSON.stringify({ vote: voteType })
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        alert(j?.error || 'Failed to vote');
+        return;
+      }
+      // Reload topics to update vote counts and UI
+      const topics = await loadRemote();
+      render(topics, currentView());
+    } catch (err) {
+      console.error('Vote error:', err);
+      alert('Network error voting');
+    }
+  }
+
   function copyLink(id) {
     const url = `${location.origin}${location.pathname}#t-${id}`;
     navigator.clipboard?.writeText(url).then(() => showToast('Copied link')); 
@@ -455,8 +493,8 @@
       render(topics, currentView());
     });
 
-    // Delegate copy-link and delete buttons
-    document.body.addEventListener('click', (e) => {
+    // Delegate copy-link, delete, and vote buttons
+    document.body.addEventListener('click', async (e) => {
       const copyBtn = e.target.closest?.('.copy-link');
       if (copyBtn) { copyLink(copyBtn.getAttribute('data-id')); return; }
       const title = e.target.closest?.('.topic-title');
@@ -465,6 +503,8 @@
       if (delTopic) { onDeleteTopic(delTopic.getAttribute('data-id')); return; }
       const delComment = e.target.closest?.('.delete-comment');
       if (delComment) { onDeleteComment(delComment.getAttribute('data-topic'), delComment.getAttribute('data-id')); return; }
+      const voteBtn = e.target.closest?.('.vote-btn');
+      if (voteBtn) { await handleVote(voteBtn.getAttribute('data-id'), voteBtn.getAttribute('data-vote')); return; }
     });
 
     // Record a view when comments are expanded
