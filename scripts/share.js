@@ -7,10 +7,10 @@
         const pageUrl = encodeURIComponent(window.location.href);
         const pageTitle = encodeURIComponent(document.title);
         
-        // Twitter share
+        // Twitter share with @Tylers_TechTips mention
         const twitterBtn = shareButtons.querySelector('.share-twitter');
         if (twitterBtn) {
-            twitterBtn.href = `https://twitter.com/intent/tweet?url=${pageUrl}&text=${pageTitle}`;
+            twitterBtn.href = `https://twitter.com/intent/tweet?url=${pageUrl}&text=${pageTitle}&via=Tylers_TechTips`;
         }
 
         // Facebook share
