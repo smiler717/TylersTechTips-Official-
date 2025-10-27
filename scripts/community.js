@@ -198,6 +198,10 @@
   async function onNewTopic(e) {
     e.preventDefault();
     const f = e.target;
+    const submitBtn = f.querySelector('button[type="submit"]');
+    const origBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting…'; }
+
     const author = f.author.value.trim() || 'Anonymous';
     const title = f.title.value.trim();
     const body = f.body.value.trim();
@@ -230,6 +234,8 @@
         return;
       } catch (_) {
         // network problem: fall back locally
+      } finally {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = origBtnHtml; }
       }
     }
     const rl = checkRateLimit('post');
@@ -240,12 +246,17 @@
     saveLocal(topics);
     f.reset();
     render(topics, currentView());
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = origBtnHtml; }
     location.hash = `#t-${topic.id}`;
   }
 
   async function onNewComment(e) {
     e.preventDefault();
-    const id = e.target.getAttribute('data-id');
+    const form = e.target;
+    const id = form.getAttribute('data-id');
+    const btn = form.querySelector('button[type="submit"]');
+    const old = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting…'; }
     const author = e.target.author.value.trim() || 'Anonymous';
     const body = e.target.body.value.trim();
     if (!body) return;
@@ -269,11 +280,13 @@
         }
         const { category } = currentView();
         const topics = await loadRemote(category);
-        e.target.reset();
+        form.reset();
         render(topics, currentView());
         return;
       } catch (_) {
         // network-only failure: fall back locally
+      } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = old; }
       }
     }
     const rl = checkRateLimit('comment');
@@ -284,8 +297,9 @@
     t.comments = t.comments || [];
     t.comments.push({ id: uid(), author, body, createdAt: Date.now(), createdBy: getDeviceId(), canDelete: true });
     saveLocal(topics);
-    e.target.reset();
+    form.reset();
     render(topics, currentView());
+    if (btn) { btn.disabled = false; btn.innerHTML = old; }
   }
 
   async function onDeleteTopic(id) {

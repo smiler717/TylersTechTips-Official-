@@ -182,4 +182,43 @@ document.addEventListener('DOMContentLoaded', function() {
             searchResults.style.display = 'none';
         }
     });
+
+    // Global keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ignore when typing in inputs/textareas or when modifier keys are used
+        const tag = (document.activeElement?.tagName || '').toLowerCase();
+        const typing = tag === 'input' || tag === 'textarea' || document.activeElement?.isContentEditable;
+        if (typing) return;
+
+        // Focus search with '/'
+        if (e.key === '/') {
+            e.preventDefault();
+            searchBar.focus();
+            try { searchBar.select(); } catch(_) {}
+        }
+
+        // Quick help with '?'
+        if (e.key === '?') {
+            e.preventDefault();
+            // Lightweight, non-intrusive hint
+            const hint = document.createElement('div');
+            hint.className = 'shortcut-hint';
+            hint.textContent = "Tip: Press '/' to search, Esc to close results.";
+            Object.assign(hint.style, {
+                position: 'fixed',
+                bottom: '20px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                background: 'var(--secondary-bg, rgba(0,0,0,0.8))',
+                color: 'var(--text-color, #fff)',
+                padding: '10px 14px',
+                borderRadius: '8px',
+                border: '1px solid var(--card-border, rgba(255,255,255,0.2))',
+                zIndex: 9999,
+                fontSize: '0.95rem',
+            });
+            document.body.appendChild(hint);
+            setTimeout(() => hint.remove(), 2200);
+        }
+    });
 });
