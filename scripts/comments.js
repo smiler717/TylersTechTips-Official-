@@ -81,23 +81,40 @@
       const res = await fetch(`/api/page-comments/${encodeURIComponent(slug)}`);
       if (!res.ok) throw new Error('Failed to fetch');
       const data = await res.json();
-      const comments = Array.isArray(data.comments) ? data.comments : [];
-      if (comments.length === 0) {
+      const flat = Array.isArray(data.comments) ? data.comments : [];
+      if (flat.length === 0) {
         listEl.innerHTML = '<div style="color:var(--secondary-text);">No comments yet. Be the first to comment!</div>';
         return;
       }
-      listEl.innerHTML = comments.map(c => {
-        const date = c.createdAt ? new Date(c.createdAt) : null;
+      // Build tree
+      const nodes = new Map();
+      flat.forEach(c => nodes.set(c.id, { ...c, children: [] }));
+      const roots = [];
+      nodes.forEach(n => {
+        if (n.parentId && nodes.has(n.parentId)) nodes.get(n.parentId).children.push(n); else roots.push(n);
+      });
+
+      function renderNode(n, depth=0){
+        const date = n.createdAt ? new Date(n.createdAt) : null;
         const when = date ? `${date.toLocaleDateString()} ${date.toLocaleTimeString()}` : '';
+        const margin = Math.min(depth, 4) * 16; // indent per depth
+        const childHtml = (n.children || []).map(ch => renderNode(ch, depth+1)).join('');
         return `
-          <div class="comment-item" style="background:var(--secondary-bg);border:1px solid var(--card-bg);border-radius:8px;padding:1rem;margin:.75rem 0;">
+          <div class="comment-item" data-id="${n.id}" style="background:var(--secondary-bg);border:1px solid var(--card-bg);border-radius:8px;padding:1rem;margin:.75rem 0;margin-left:${margin}px;">
             <div style="display:flex;justify-content:space-between;gap:.5rem;flex-wrap:wrap;">
-              <strong>${escapeHTML(c.author || 'Anonymous')}</strong>
+              <strong>${escapeHTML(n.author || 'Anonymous')}</strong>
               <span style="color:var(--secondary-text);font-size:.9rem;">${escapeHTML(when)}</span>
             </div>
-            <div style="white-space:pre-wrap;margin-top:.5rem;">${escapeHTML(c.body || '')}</div>
-          </div>`;
-      }).join('');
+            <div style="white-space:pre-wrap;margin-top:.5rem;">${escapeHTML(n.body || '')}</div>
+            <div class="comment-actions" style="margin-top:.5rem;">
+              <button class="reply-btn" data-target="${n.id}" style="background:transparent;border:none;color:var(--accent-color);cursor:pointer;padding:0;font-weight:600;">Reply</button>
+            </div>
+            <div class="reply-form-slot"></div>
+          </div>
+          ${childHtml}`;
+      }
+
+      listEl.innerHTML = roots.map(r => renderNode(r, 0)).join('');
     } catch (e) {
       listEl.innerHTML = '<div style="color:#dc3545;">Failed to load comments.</div>';
     }
@@ -153,6 +170,78 @@
       submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Post Comment';
     }
   }
+
+  // Event delegation for Reply buttons
+  listEl.addEventListener('click', (ev) => {
+    const btn = ev.target.closest && ev.target.closest('.reply-btn');
+    if (!btn) return;
+    const id = btn.getAttribute('data-target');
+    const item = btn.closest('.comment-item');
+    if (!item) return;
+    const slot = item.querySelector('.reply-form-slot');
+    // Toggle existing
+    if (slot.dataset.open === '1') {
+      slot.innerHTML = '';
+      slot.dataset.open = '0';
+      return;
+    }
+    // Close any other open forms
+    listEl.querySelectorAll('.reply-form-slot[data-open="1"]').forEach(s => { s.innerHTML=''; s.dataset.open='0'; });
+    slot.dataset.open = '1';
+    slot.innerHTML = `
+      <div class="reply-form" style="margin-top:.5rem;padding:.5rem;border-left:3px solid var(--accent-color);">
+        <div class="form-group" style="margin-bottom:.5rem;">
+          <label style="display:block;font-size:.9rem;">Name</label>
+          <input type="text" class="reply-author" placeholder="Your name (optional)" maxlength="60" style="width:100%;">
+        </div>
+        <div class="form-group" style="margin-bottom:.5rem;">
+          <label style="display:block;font-size:.9rem;">Reply</label>
+          <textarea class="reply-body" rows="3" placeholder="Write your reply..." maxlength="2000" style="width:100%;"></textarea>
+        </div>
+        <div style="display:flex;gap:.5rem;">
+          <button class="pill reply-submit" data-parent="${id}"><i class="fas fa-reply"></i> Post Reply</button>
+          <button class="pill reply-cancel" style="background:var(--secondary-bg);color:var(--text-color);border:1px solid var(--card-bg);">Cancel</button>
+        </div>
+      </div>`;
+  });
+
+  // Handle reply submit/cancel
+  listEl.addEventListener('click', async (ev) => {
+    const cancel = ev.target.closest && ev.target.closest('.reply-cancel');
+    if (cancel) {
+      const slot = cancel.closest('.reply-form-slot');
+      if (slot) { slot.innerHTML=''; slot.dataset.open='0'; }
+      return;
+    }
+    const submit = ev.target.closest && ev.target.closest('.reply-submit');
+    if (submit) {
+      const parentId = submit.getAttribute('data-parent');
+      const wrap = submit.closest('.reply-form');
+      if (!wrap) return;
+      const a = wrap.querySelector('.reply-author');
+      const b = wrap.querySelector('.reply-body');
+      const author = (a && a.value || '').trim();
+      const body = (b && b.value || '').trim();
+      if (!body) return; // simple guard
+      submit.disabled = true;
+      submit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting…';
+      try {
+        const res = await fetch(`/api/page-comments/${encodeURIComponent(slug)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-device-id': getDeviceId() },
+          body: JSON.stringify({ author, body, parentId })
+        });
+        if (!res.ok) {
+          // ignore inline error UI for brevity; full form message is above
+        } else {
+          await loadComments();
+        }
+      } catch {}
+      finally {
+        submit.disabled = false;
+      }
+    }
+  });
 
   submitBtn.addEventListener('click', postComment);
   loadComments();

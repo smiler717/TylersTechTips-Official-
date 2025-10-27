@@ -31,7 +31,7 @@ export async function onRequest(context) {
   if (method === 'GET') {
     try {
       const res = await DB
-        .prepare('SELECT id, author, body, created_at FROM page_comments WHERE slug = ? ORDER BY created_at ASC')
+        .prepare('SELECT id, author, body, created_at, parent_id FROM page_comments WHERE slug = ? ORDER BY created_at ASC')
         .bind(slug)
         .all();
       const rows = res.results || [];
@@ -40,6 +40,7 @@ export async function onRequest(context) {
         author: r.author || 'Anonymous',
         body: r.body || '',
         createdAt: r.created_at || 0,
+        parentId: r.parent_id || null,
       }));
       return json({ comments });
     } catch (e) {
@@ -71,6 +72,7 @@ export async function onRequest(context) {
 
     const author = sanitizeText(body.author || 'Anonymous', 60) || 'Anonymous';
     const content = sanitizeText(body.body || '', 2000);
+    const parentId = validateParentId(body.parentId);
     if (!content) return error(400, 'Comment body is required');
 
     const id = crypto.randomUUID();
@@ -78,10 +80,10 @@ export async function onRequest(context) {
 
     try {
       await DB
-        .prepare('INSERT INTO page_comments (id, slug, author, body, created_at, created_by) VALUES (?, ?, ?, ?, ?, ?)')
-        .bind(id, slug, author, content, createdAt, deviceId)
+        .prepare('INSERT INTO page_comments (id, slug, author, body, created_at, created_by, parent_id) VALUES (?, ?, ?, ?, ?, ?, ?)')
+        .bind(id, slug, author, content, createdAt, deviceId, parentId)
         .run();
-      return json({ comment: { id, author, body: content, createdAt } }, { status: 201 });
+      return json({ comment: { id, author, body: content, createdAt, parentId } }, { status: 201 });
     } catch (e) {
       const msg = String(e && e.message || '').toLowerCase();
       if (msg.includes('no such table') || msg.includes('not exist')) {
@@ -102,8 +104,30 @@ async function ensurePageCommentsSchema(DB) {
       author TEXT,
       body TEXT NOT NULL,
       created_at INTEGER NOT NULL,
-      created_by TEXT
+      created_by TEXT,
+      parent_id TEXT
     );`).run();
   await DB.prepare(`CREATE INDEX IF NOT EXISTS idx_page_comments_slug ON page_comments(slug);`).run();
   await DB.prepare(`CREATE INDEX IF NOT EXISTS idx_page_comments_created ON page_comments(created_at);`).run();
+  // Try to add parent_id if missing
+  try {
+    const info = await DB.prepare(`PRAGMA table_info(page_comments);`).all();
+    const cols = (info && info.results) ? info.results.map(r => (r.name || r.column || '').toLowerCase()) : [];
+    if (!cols.includes('parent_id')) {
+      await DB.prepare(`ALTER TABLE page_comments ADD COLUMN parent_id TEXT;`).run();
+      await DB.prepare(`CREATE INDEX IF NOT EXISTS idx_page_comments_parent ON page_comments(parent_id);`).run();
+    }
+  } catch (_) {
+    // best-effort migration; ignore if not supported
+  }
+}
+
+function validateParentId(val) {
+  if (!val) return null;
+  if (typeof val !== 'string') return null;
+  const s = val.trim();
+  // basic UUID v4/any-uuid pattern
+  const uuidRe = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+  if (uuidRe.test(s)) return s;
+  return null;
 }
