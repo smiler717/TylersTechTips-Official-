@@ -1,0 +1,44 @@
+name: Generate App Icons
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'favicon.svg'
+      - '.github/workflows/generate-icons.yml'
+      - 'site.webmanifest'
+
+jobs:
+  build-icons:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install sharp-cli
+        run: npm i -g sharp-cli
+      - name: Generate icons from favicon.svg
+        run: |
+          sharp favicon.svg --resize 180 --withoutEnlargement apple-touch-icon.png
+          sharp favicon.svg --resize 192 --withoutEnlargement android-chrome-192x192.png
+          sharp favicon.svg --resize 512 --withoutEnlargement android-chrome-512x512.png
+          # Maskable can reuse same graphics; ideally provide safe-zone bleed
+          cp android-chrome-192x192.png android-chrome-192x192-maskable.png
+          cp android-chrome-512x512.png android-chrome-512x512-maskable.png
+      - name: Commit and push icons
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apple-touch-icon.png android-chrome-*.png || true
+          if ! git diff --cached --quiet; then
+            git commit -m "ci(icons): generate platform icons from favicon.svg"
+            git push
+          else
+            echo "No icon changes to commit"
+          fi
