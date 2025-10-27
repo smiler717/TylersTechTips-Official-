@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Pinned tab icons should be monochrome; Safari applies the mask color -->
+  <rect width="100" height="100" rx="20" fill="#000"/>
+  <g fill="#fff">
+    <text x="50" y="64" font-family="Arial, sans-serif" font-size="44" font-weight="700" text-anchor="middle">TTT</text>
+  </g>
+</svg>
