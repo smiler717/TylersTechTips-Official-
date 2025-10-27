@@ -10,7 +10,8 @@ export async function onRequest(context) {
   const { request, env, params } = context;
   const method = request.method.toUpperCase();
   const slug = (params && params.slug) ? String(params.slug) : '';
-  const DB = env && env.DB;
+  const DB = (env && (env.DB || env.TYLERS_TECH_DB));
+  const KV = (env && (env.RATE_LIMIT || env.TYLERS_TECH_KV)) || null;
 
   if (!slug) return error(400, 'Missing page slug');
   if (!DB) return error(500, 'Database binding DB is not configured');
@@ -51,7 +52,8 @@ export async function onRequest(context) {
       return error(400, 'Invalid device identifier');
     }
 
-    const rl = await checkRateLimit(env, `page-comment:${slug}:${deviceId}`, 20000);
+  // Use whichever KV binding exists for rate limit
+  const rl = await checkRateLimit({ RATE_LIMIT: KV }, `page-comment:${slug}:${deviceId}`, 20000);
     if (!rl.ok) return error(429, 'Rate limited', { waitMs: rl.waitMs });
 
     const body = await readJson(request);
