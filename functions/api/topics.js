@@ -1,4 +1,5 @@
 import { json, error, readJson, getDeviceId, checkRateLimit, isAdmin, getViews } from './_utils.js';
+import { sanitizeTopicInput, validateDeviceId } from './_sanitize.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -9,7 +10,7 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const method = request.method.toUpperCase();
   const deviceId = getDeviceId(request);
-  const admin = isAdmin(request, env);
+  const admin = await isAdmin(request, env);
 
   if (method === 'GET') {
     // Optional: server-side filtering/sorting
@@ -74,12 +75,19 @@ export async function onRequest(context) {
   if (method === 'POST') {
     const body = await readJson(request);
     if (!body) return error(400, 'Invalid JSON');
-    const title = (body.title || '').trim();
-    const content = (body.body || '').trim();
-    const author = (body.author || 'Anonymous').trim();
-    const category = (body.category || 'General').trim();
+    
+    // Sanitize all inputs
+    const { title, body: content, author, category } = sanitizeTopicInput(body);
+    
     if (!title || !content) return error(400, 'Title and body are required');
     if (!deviceId) return error(400, 'Missing X-Device-Id');
+    
+    // Validate device ID
+    try {
+      validateDeviceId(deviceId);
+    } catch {
+      return error(400, 'Invalid device identifier');
+    }
 
     const rl = await checkRateLimit(env, `post:${deviceId}`, 20000);
     if (!rl.ok) return error(429, 'Rate limited', { waitMs: rl.waitMs });

@@ -1,11 +1,55 @@
 // Shared utilities for Cloudflare Pages Functions (Workers runtime)
 
 /**
+ * CORS headers configuration
+ */
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*', // Change to specific domain in production
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, x-device-id, x-admin-key',
+  'Access-Control-Max-Age': '86400',
+};
+
+/**
+ * Handle CORS preflight requests
+ */
+export function handleCORS(request) {
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: CORS_HEADERS
+    });
+  }
+  return null;
+}
+
+/**
+ * Add CORS headers to response
+ */
+export function addCORSHeaders(response) {
+  const newHeaders = new Headers(response.headers);
+  Object.entries(CORS_HEADERS).forEach(([key, value]) => {
+    newHeaders.set(key, value);
+  });
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: newHeaders
+  });
+}
+
+/**
  * JSON response helper
  */
 export function json(data, init = {}) {
   const headers = new Headers(init.headers || {});
   headers.set('content-type', 'application/json; charset=utf-8');
+  
+  // Add CORS headers
+  Object.entries(CORS_HEADERS).forEach(([key, value]) => {
+    headers.set(key, value);
+  });
+  
   return new Response(JSON.stringify(data), { ...init, headers });
 }
 
@@ -37,12 +81,39 @@ export function getDeviceId(request) {
 
 /**
  * Admin check via secret header and Pages env secret
+ * Includes rate limiting to prevent brute force attacks
  */
-export function isAdmin(request, env) {
+export async function isAdmin(request, env) {
   const header = request.headers.get('x-admin-key');
   const key = header && header.trim();
   const secret = env && env.ADMIN_KEY;
-  return Boolean(secret && key && key === secret);
+  
+  if (!secret) return false;
+  
+  // Rate limit admin login attempts
+  const ip = request.headers.get('cf-connecting-ip') || 'unknown';
+  const rateLimitKey = `admin-attempt:${ip}`;
+  
+  if (env.RATE_LIMIT) {
+    const attempts = await env.RATE_LIMIT.get(rateLimitKey);
+    if (attempts && parseInt(attempts) > 10) {
+      // Too many failed attempts, block for 1 hour
+      return false;
+    }
+  }
+  
+  const isValid = Boolean(key && key === secret);
+  
+  // Track failed attempts
+  if (!isValid && env.RATE_LIMIT) {
+    const current = parseInt(await env.RATE_LIMIT.get(rateLimitKey) || '0');
+    await env.RATE_LIMIT.put(rateLimitKey, String(current + 1), { expirationTtl: 3600 }); // 1 hour
+  } else if (isValid && env.RATE_LIMIT) {
+    // Reset on success
+    await env.RATE_LIMIT.delete(rateLimitKey);
+  }
+  
+  return isValid;
 }
 
 /**

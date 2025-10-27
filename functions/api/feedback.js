@@ -1,9 +1,24 @@
 // Cloudflare Pages Function: /api/feedback
 // Handles user feedback submissions with rate limiting
+import { sanitizeFeedbackInput, validateDeviceId } from './_sanitize.js';
+
+// Handle CORS preflight
+export async function onRequestOptions() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, x-device-id, x-admin-key',
+      'Access-Control-Max-Age': '86400',
+    }
+  });
+}
 
 export async function onRequestPost({ request, env }) {
   try {
-    const { name, email, type, message } = await request.json();
+    const rawInput = await request.json();
+    const { name, email, type, message } = sanitizeFeedbackInput(rawInput);
     
     if (!type || !message) {
       return new Response(JSON.stringify({ error: 'Type and message are required' }), {
@@ -13,9 +28,19 @@ export async function onRequestPost({ request, env }) {
     }
 
     // Get device ID for rate limiting
-    const deviceId = request.headers.get('x-device-id') || 
-                    request.headers.get('cf-connecting-ip') || 
-                    'unknown';
+    const rawDeviceId = request.headers.get('x-device-id') || 
+                        request.headers.get('cf-connecting-ip') || 
+                        'unknown';
+    
+    let deviceId;
+    try {
+      deviceId = validateDeviceId(rawDeviceId);
+    } catch {
+      return new Response(JSON.stringify({ error: 'Invalid device identifier' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
     
     // Rate limiting: 1 feedback per 60 seconds per device
     const rateLimitKey = `feedback:${deviceId}`;

@@ -1,4 +1,5 @@
 import { isAdmin, getDeviceId } from '../../_utils.js';
+import { validateDeviceId } from '../../_sanitize.js';
 
 export async function onRequest(context) {
   const { request, env, params } = context;
@@ -28,6 +29,17 @@ async function handleVote(request, env, topicId) {
     }
     
     const deviceId = getDeviceId(request);
+    
+    // Validate device ID
+    try {
+      validateDeviceId(deviceId);
+    } catch {
+      return new Response(JSON.stringify({ error: 'Invalid device identifier' }), {
+        status: 400,
+        headers: { 'content-type': 'application/json' }
+      });
+    }
+    
     const voteKey = `vote:topic:${topicId}:${deviceId}`;
     const upvotesKey = `votes:topic:${topicId}:up`;
     const downvotesKey = `votes:topic:${topicId}:down`;

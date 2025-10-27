@@ -1,0 +1,27 @@
+## Security Headers for TylersTechTips
+## These headers are automatically applied by Cloudflare Pages
+
+/*
+  # Security Headers
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
+  
+  # HSTS - Force HTTPS (1 year)
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  
+  # Content Security Policy
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';
+
+/api/*
+  # API-specific headers
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  
+  # CORS for API endpoints (adjust as needed)
+  Access-Control-Allow-Origin: https://tylerstechtips.com
+  Access-Control-Allow-Methods: GET, POST, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, x-device-id, x-admin-key
+  Access-Control-Max-Age: 86400

@@ -10,7 +10,7 @@ export async function onRequest(context) {
   const topicId = params.id;
   const commentId = params.commentId;
   const deviceId = getDeviceId(request);
-  const admin = isAdmin(request, env);
+  const admin = await isAdmin(request, env);
 
   if (method !== 'DELETE') return error(405, 'Method Not Allowed');
   if (!topicId || !commentId) return error(400, 'Missing ids');

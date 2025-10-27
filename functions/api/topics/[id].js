@@ -9,7 +9,7 @@ export async function onRequest(context) {
   const method = request.method.toUpperCase();
   const id = params.id;
   const deviceId = getDeviceId(request);
-  const admin = isAdmin(request, env);
+  const admin = await isAdmin(request, env);
 
   if (!id) return error(400, 'Missing id');
 

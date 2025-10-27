@@ -1,4 +1,5 @@
 import { json, error, readJson, getDeviceId, checkRateLimit, isAdmin } from '../../_utils.js';
+import { sanitizeText, validateDeviceId } from '../../_sanitize.js';
 
 export async function onRequest(context) {
   const { request, env, params } = context;
@@ -9,7 +10,7 @@ export async function onRequest(context) {
   const method = request.method.toUpperCase();
   const topicId = params.id;
   const deviceId = getDeviceId(request);
-  const admin = isAdmin(request, env);
+  const admin = await isAdmin(request, env);
 
   if (!topicId) return error(400, 'Missing topic id');
 
@@ -21,10 +22,21 @@ export async function onRequest(context) {
 
   if (method === 'POST') {
     if (!deviceId) return error(400, 'Missing X-Device-Id');
+    
+    // Validate device ID
+    try {
+      validateDeviceId(deviceId);
+    } catch {
+      return error(400, 'Invalid device identifier');
+    }
+    
     const body = await readJson(request);
     if (!body) return error(400, 'Invalid JSON');
-    const author = (body.author || 'Anonymous').trim();
-    const content = (body.body || '').trim();
+    
+    // Sanitize inputs
+    const author = sanitizeText(body.author || 'Anonymous', 60);
+    const content = sanitizeText(body.body || '', 2000);
+    
     if (!content) return error(400, 'Body is required');
 
     const rl = await checkRateLimit(env, `comment:${deviceId}`, 20000);
