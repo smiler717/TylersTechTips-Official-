@@ -21,9 +21,51 @@
     <meta name="twitter:image" content="https://tylerstechtips.com/images/og-image.png">
     <!-- RSS Feed -->
     <link rel="alternate" type="application/rss+xml" title="Tyler's Tech Tips RSS Feed" href="https://tylerstechtips.com/feed.xml">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="style.css">
     <!-- Font Awesome CDN for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Preconnect for faster loading -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Tyler's Tech Tips",
+      "url": "https://tylerstechtips.com",
+      "logo": "https://tylerstechtips.com/images/logo.png",
+      "description": "Expert tech tutorials, guides, and tips for IT professionals and enthusiasts",
+      "sameAs": [
+        "https://x.com/Tylers_TechTips",
+        "https://www.linkedin.com/in/tyler-furman/"
+      ],
+      "founder": {
+        "@type": "Person",
+        "name": "Tyler",
+        "url": "https://www.linkedin.com/in/tyler-furman/"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "contact@tylerstech.tips",
+        "contactType": "Customer Service"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Tyler's Tech Tips",
+      "url": "https://tylerstechtips.com",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://tylerstechtips.com/?s={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
     <script src="scripts/theme.js"></script>
     <script defer src="scripts/search.js"></script>
 </head>
