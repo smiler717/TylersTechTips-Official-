@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Generate Android/Maskable Icons</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 2rem; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 1rem; }
+    canvas { border: 1px solid #ddd; }
+    .btn { background:#00d9ff; color:#0a0e27; border:none; padding:.5rem .9rem; border-radius:8px; font-weight:700; cursor:pointer; }
+    .btn:hover { filter: brightness(.9); }
+    .card { padding: 1rem; border:1px solid #eee; border-radius:12px; }
+  </style>
+</head>
+<body>
+  <h1>Generate Android PNG Icons</h1>
+  <p>This will create four files in your Downloads: <code>android-chrome-192x192.png</code>, <code>android-chrome-512x512.png</code>, and their maskable variants. Place them in your site root.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h3>192x192 (any)</h3>
+      <canvas id="c192" width="192" height="192"></canvas><br>
+      <button class="btn" data-target="c192" data-name="android-chrome-192x192.png">Download</button>
+    </div>
+    <div class="card">
+      <h3>512x512 (any)</h3>
+      <canvas id="c512" width="512" height="512"></canvas><br>
+      <button class="btn" data-target="c512" data-name="android-chrome-512x512.png">Download</button>
+    </div>
+    <div class="card">
+      <h3>192x192 (maskable)</h3>
+      <canvas id="m192" width="192" height="192"></canvas><br>
+      <button class="btn" data-target="m192" data-name="android-chrome-192x192-maskable.png">Download</button>
+    </div>
+    <div class="card">
+      <h3>512x512 (maskable)</h3>
+      <canvas id="m512" width="512" height="512"></canvas><br>
+      <button class="btn" data-target="m512" data-name="android-chrome-512x512-maskable.png">Download</button>
+    </div>
+  </div>
+
+  <script>
+    const BLUE = '#00d9ff';
+    const DARK = '#0a0e27';
+
+    function drawAny(canvas){
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = BLUE; ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = DARK;
+      const size = Math.round(canvas.width * 0.44);
+      ctx.font = `bold ${size}px Arial`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('TTT', canvas.width/2, canvas.height/2);
+    }
+
+    function drawMaskable(canvas){
+      const ctx = canvas.getContext('2d');
+      // Safe zone with margin for maskable icons
+      const m = Math.round(canvas.width * 0.08);
+      ctx.fillStyle = BLUE; ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = DARK;
+      const size = Math.round(canvas.width * 0.44);
+      ctx.font = `bold ${size}px Arial`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('TTT', canvas.width/2, canvas.height/2 + m*0.25);
+    }
+
+    function init(){
+      drawAny(document.getElementById('c192'));
+      drawAny(document.getElementById('c512'));
+      drawMaskable(document.getElementById('m192'));
+      drawMaskable(document.getElementById('m512'));
+
+      document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-target');
+          const name = btn.getAttribute('data-name');
+          const canvas = document.getElementById(id);
+          canvas.toBlob((blob) => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = name; a.click();
+            URL.revokeObjectURL(url);
+          }, 'image/png');
+        });
+      });
+    }
+
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  </script>
+</body>
+</html>
