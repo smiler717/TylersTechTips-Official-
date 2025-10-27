@@ -77,7 +77,7 @@ export async function onRequestGet({ request, env }) {
   try {
     // Require admin key
     const adminKey = request.headers.get('x-admin-key');
-    const expectedKey = env.ADMIN_KEY;
+    const expectedKey = env.FEEDBACK_ADMIN_KEY;
     
     if (!adminKey || adminKey !== expectedKey) {
       return new Response(JSON.stringify({ error: 'Admin access required' }), {
