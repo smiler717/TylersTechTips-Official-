@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="160" viewBox="0 0 240 160" role="img" aria-label="Bachelor of Science">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00d4ff"/>
+      <stop offset="100%" stop-color="#0077ff"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="240" height="160" rx="16" fill="#0a0f1a"/>
+  <g transform="translate(20,28)">
+    <!-- Mortarboard -->
+    <polygon points="100,0 200,40 100,80 0,40" fill="url(#g1)"/>
+    <rect x="80" y="70" width="40" height="18" rx="4" fill="#1e2a3a"/>
+    <rect x="70" y="88" width="60" height="10" rx="3" fill="#16202e"/>
+    <!-- Tassel -->
+    <line x1="200" y1="40" x2="215" y2="68" stroke="#f9c74f" stroke-width="4"/>
+    <circle cx="215" cy="68" r="5" fill="#f9c74f"/>
+  </g>
+  <text x="120" y="130" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="20" fill="#e6f1ff" font-weight="700">BS</text>
+</svg>
