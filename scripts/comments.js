@@ -97,7 +97,7 @@
       function renderNode(n, depth=0){
         const date = n.createdAt ? new Date(n.createdAt) : null;
         const when = date ? `${date.toLocaleDateString()} ${date.toLocaleTimeString()}` : '';
-        const margin = Math.min(depth, 4) * 16; // indent per depth
+        const isReply = depth > 0; const margin = Math.min(depth, 4) * 32; const bg = isReply ? "var(--card-bg)" : "var(--secondary-bg)"; const borderLeft = isReply ? "4px solid var(--accent-color)" : "none"; const replyBadge = isReply ? `<div style="font-size:.8rem;color:var(--accent-color);margin-bottom:.3rem;font-weight:600;"><i class="fas fa-reply" style="margin-right:.4rem;"></i>Reply</div>` : ""; const boxShadow = isReply ? "0 1px 3px rgba(0,0,0,0.1)" : "none"; // indent per depth
         const childHtml = (n.children || []).map(ch => renderNode(ch, depth+1)).join('');
         return `
           <div class="comment-item" data-id="${n.id}" style="background:var(--secondary-bg);border:1px solid var(--card-bg);border-radius:8px;padding:1rem;margin:.75rem 0;margin-left:${margin}px;">
