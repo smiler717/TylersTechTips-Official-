@@ -17,7 +17,12 @@ export async function onRequest(context) {
   if (!DB) return error(500, 'Database binding DB is not configured');
 
   // Ensure table exists (idempotent)
-  await ensurePageCommentsSchema(DB);
+  // Run defensively and don't fail the whole request if schema creation encounters a transient issue
+  try {
+    await ensurePageCommentsSchema(DB);
+  } catch (_) {
+    // Proceed; if the table truly doesn't exist the SELECT/INSERT will fail below and return a clear error
+  }
 
   if (method === 'OPTIONS') {
     return json({}, { status: 204 });
@@ -81,16 +86,16 @@ export async function onRequest(context) {
 }
 
 async function ensurePageCommentsSchema(DB) {
-  await DB.exec(`
-    CREATE TABLE IF NOT EXISTS page_comments (
+  // Some environments are picky about multiple statements in a single exec.
+  // Execute statements individually to maximize compatibility.
+  await DB.exec(`CREATE TABLE IF NOT EXISTS page_comments (
       id TEXT PRIMARY KEY,
       slug TEXT NOT NULL,
       author TEXT,
       body TEXT NOT NULL,
       created_at INTEGER NOT NULL,
       created_by TEXT
-    );
-    CREATE INDEX IF NOT EXISTS idx_page_comments_slug ON page_comments(slug);
-    CREATE INDEX IF NOT EXISTS idx_page_comments_created ON page_comments(created_at);
-  `);
+    );`);
+  await DB.exec(`CREATE INDEX IF NOT EXISTS idx_page_comments_slug ON page_comments(slug);`);
+  await DB.exec(`CREATE INDEX IF NOT EXISTS idx_page_comments_created ON page_comments(created_at);`);
 }
