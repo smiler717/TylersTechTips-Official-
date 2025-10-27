@@ -97,10 +97,16 @@
       function renderNode(n, depth=0){
         const date = n.createdAt ? new Date(n.createdAt) : null;
         const when = date ? `${date.toLocaleDateString()} ${date.toLocaleTimeString()}` : '';
-        const isReply = depth > 0; const margin = Math.min(depth, 4) * 32; const bg = isReply ? "var(--card-bg)" : "var(--secondary-bg)"; const borderLeft = isReply ? "4px solid var(--accent-color)" : "none"; const replyBadge = isReply ? `<div style="font-size:.8rem;color:var(--accent-color);margin-bottom:.3rem;font-weight:600;"><i class="fas fa-reply" style="margin-right:.4rem;"></i>Reply</div>` : ""; const boxShadow = isReply ? "0 1px 3px rgba(0,0,0,0.1)" : "none"; // indent per depth
+        const isReply = depth > 0;
+        const margin = Math.min(depth, 4) * 40; // 40px indent for better visual distinction
+        const bg = isReply ? 'var(--card-bg)' : 'var(--secondary-bg)';
+        const borderLeft = isReply ? '4px solid var(--accent-color)' : 'none';
+        const boxShadow = isReply ? '0 2px 4px rgba(0,0,0,.1)' : 'none';
+        const replyBadge = isReply ? `<div style="display:inline-block;background:var(--accent-color);color:white;font-size:.7rem;font-weight:700;padding:.25rem .6rem;border-radius:3px;margin-bottom:.5rem;letter-spacing:.5px;"><i class="fas fa-reply" style="margin-right:.3rem;"></i>REPLY</div>` : '';
         const childHtml = (n.children || []).map(ch => renderNode(ch, depth+1)).join('');
         return `
-          <div class="comment-item" data-id="${n.id}" style="background:var(--secondary-bg);border:1px solid var(--card-bg);border-radius:8px;padding:1rem;margin:.75rem 0;margin-left:${margin}px;">
+          ${replyBadge}
+          <div class="comment-item" data-id="${n.id}" style="background:${bg};border:1px solid var(--card-bg);border-left:${borderLeft};border-radius:8px;padding:1rem;margin:.75rem 0 .75rem ${margin}px;${boxShadow ? `box-shadow:${boxShadow};` : ``}">
             <div style="display:flex;justify-content:space-between;gap:.5rem;flex-wrap:wrap;">
               <strong>${escapeHTML(n.author || 'Anonymous')}</strong>
               <span style="color:var(--secondary-text);font-size:.9rem;">${escapeHTML(when)}</span>
