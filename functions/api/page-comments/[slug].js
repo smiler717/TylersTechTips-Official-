@@ -43,6 +43,11 @@ export async function onRequest(context) {
       }));
       return json({ comments });
     } catch (e) {
+      // If table doesn't exist yet, treat as empty list instead of failing
+      const msg = String(e && e.message || '').toLowerCase();
+      if (msg.includes('no such table') || msg.includes('not exist')) {
+        return json({ comments: [] });
+      }
       return error(500, 'Failed to load comments');
     }
   }
