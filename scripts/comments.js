@@ -128,7 +128,20 @@
         showMsg(`You're commenting too fast. Please wait ${waitSec}s.`, 'error');
         return;
       }
-      if (!res.ok) throw new Error('Failed to post');
+      if (!res.ok) {
+        // Try to surface server error message if available
+        try {
+          const data = await res.json();
+          if (data && data.error) {
+            showMsg(data.error, 'error');
+          } else {
+            showMsg('Network error. Please try again.', 'error');
+          }
+        } catch {
+          showMsg('Network error. Please try again.', 'error');
+        }
+        return;
+      }
       bodyEl.value = '';
       showMsg('Comment posted!', 'success');
       await loadComments();

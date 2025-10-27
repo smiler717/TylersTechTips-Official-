@@ -83,7 +83,11 @@ export async function onRequest(context) {
         .run();
       return json({ comment: { id, author, body: content, createdAt } }, { status: 201 });
     } catch (e) {
-      return error(500, 'Failed to save comment');
+      const msg = String(e && e.message || '').toLowerCase();
+      if (msg.includes('no such table') || msg.includes('not exist')) {
+        return error(500, 'Comments storage is initializing, please try again in a moment.', { code: 'TABLE_INIT' });
+      }
+      return error(500, 'Failed to save comment', { code: 'DB_INSERT_FAILED' });
     }
   }
 
@@ -91,16 +95,15 @@ export async function onRequest(context) {
 }
 
 async function ensurePageCommentsSchema(DB) {
-  // Some environments are picky about multiple statements in a single exec.
-  // Execute statements individually to maximize compatibility.
-  await DB.exec(`CREATE TABLE IF NOT EXISTS page_comments (
+  // Use prepare().run() per statement for maximum D1 compatibility
+  await DB.prepare(`CREATE TABLE IF NOT EXISTS page_comments (
       id TEXT PRIMARY KEY,
       slug TEXT NOT NULL,
       author TEXT,
       body TEXT NOT NULL,
       created_at INTEGER NOT NULL,
       created_by TEXT
-    );`);
-  await DB.exec(`CREATE INDEX IF NOT EXISTS idx_page_comments_slug ON page_comments(slug);`);
-  await DB.exec(`CREATE INDEX IF NOT EXISTS idx_page_comments_created ON page_comments(created_at);`);
+    );`).run();
+  await DB.prepare(`CREATE INDEX IF NOT EXISTS idx_page_comments_slug ON page_comments(slug);`).run();
+  await DB.prepare(`CREATE INDEX IF NOT EXISTS idx_page_comments_created ON page_comments(created_at);`).run();
 }
