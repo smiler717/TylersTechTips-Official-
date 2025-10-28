@@ -129,7 +129,8 @@
                 // Switch button to profile with avatar + name
                 btn.href = 'profile.html';
                                 const uname = user.username ? ` (@${user.username})` : '';
-                                btn.title = `Logged in as ${name}${uname} • View your profile`;
+                                const last = user.lastLogin ? ` • Last login: ${new Date(user.lastLogin).toLocaleString()}` : '';
+                                                btn.title = `Logged in as ${name}${uname} • View your profile${last}`;
                 btn.innerHTML = `
                   <span class="user-avatar-chip" ${avatarUrl ? `style=\"background-image:url('${escapeAttr(avatarUrl)}')\"` : ''}>${avatarUrl ? '' : escapeHtml(initial)}</span>
                   <span class="user-name">${escapeHtml(name)}</span>
@@ -240,6 +241,22 @@
                 const v = Math.max(0, parseInt(n, 10) || 0);
                 localStorage.setItem(UNREAD_KEY, String(v));
                 renderUserNavbar();
+            } catch (_) {}
+        },
+        toast: function(message, type = 'success') {
+            try {
+                let c = document.querySelector('.toast-container');
+                if (!c) {
+                    c = document.createElement('div');
+                    c.className = 'toast-container';
+                    document.body.appendChild(c);
+                }
+                const t = document.createElement('div');
+                t.className = `toast ${type}`;
+                t.innerHTML = `<span class="toast-title">${type === 'error' ? 'Error' : 'Success'}</span> ${message}`;
+                c.appendChild(t);
+                requestAnimationFrame(() => t.classList.add('show'));
+                setTimeout(() => { t.classList.remove('show'); setTimeout(()=>t.remove(), 300); }, 3000);
             } catch (_) {}
         }
     });

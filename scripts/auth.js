@@ -178,14 +178,14 @@
         return;
       }
 
-      const data = await res.json();
-      const user = data.user;
+  const data = await res.json();
+  const user = data.user;
 
       // Hide auth forms, show profile
       document.getElementById('auth-section').style.display = 'none';
       document.getElementById('profile-section').classList.add('active');
 
-      // Populate profile
+  // Populate profile
       document.getElementById('profile-display-name').textContent = user.displayName || user.username;
       document.getElementById('profile-username').textContent = user.username;
       document.getElementById('profile-email').textContent = user.email;
@@ -225,6 +225,9 @@
       } else {
         avatar.innerHTML = `<span style='font-size:2.5rem;'>${(user.displayName || user.username).charAt(0).toUpperCase()}</span>`;
       }
+
+      // Persist latest user data (includes createdAt/lastLogin for navbar tooltip on other pages)
+      try { setUserData(user); } catch (_) {}
 
     } catch (e) {
       console.error('Failed to load profile:', e);
