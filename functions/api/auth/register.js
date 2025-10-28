@@ -42,21 +42,21 @@ export async function onRequestPost({ request, env }) {
 
     // Hash password and create user
     const passwordHash = await hashPassword(password);
-    const userId = crypto.randomUUID();
     const createdAt = Date.now();
 
     await DB.prepare(`
-      INSERT INTO users (id, username, email, password_hash, display_name, created_at)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).bind(userId, username, email, passwordHash, displayName, createdAt).run();
+      INSERT INTO users (username, email, password_hash, display_name, created_at)
+      VALUES (?, ?, ?, ?, ?)
+    `).bind(username, email, passwordHash, displayName, createdAt).run();
+
+    // Get the new user row (with auto-incremented id)
+    const user = await DB.prepare(
+      'SELECT id, username, display_name FROM users WHERE username = ?'
+    ).bind(username).first();
 
     return json({
       success: true,
-      user: {
-        id: userId,
-        username,
-        displayName
-      }
+      user
     }, { status: 201 });
 
   } catch (e) {
