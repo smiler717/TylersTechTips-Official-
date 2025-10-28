@@ -121,14 +121,15 @@
             wrapper.querySelector('.user-menu-toggle')?.remove();
             wrapper.querySelector('.user-menu-dropdown')?.remove();
 
-            if (isLoggedIn()) {
+                        if (isLoggedIn()) {
                 const user = getUser() || {};
                 const name = (user.displayName || user.username || 'My Profile');
                 const initial = (name || 'U').trim().charAt(0).toUpperCase();
                 const avatarUrl = user.avatarUrl || '';
                 // Switch button to profile with avatar + name
                 btn.href = 'profile.html';
-                btn.title = 'View your profile';
+                                const uname = user.username ? ` (@${user.username})` : '';
+                                btn.title = `Logged in as ${name}${uname} • View your profile`;
                 btn.innerHTML = `
                   <span class="user-avatar-chip" ${avatarUrl ? `style=\"background-image:url('${escapeAttr(avatarUrl)}')\"` : ''}>${avatarUrl ? '' : escapeHtml(initial)}</span>
                   <span class="user-name">${escapeHtml(name)}</span>
@@ -167,6 +168,10 @@
                         toggle.setAttribute('aria-expanded', 'false');
                     }
                 }, { capture: true });
+
+                // Unread indicator
+                ensureUnreadDot(wrapper);
+                updateUnreadDot(wrapper);
             } else {
                 // Logged out: default Join Community button
                 btn.href = 'profile.html';
@@ -186,4 +191,43 @@
     function escapeAttr(str){
         return String(str ?? '').replace(/"/g, '&quot;');
     }
+
+    // --- Unread indicator helpers ---
+    const UNREAD_KEY = 'tt_notifications_unread_v1';
+    function getUnreadCount() {
+        const n = parseInt(localStorage.getItem(UNREAD_KEY) || '0', 10);
+        return isNaN(n) ? 0 : Math.max(0, n);
+    }
+    function ensureUnreadDot(wrapper) {
+        if (!wrapper.querySelector('.user-unread-dot')) {
+            const dot = document.createElement('span');
+            dot.className = 'user-unread-dot';
+            wrapper.appendChild(dot);
+        }
+    }
+    function updateUnreadDot(wrapper) {
+        const dot = wrapper.querySelector('.user-unread-dot');
+        if (!dot) return;
+        const count = getUnreadCount();
+        dot.style.display = count > 0 ? 'inline-block' : 'none';
+        dot.setAttribute('aria-hidden', count > 0 ? 'false' : 'true');
+    }
+
+    // Keep unread in sync across tabs
+    window.addEventListener('storage', (e) => {
+        if (e.key === UNREAD_KEY) {
+            try { renderUserNavbar(); } catch (_) {}
+        }
+    });
+
+    // Expose a tiny helper for future updates
+    window.TT_UI = Object.assign({}, window.TT_UI || {}, {
+        setUnread: function(n) {
+            try {
+                const v = Math.max(0, parseInt(n, 10) || 0);
+                localStorage.setItem(UNREAD_KEY, String(v));
+                renderUserNavbar();
+            } catch (_) {}
+        }
+    });
 })();

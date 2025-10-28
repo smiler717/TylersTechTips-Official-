@@ -261,6 +261,7 @@ button,
 /* User menu (logged-in navbar) */
 .user-menu { position: relative; display: inline-flex; align-items: center; }
 .user-menu .join-community-btn { gap: 0.5rem; }
+.user-menu .join-community-btn { position: relative; }
 .user-avatar-chip {
     width: 22px; height: 22px; border-radius: 50%;
     background: var(--primary-bg); color: var(--accent-color);
@@ -286,6 +287,19 @@ button,
     padding: 0.6rem 0.75rem; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;
 }
 .user-menu-dropdown a:hover, .user-menu-dropdown button:hover { background: var(--card-bg); }
+
+/* Tiny unread dot */
+.user-unread-dot {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ff4d4f; /* red */
+    box-shadow: 0 0 0 2px var(--secondary-bg);
+    display: none;
+}
 
 .logo h1 {
     color: var(--accent-color);
