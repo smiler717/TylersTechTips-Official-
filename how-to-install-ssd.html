@@ -15,7 +15,6 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="scripts/theme.js"></script>
-    <script defer src="scripts/navbar-auth.js"></script>
     <!-- Structured Data for SEO -->
     <script type="application/ld+json">
     {
@@ -108,6 +107,11 @@
     <script defer src="scripts/comments.js"></script>
 </head>
 <body>
+    <!-- Reading Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar"></div>
+    </div>
+    
     <header>
         <nav class="navbar">
             <div class="logo">
@@ -140,6 +144,7 @@
                 <li><a href="cheat-sheet.html"><i class="fas fa-book"></i> Cheat Sheet</a></li>
                 <li><a href="about.html"><i class="fas fa-user"></i> About</a></li>
             </ul>
+            <a href="community.html" class="join-community-btn"><i class="fas fa-users"></i> Join Community</a>
             <button id="theme-toggle" aria-label="Toggle theme">
                 <span class="theme-icon">🌙</span>
             </button>

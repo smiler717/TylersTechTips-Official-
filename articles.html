@@ -15,11 +15,15 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="scripts/theme.js"></script>
-    <script defer src="scripts/navbar-auth.js"></script>
     <script defer src="scripts/search.js"></script>
     <meta name="description" content="Browse all tech articles and tutorials on Tyler's Tech Tips.">
 </head>
 <body>
+    <!-- Reading Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar"></div>
+    </div>
+    
     <header>
         <nav class="navbar">
             <div class="logo">
@@ -52,6 +56,7 @@
                 <li><a href="cheat-sheet.html"><i class="fas fa-book"></i> Cheat Sheet</a></li>
                 <li><a href="about.html"><i class="fas fa-user"></i> About</a></li>
             </ul>
+            <a href="community.html" class="join-community-btn"><i class="fas fa-users"></i> Join Community</a>
             <button id="theme-toggle" aria-label="Toggle theme">
                 <span class="theme-icon">🌙</span>
             </button>
@@ -146,11 +151,19 @@
     <script>
     window.onscroll = function() {
         const backToTop = document.querySelector('.back-to-top');
+        const progressBar = document.querySelector('.progress-bar');
+        
         if (document.body.scrollTop > 500 || document.documentElement.scrollTop > 500) {
             backToTop.classList.add('visible');
         } else {
             backToTop.classList.remove('visible');
         }
+        
+        // Reading progress
+        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (winScroll / height) * 100;
+        progressBar.style.width = scrolled + "%";
     };
     document.querySelector('.back-to-top').onclick = function() {
         document.body.scrollTop = 0;
