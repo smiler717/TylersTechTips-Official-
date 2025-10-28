@@ -1228,6 +1228,7 @@ button,
 
 .topic-list { display: grid; gap: 1rem; }
 .topic-card { background: var(--card-bg); border: 1px solid var(--accent-color); border-radius: 10px; padding: 1rem; }
+.topic-card.unread { border-left: 4px solid #ff4d4f; box-shadow: 0 0 0 1px rgba(255,77,79,0.15) inset; }
 .topic-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
 .topic-title { color: var(--accent-color); font-size: 1.2rem; margin: 0; }
 .topic-meta { color: var(--secondary-text); font-size: 0.9rem; display: flex; gap: 1rem; align-items: center; }

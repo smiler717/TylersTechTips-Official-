@@ -54,6 +54,7 @@
       </div>
       <div class="tool-right">
         <button id="mark-read" class="pill"><i class="fas fa-check"></i> Mark all read</button>
+        <button id="clear-all" class="pill" style="background: var(--secondary-bg); color: var(--text-color);"><i class="fas fa-trash-alt"></i> Clear all</button>
         <button id="add-sample" class="pill"><i class="fas fa-plus-circle"></i> Add sample</button>
       </div>
     </div>
@@ -166,6 +167,13 @@
       list.unshift({ title: 'New reply on your topic', body: 'Someone responded to your question.', ts: Date.now(), read: false });
       setList(list);
       setUnreadFromList(list);
+      render();
+    });
+
+    document.getElementById('clear-all').addEventListener('click', () => {
+      if (!confirm('Clear all notifications?')) return;
+      setList([]);
+      setUnread(0);
       render();
     });
 
