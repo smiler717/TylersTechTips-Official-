@@ -110,7 +110,7 @@
     } catch (_) {}
   }
 
-  function render(topics, { query = '', sort = 'new' } = {}) {
+  function render(topics, { query = '', sort = 'new', my = '' } = {}) {
     const list = $('#topic-list');
     if (!list) return;
     const loggedIn = !!(window.TT_Auth && typeof window.TT_Auth.isLoggedIn === 'function' && window.TT_Auth.isLoggedIn());
@@ -124,6 +124,19 @@
         (t.author || '').toLowerCase().includes(q)
       );
     }
+    // filter my posts/comments if requested
+    if (my && window.TT_Auth && typeof window.TT_Auth.getUserData === 'function') {
+      const u = window.TT_Auth.getUserData();
+      const names = new Set([(u?.displayName || '').toLowerCase(), (u?.username || '').toLowerCase()]);
+      if (my === 'topics') {
+        items = items.filter(t => names.has((t.author || '').toLowerCase()));
+      }
+      // For comments view, include topics with at least one comment by the user
+      if (my === 'comments') {
+        items = items.filter(t => (t.comments || []).some(c => names.has((c.author || '').toLowerCase())));
+      }
+    }
+
     // sort
     if (sort === 'old') items.sort((a, b) => a.createdAt - b.createdAt);
     else if (sort === 'comments') items.sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0));
@@ -459,7 +472,9 @@
     const query = $('#topic-search')?.value || '';
     const category = $('#topic-category')?.value || '';
     const sort = $('#topic-sort')?.value || 'new';
-    return { query, category, sort };
+    const params = new URLSearchParams(location.search);
+    const my = params.get('my') || '';
+    return { query, category, sort, my };
   }
 
   async function exportJSON() {

@@ -16,11 +16,22 @@ export async function onRequestGet({ request, env }) {
   }
 
   try {
-    const user = await DB.prepare(`
-      SELECT id, username, email, display_name, bio, avatar_url, created_at, last_login
-      FROM users
-      WHERE id = ?
-    `).bind(currentUser.userId).first();
+    let user;
+    try {
+      user = await DB.prepare(`
+        SELECT id, username, email, display_name, bio, avatar_url, created_at, last_login
+        FROM users
+        WHERE id = ?
+      `).bind(currentUser.userId).first();
+    } catch (e) {
+      // Fallback for schema without last_login
+      user = await DB.prepare(`
+        SELECT id, username, email, display_name, bio, avatar_url, created_at
+        FROM users
+        WHERE id = ?
+      `).bind(currentUser.userId).first();
+      user.last_login = null;
+    }
 
     if (!user) {
       return error(404, 'User not found');

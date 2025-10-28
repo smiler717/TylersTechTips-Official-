@@ -101,6 +101,7 @@
             padding: 1.5rem;
             background: var(--card-bg);
             border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.10);
         }
         .profile-avatar {
             width: 80px;
@@ -113,6 +114,36 @@
             font-size: 2rem;
             color: white;
             font-weight: bold;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+            overflow: hidden;
+        }
+        .profile-divider {
+            border: none;
+            border-top: 1px solid var(--card-border);
+            margin: 2rem 0;
+        }
+        @media (max-width: 600px) {
+            .auth-container {
+                padding: 0.5rem;
+            }
+            .profile-header {
+                flex-direction: column;
+                align-items: flex-start;
+                text-align: left;
+            }
+            .profile-stats {
+                grid-template-columns: 1fr;
+            }
+            .profile-avatar {
+                margin-bottom: 1rem;
+            }
+            .profile-info h2 {
+                font-size: 1.2rem;
+            }
+            .profile-view form .cta-button, .profile-view form .pill {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
         }
         .profile-avatar img {
             width: 100%;
@@ -267,8 +298,11 @@
                         <h2 id="profile-display-name"></h2>
                         <p><i class="fas fa-at"></i> <span id="profile-username"></span></p>
                         <p><i class="fas fa-envelope"></i> <span id="profile-email"></span></p>
+                        <p id="profile-member-since" style="margin-top:0.5rem;color:var(--secondary-text);font-size:0.95em;"></p>
                     </div>
                 </div>
+
+                <hr class="profile-divider">
 
                 <div class="profile-stats">
                     <div class="stat-card">
@@ -285,6 +319,13 @@
                     </div>
                 </div>
 
+                <div style="display:flex;gap:1rem;margin-bottom:2rem;">
+                    <a href="community.html?my=topics" class="cta-button" style="flex:1;text-align:center"><i class="fas fa-list"></i> View My Posts</a>
+                    <a href="community.html?my=comments" class="pill" style="flex:1;background:var(--secondary-bg);color:var(--text-color);text-align:center"><i class="fas fa-comment"></i> View My Comments</a>
+                </div>
+
+                <hr class="profile-divider">
+
                 <h3><i class="fas fa-edit"></i> Edit Profile</h3>
                 <form id="profile-form">
                     <div class="form-group">
@@ -300,7 +341,7 @@
                         <input type="url" id="edit-avatar-url" placeholder="https://...">
                         <small style="color:var(--secondary-text);">Link to your profile picture</small>
                     </div>
-                    <div style="display:flex;gap:1rem;">
+                    <div style="display:flex;gap:1rem;flex-wrap:wrap;">
                         <button type="submit" class="cta-button" style="flex:1">
                             <i class="fas fa-save"></i> Save Changes
                         </button>
@@ -308,6 +349,21 @@
                             <i class="fas fa-sign-out-alt"></i> Logout
                         </button>
                     </div>
+                </form>
+
+                <hr class="profile-divider">
+
+                <h3><i class="fas fa-key"></i> Change Password</h3>
+                <form id="change-password-form" style="margin-bottom:2rem;">
+                    <div class="form-group">
+                        <label for="current-password">Current Password</label>
+                        <input type="password" id="current-password" required autocomplete="current-password">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-password">New Password</label>
+                        <input type="password" id="new-password" required minlength="8" autocomplete="new-password">
+                    </div>
+                    <button type="submit" class="cta-button" style="width:100%"><i class="fas fa-key"></i> Change Password</button>
                 </form>
             </div>
         </div>

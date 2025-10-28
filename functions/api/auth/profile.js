@@ -4,7 +4,7 @@
  */
 
 import { json, error, readJson } from '../_utils.js';
-import { getCurrentUser } from '../_auth.js';
+import { getCurrentUser, hashPassword, verifyPassword } from '../_auth.js';
 import { sanitizeText } from '../_sanitize.js';
 
 export async function onRequestPatch({ request, env }) {
@@ -22,6 +22,8 @@ export async function onRequestPatch({ request, env }) {
   const displayName = body.displayName ? sanitizeText(body.displayName, 60) : null;
   const bio = body.bio ? sanitizeText(body.bio, 500) : null;
   const avatarUrl = body.avatarUrl ? sanitizeText(body.avatarUrl, 500) : null;
+  const newPassword = body.password ? String(body.password) : null;
+  const currentPassword = body.currentPassword ? String(body.currentPassword) : null;
 
   try {
     const updates = [];
@@ -38,6 +40,24 @@ export async function onRequestPatch({ request, env }) {
     if (avatarUrl !== null) {
       updates.push('avatar_url = ?');
       values.push(avatarUrl);
+    }
+
+    // If changing password, verify current password and set new hash
+    if (newPassword) {
+      if (newPassword.length < 8) {
+        return error(400, 'New password must be at least 8 characters');
+      }
+      // Fetch current hash to verify
+      const existing = await DB.prepare('SELECT password_hash FROM users WHERE id = ?')
+        .bind(currentUser.userId).first();
+      if (!existing) return error(404, 'User not found');
+      if (existing.password_hash && currentPassword) {
+        const ok = await verifyPassword(currentPassword, existing.password_hash);
+        if (!ok) return error(401, 'Current password is incorrect');
+      }
+      const newHash = await hashPassword(newPassword);
+      updates.push('password_hash = ?');
+      values.push(newHash);
     }
 
     if (updates.length === 0) {

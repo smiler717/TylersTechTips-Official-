@@ -154,8 +154,8 @@
         return;
       }
 
-      setUserData(data.user);
-      showSuccess('Profile updated successfully!');
+  setUserData(data.user);
+  showSuccess('Profile updated!');
       loadProfile();
 
     } catch (e) {
@@ -190,23 +190,29 @@
       document.getElementById('profile-username').textContent = user.username;
       document.getElementById('profile-email').textContent = user.email;
 
-      // Avatar
-      const avatar = document.getElementById('profile-avatar');
-      if (user.avatarUrl) {
-        avatar.innerHTML = `<img src="${user.avatarUrl}" alt="Avatar">`;
-      } else {
-        avatar.textContent = (user.displayName || user.username).charAt(0).toUpperCase();
-      }
+      // Avatar is set below with fallback
 
       // Edit form
       document.getElementById('edit-display-name').value = user.displayName || '';
       document.getElementById('edit-bio').value = user.bio || '';
       document.getElementById('edit-avatar-url').value = user.avatarUrl || '';
 
-      // Stats (calculate days active)
+      // Member since
       if (user.createdAt) {
+        const date = new Date(user.createdAt);
+        document.getElementById('profile-member-since').textContent = `Member since ${date.toLocaleDateString()}`;
         const days = Math.floor((Date.now() - user.createdAt) / (1000 * 60 * 60 * 24));
         document.getElementById('stat-days').textContent = days;
+      } else {
+        document.getElementById('profile-member-since').textContent = '';
+      }
+
+      // Avatar fallback
+      var avatar = document.getElementById('profile-avatar');
+      if (user.avatarUrl) {
+        avatar.innerHTML = `<img src="${user.avatarUrl}" alt="Avatar">`;
+      } else {
+        avatar.innerHTML = `<span style='font-size:2.5rem;'>${(user.displayName || user.username).charAt(0).toUpperCase()}</span>`;
       }
 
     } catch (e) {
@@ -255,6 +261,38 @@
       loadProfile();
     }
   })();
+
+  // Change password handler
+  document.getElementById('change-password-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const token = getToken();
+    if (!token) return;
+    const current = document.getElementById('current-password').value;
+    const next = document.getElementById('new-password').value;
+    if (!current || !next || next.length < 8) {
+      showError('Please enter your current password and a new password (min 8 chars).');
+      return;
+    }
+    try {
+      const res = await fetch('/api/auth/profile', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ password: next, currentPassword: current })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showError(data.error || 'Password change failed');
+        return;
+      }
+      showSuccess('Password changed!');
+      document.getElementById('change-password-form').reset();
+    } catch (e) {
+      showError('Network error. Please try again.');
+    }
+  });
 
   // Export auth functions for use in other scripts
   window.TT_Auth = {
