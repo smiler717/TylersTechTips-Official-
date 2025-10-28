@@ -535,6 +535,27 @@
       }
       const submitBtn = document.querySelector('#new-topic-form button[type="submit"]');
       if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to Post';
+
+      // Add a top-of-page banner prompting login with return URL
+      const header = document.querySelector('.article-header');
+      if (header && !document.querySelector('.login-banner')) {
+        const nextUrl = `${location.pathname}${location.search}${location.hash}`;
+        const banner = document.createElement('div');
+        banner.className = 'login-banner';
+        banner.style.margin = '1rem 0';
+        banner.style.padding = '0.75rem 1rem';
+        banner.style.background = 'var(--card-bg)';
+        banner.style.border = '1px solid var(--secondary-bg)';
+        banner.style.borderRadius = '8px';
+        banner.style.display = 'flex';
+        banner.style.alignItems = 'center';
+        banner.style.justifyContent = 'space-between';
+        banner.innerHTML = `
+          <span style="color: var(--secondary-text);"><i class="fas fa-info-circle"></i> You can browse topics freely. Login to post or comment.</span>
+          <a class="pill" href="${LOGIN_PAGE}?next=${encodeURIComponent(nextUrl)}&action=login" style="margin-left:1rem;white-space:nowrap;"><i class="fas fa-sign-in-alt"></i> Login to Post</a>
+        `;
+        header.insertAdjacentElement('afterend', banner);
+      }
     }
     // Try server first
     try {

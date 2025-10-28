@@ -76,7 +76,16 @@
       setToken(data.token);
       setUserData(data.user);
       showSuccess('Login successful!');
-      setTimeout(() => loadProfile(), 1000);
+      // If a return URL is provided, navigate back after login
+      const params = new URLSearchParams(location.search);
+      const next = params.get('next');
+      setTimeout(() => {
+        if (next) {
+          location.href = next;
+        } else {
+          loadProfile();
+        }
+      }, 600);
 
     } catch (e) {
       showError('Network error. Please try again.');
