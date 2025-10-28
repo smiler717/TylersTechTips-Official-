@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notifications - Tyler's Tech Tips</title>
+  <meta name="description" content="Your notifications on Tyler's Tech Tips." />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="alternate icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="mask-icon" href="safari-pinned-tab.svg" color="#00d9ff" />
+  <meta name="theme-color" content="#00d9ff" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <script src="scripts/theme.js"></script>
+</head>
+<body>
+  <!-- Reading Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar"></div>
+  </div>
+
+  <header>
+    <nav class="navbar">
+      <div class="logo">
+        <h1><a href="index.html"><i class="fas fa-laptop-code"></i> Tyler's Tech Tips</a></h1>
+      </div>
+      <div class="search-container">
+        <input type="text" class="search-bar" placeholder="Search articles..." />
+        <i class="fas fa-search search-icon"></i>
+      </div>
+      <ul class="nav-links">
+        <li><a href="index.html#home"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="community.html"><i class="fas fa-users"></i> Community</a></li>
+        <li><a href="about.html"><i class="fas fa-user"></i> About</a></li>
+      </ul>
+      <a href="profile.html" class="join-community-btn"><i class="fas fa-users"></i> Join Community</a>
+      <button id="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon">🌙</span>
+      </button>
+    </nav>
+  </header>
+
+  <section class="article-content">
+    <div class="article-header" style="text-align:left;">
+      <h1><i class="fas fa-bell"></i> Notifications</h1>
+      <p class="article-meta">View and manage your site notifications.</p>
+    </div>
+
+    <div class="topic-tools">
+      <div class="tool-left">
+        <span id="notif-summary" class="pill" style="background: var(--secondary-bg); color: var(--text-color); border-color: var(--card-bg);">Unread: 0</span>
+      </div>
+      <div class="tool-right">
+        <button id="mark-read" class="pill"><i class="fas fa-check"></i> Mark all read</button>
+        <button id="add-sample" class="pill"><i class="fas fa-plus-circle"></i> Add sample</button>
+      </div>
+    </div>
+
+    <div id="notif-list" class="topic-list"></div>
+  </section>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="community.html">Community</a></li>
+          <li><a href="about.html">About</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="copyright">
+      <p>© 2025 Tyler's Tech Tips. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <div class="back-to-top"><i class="fas fa-arrow-up"></i></div>
+
+  <script>
+    // Back to Top Button and Reading Progress
+    window.onscroll = function() {
+      const backToTop = document.querySelector('.back-to-top');
+      const progressBar = document.querySelector('.progress-bar');
+      if (document.body.scrollTop > 500 || document.documentElement.scrollTop > 500) {
+        backToTop.classList.add('visible');
+      } else {
+        backToTop.classList.remove('visible');
+      }
+      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      progressBar.style.width = scrolled + "%";
+    };
+    document.querySelector('.back-to-top').onclick = function() {
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    };
+
+    // Minimal demo data for notifications (client-side only)
+    const UNREAD_KEY = 'tt_notifications_unread_v1';
+    const LIST_KEY = 'tt_notifications_list_v1';
+
+    function getUnread() {
+      const n = parseInt(localStorage.getItem(UNREAD_KEY) || '0', 10);
+      return isNaN(n) ? 0 : Math.max(0, n);
+    }
+    function setUnread(n) {
+      if (window.TT_UI && typeof window.TT_UI.setUnread === 'function') {
+        window.TT_UI.setUnread(n);
+      } else {
+        localStorage.setItem(UNREAD_KEY, String(Math.max(0, n|0)));
+      }
+    }
+    function getList() {
+      try { return JSON.parse(localStorage.getItem(LIST_KEY) || '[]'); } catch { return []; }
+    }
+    function setList(arr) {
+      localStorage.setItem(LIST_KEY, JSON.stringify(arr));
+    }
+
+    function render() {
+      const list = getList();
+      const wrap = document.getElementById('notif-list');
+      const unread = getUnread();
+      document.getElementById('notif-summary').textContent = 'Unread: ' + unread;
+      if (!list.length) {
+        wrap.innerHTML = '<div class="no-results">No notifications yet.</div>';
+        return;
+      }
+      wrap.innerHTML = list.map(n => `
+        <article class="topic-card">
+          <header class="topic-header">
+            <h3 class="topic-title"><i class="fas fa-bell"></i> ${escapeHtml(n.title || 'Notification')}</h3>
+            <div class="topic-meta">
+              <span class="meta-item"><i class="fas fa-clock"></i> ${new Date(n.ts||Date.now()).toLocaleString()}</span>
+            </div>
+          </header>
+          <div class="topic-body">${escapeHtml(n.body||'')}</div>
+        </article>
+      `).join('');
+    }
+    function escapeHtml(s){ const d=document.createElement('div'); d.textContent=String(s??''); return d.innerHTML; }
+
+    // Wire buttons
+    document.getElementById('mark-read').addEventListener('click', () => {
+      setUnread(0);
+      render();
+    });
+    document.getElementById('add-sample').addEventListener('click', () => {
+      const list = getList();
+      list.unshift({ title: 'New reply on your topic', body: 'Someone responded to your question.', ts: Date.now() });
+      setList(list);
+      setUnread(getUnread() + 1);
+      render();
+    });
+
+    // Initial render
+    render();
+
+    // Keep in sync across tabs
+    window.addEventListener('storage', (e) => {
+      if (e.key === UNREAD_KEY || e.key === LIST_KEY) render();
+    });
+  </script>
+</body>
+</html>

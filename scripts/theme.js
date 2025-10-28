@@ -143,10 +143,12 @@
                 toggle.innerHTML = '<i class="fas fa-caret-down"></i>';
                 wrapper.appendChild(toggle);
 
-                // Build dropdown
+                // Build dropdown (includes Notifications)
                 const menu = document.createElement('div');
                 menu.className = 'user-menu-dropdown';
+                const unread = getUnreadCount();
                 menu.innerHTML = `
+                  <a href="notifications.html"><i class="fas fa-bell"></i> Notifications ${unread > 0 ? `<span class="count-pill">${unread}</span>` : ''}</a>
                   <a href="profile.html"><i class="fas fa-user"></i> My Profile</a>
                   <button type="button" class="logout-item"><i class="fas fa-sign-out-alt"></i> Logout</button>
                 `;
@@ -156,6 +158,7 @@
                 toggle.addEventListener('click', (e) => {
                     e.preventDefault();
                     const open = menu.classList.toggle('open');
+                    wrapper.classList.toggle('menu-open', open);
                     toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
                 });
                 menu.querySelector('.logout-item')?.addEventListener('click', (e) => {
@@ -165,6 +168,7 @@
                 document.addEventListener('click', (e) => {
                     if (!wrapper.contains(e.target)) {
                         menu.classList.remove('open');
+                        wrapper.classList.remove('menu-open');
                         toggle.setAttribute('aria-expanded', 'false');
                     }
                 }, { capture: true });
@@ -211,6 +215,15 @@
         const count = getUnreadCount();
         dot.style.display = count > 0 ? 'inline-block' : 'none';
         dot.setAttribute('aria-hidden', count > 0 ? 'false' : 'true');
+        const pill = wrapper.querySelector('.user-menu-dropdown .count-pill');
+        if (pill) {
+            if (count > 0) {
+                pill.textContent = String(count);
+                pill.style.display = 'inline-flex';
+            } else {
+                pill.style.display = 'none';
+            }
+        }
     }
 
     // Keep unread in sync across tabs
