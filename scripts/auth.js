@@ -230,9 +230,29 @@
   };
 
   // Check if already logged in
-  if (getToken()) {
-    loadProfile();
-  }
+  (function onLoadRouting() {
+    const params = new URLSearchParams(location.search);
+    const action = params.get('action');
+    const next = params.get('next');
+    const token = getToken();
+
+    // Preselect tab based on action param
+    if (action === 'register') {
+      document.querySelector('[onclick*="register"]')?.click();
+    } else if (action === 'login') {
+      document.querySelector('[onclick*="login"]')?.click();
+    }
+
+    // If already logged in and a next URL exists, go there immediately
+    if (token && next) {
+      location.href = next;
+      return;
+    }
+
+    if (token) {
+      loadProfile();
+    }
+  })();
 
   // Export auth functions for use in other scripts
   window.TT_Auth = {

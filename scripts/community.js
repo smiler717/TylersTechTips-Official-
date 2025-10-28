@@ -113,6 +113,7 @@
   function render(topics, { query = '', sort = 'new' } = {}) {
     const list = $('#topic-list');
     if (!list) return;
+    const loggedIn = !!(window.TT_Auth && typeof window.TT_Auth.isLoggedIn === 'function' && window.TT_Auth.isLoggedIn());
     // filter
     const q = (query || '').trim().toLowerCase();
     let items = topics.slice();
@@ -182,9 +183,11 @@
             </div>
             <form class="comment-form" data-id="${t.id}">
               <div class="form-row">
-                <input type="text" name="author" placeholder="Your name" maxlength="60"/>
-                <input type="text" name="body" placeholder="Write a comment" required maxlength="500"/>
-                <button class="pill" type="submit"><i class="fas fa-reply"></i> Comment</button>
+                <input type="text" name="author" placeholder="Your name" maxlength="60" ${loggedIn ? '' : 'disabled'}/>
+                <input type="text" name="body" placeholder="${loggedIn ? 'Write a comment' : 'Login to write a comment'}" ${loggedIn ? 'required' : 'disabled'} maxlength="500"/>
+                ${loggedIn
+                  ? '<button class="pill" type="submit"><i class="fas fa-reply"></i> Comment</button>'
+                  : `<a class="pill" href="${LOGIN_PAGE}?next=${encodeURIComponent(location.pathname + location.search + location.hash)}&action=login"><i class=\"fas fa-sign-in-alt\"></i> Login to Comment</a>`}
               </div>
             </form>
           </details>
@@ -535,6 +538,20 @@
       }
       const submitBtn = document.querySelector('#new-topic-form button[type="submit"]');
       if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to Post';
+      // Disable new-topic form fields
+      const form = document.getElementById('new-topic-form');
+      if (form) {
+        form.querySelectorAll('input, textarea, select').forEach(el => el.setAttribute('disabled', ''));
+        // Replace submit button with login link if present
+        if (submitBtn) {
+          const nextUrl = `${location.pathname}${location.search}${location.hash}`;
+          const loginLink = document.createElement('a');
+          loginLink.className = 'cta-button';
+          loginLink.href = `${LOGIN_PAGE}?next=${encodeURIComponent(nextUrl)}&action=login`;
+          loginLink.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to Post';
+          submitBtn.replaceWith(loginLink);
+        }
+      }
 
       // Add a top-of-page banner prompting login with return URL
       const header = document.querySelector('.article-header');
@@ -551,8 +568,11 @@
         banner.style.alignItems = 'center';
         banner.style.justifyContent = 'space-between';
         banner.innerHTML = `
-          <span style="color: var(--secondary-text);"><i class="fas fa-info-circle"></i> You can browse topics freely. Login to post or comment.</span>
-          <a class="pill" href="${LOGIN_PAGE}?next=${encodeURIComponent(nextUrl)}&action=login" style="margin-left:1rem;white-space:nowrap;"><i class="fas fa-sign-in-alt"></i> Login to Post</a>
+          <span style="color: var(--secondary-text);"><i class="fas fa-info-circle"></i> You can browse topics freely. Login or create an account to post or comment.</span>
+          <span style="display:flex;gap:0.5rem;">
+            <a class="pill" href="${LOGIN_PAGE}?next=${encodeURIComponent(nextUrl)}&action=login" style="white-space:nowrap;"><i class="fas fa-sign-in-alt"></i> Login</a>
+            <a class="pill" href="${LOGIN_PAGE}?next=${encodeURIComponent(nextUrl)}&action=register" style="white-space:nowrap;"><i class="fas fa-user-plus"></i> Create Account</a>
+          </span>
         `;
         header.insertAdjacentElement('afterend', banner);
       }
