@@ -9,6 +9,7 @@
   let SERVER_MODE = false;
   const VIEWED_KEY = 'ttt_viewed_topics_session_v1';
   let viewed = new Set();
+  const LOGIN_PAGE = 'profile.html';
 
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
@@ -197,14 +198,19 @@
 
   async function onNewTopic(e) {
     e.preventDefault();
+    // Require login to post a topic
+    if (!(window.TT_Auth && typeof window.TT_Auth.isLoggedIn === 'function' && window.TT_Auth.isLoggedIn())) {
+      // Redirect to signup/login, preserving intent via query params
+      const next = `${location.pathname}${location.search}${location.hash}`;
+      location.href = `${LOGIN_PAGE}?next=${encodeURIComponent(next)}&action=post-topic`;
+      return;
+    }
     const f = e.target;
     const submitBtn = f.querySelector('button[type="submit"]');
     const origBtnHtml = submitBtn ? submitBtn.innerHTML : '';
     if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting…'; }
 
-    // Get logged in user if available
-    const loggedInUser = window.TT_Auth && window.TT_Auth.isLoggedIn() ? window.TT_Auth.getUserData() : null;
-    const author = loggedInUser ? (loggedInUser.displayName || loggedInUser.username) : (f.author.value.trim() || 'Anonymous');
+    const author = f.author.value.trim() || 'Anonymous';
     const title = f.title.value.trim();
     const body = f.body.value.trim();
     const category = f.category?.value || 'General';
@@ -213,11 +219,7 @@
       try {
         const res = await fetch('/api/topics', {
           method: 'POST',
-          headers: {
-            'content-type': 'application/json',
-            'x-device-id': getDeviceId(),
-            ...(window.TT_Auth && window.TT_Auth.getToken() ? { 'Authorization': `Bearer ${window.TT_Auth.getToken()}` } : {})
-          },
+          headers: { 'content-type': 'application/json', 'x-device-id': getDeviceId() },
           body: JSON.stringify({ author, title, body, category })
         });
         if (res.status === 429) {
@@ -258,6 +260,12 @@
 
   async function onNewComment(e) {
     e.preventDefault();
+    // Require login to post a comment
+    if (!(window.TT_Auth && typeof window.TT_Auth.isLoggedIn === 'function' && window.TT_Auth.isLoggedIn())) {
+      const next = `${location.pathname}${location.search}${location.hash}`;
+      location.href = `${LOGIN_PAGE}?next=${encodeURIComponent(next)}&action=comment`;
+      return;
+    }
     const form = e.target;
     const id = form.getAttribute('data-id');
     const btn = form.querySelector('button[type="submit"]');
@@ -270,11 +278,7 @@
       try {
         const res = await fetch(`/api/topics/${encodeURIComponent(id)}/comments`, {
           method: 'POST',
-          headers: {
-            'content-type': 'application/json',
-            'x-device-id': getDeviceId(),
-            ...(window.TT_Auth && window.TT_Auth.getToken() ? { 'Authorization': `Bearer ${window.TT_Auth.getToken()}` } : {})
-          },
+          headers: { 'content-type': 'application/json', 'x-device-id': getDeviceId() },
           body: JSON.stringify({ author, body })
         });
         if (res.status === 429) {
@@ -516,6 +520,22 @@
 
   document.addEventListener('DOMContentLoaded', async () => {
     loadViewed();
+    // If not logged in, add a subtle notice above the form and adjust submit button label for clarity
+    const isLoggedIn = !!(window.TT_Auth && typeof window.TT_Auth.isLoggedIn === 'function' && window.TT_Auth.isLoggedIn());
+    if (!isLoggedIn) {
+      const formWrap = document.querySelector('.topic-form');
+      if (formWrap && !formWrap.querySelector('.login-required-note')) {
+        const note = document.createElement('div');
+        note.className = 'login-required-note';
+        note.style.margin = '0 0 0.75rem 0';
+        note.style.color = 'var(--secondary-text)';
+        note.innerHTML = '<i class="fas fa-lock"></i> Login required to post topics or comments';
+        const h2 = formWrap.querySelector('h2');
+        if (h2) h2.insertAdjacentElement('afterend', note);
+      }
+      const submitBtn = document.querySelector('#new-topic-form button[type="submit"]');
+      if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to Post';
+    }
     // Try server first
     try {
       const topics = await loadRemote();
