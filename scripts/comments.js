@@ -58,6 +58,16 @@
   }
 
   const authorEl = section.querySelector('#comment-author');
+
+  // Check if user is logged in and pre-fill/hide name field
+  if (window.TT_Auth && window.TT_Auth.isLoggedIn()) {
+    const userData = window.TT_Auth.getUserData();
+    if (userData && userData.displayName) {
+      authorEl.value = userData.displayName;
+      authorEl.disabled = true;
+      authorEl.style.background = 'var(--card-bg)';
+    }
+  }
   const bodyEl = section.querySelector('#comment-body');
   const submitBtn = section.querySelector('#comment-submit');
   const msgEl = section.querySelector('#comment-msg');
@@ -128,6 +138,7 @@
 
   async function postComment(){
     clearMsg();
+    const token = window.TT_Auth ? window.TT_Auth.getToken() : null;
     const author = (authorEl.value || '').trim();
     const body = (bodyEl.value || '').trim();
     if (!body) {
@@ -141,7 +152,8 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-device-id': getDeviceId()
+          'x-device-id': getDeviceId(),
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
         body: JSON.stringify({ author, body })
       });

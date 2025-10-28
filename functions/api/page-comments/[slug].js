@@ -70,7 +70,9 @@ export async function onRequest(context) {
     const body = await readJson(request);
     if (!body) return error(400, 'Invalid JSON');
 
-    const author = sanitizeText(body.author || 'Anonymous', 60) || 'Anonymous';
+    // If user is logged in, use their profile info
+    const author = currentUser ? (currentUser.displayName || currentUser.username) : (sanitizeText(body.author || 'Anonymous', 60) || 'Anonymous');
+    const userId = currentUser ? currentUser.userId : null;
     const content = sanitizeText(body.body || '', 2000);
     const parentId = validateParentId(body.parentId);
     if (!content) return error(400, 'Comment body is required');
@@ -80,8 +82,8 @@ export async function onRequest(context) {
 
     try {
       await DB
-        .prepare('INSERT INTO page_comments (id, slug, author, body, created_at, created_by, parent_id) VALUES (?, ?, ?, ?, ?, ?, ?)')
-        .bind(id, slug, author, content, createdAt, deviceId, parentId)
+        .prepare('INSERT INTO page_comments (id, slug, author, body, created_at, created_by, parent_id, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+        .bind(id, slug, author, content, createdAt, deviceId, parentId, userId)
         .run();
       return json({ comment: { id, author, body: content, createdAt, parentId } }, { status: 201 });
     } catch (e) {

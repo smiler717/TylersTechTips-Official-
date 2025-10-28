@@ -202,7 +202,9 @@
     const origBtnHtml = submitBtn ? submitBtn.innerHTML : '';
     if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting…'; }
 
-    const author = f.author.value.trim() || 'Anonymous';
+    // Get logged in user if available
+    const loggedInUser = window.TT_Auth && window.TT_Auth.isLoggedIn() ? window.TT_Auth.getUserData() : null;
+    const author = loggedInUser ? (loggedInUser.displayName || loggedInUser.username) : (f.author.value.trim() || 'Anonymous');
     const title = f.title.value.trim();
     const body = f.body.value.trim();
     const category = f.category?.value || 'General';
@@ -211,7 +213,11 @@
       try {
         const res = await fetch('/api/topics', {
           method: 'POST',
-          headers: { 'content-type': 'application/json', 'x-device-id': getDeviceId() },
+          headers: {
+            'content-type': 'application/json',
+            'x-device-id': getDeviceId(),
+            ...(window.TT_Auth && window.TT_Auth.getToken() ? { 'Authorization': `Bearer ${window.TT_Auth.getToken()}` } : {})
+          },
           body: JSON.stringify({ author, title, body, category })
         });
         if (res.status === 429) {
@@ -264,7 +270,11 @@
       try {
         const res = await fetch(`/api/topics/${encodeURIComponent(id)}/comments`, {
           method: 'POST',
-          headers: { 'content-type': 'application/json', 'x-device-id': getDeviceId() },
+          headers: {
+            'content-type': 'application/json',
+            'x-device-id': getDeviceId(),
+            ...(window.TT_Auth && window.TT_Auth.getToken() ? { 'Authorization': `Bearer ${window.TT_Auth.getToken()}` } : {})
+          },
           body: JSON.stringify({ author, body })
         });
         if (res.status === 429) {

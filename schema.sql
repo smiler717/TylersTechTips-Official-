@@ -52,3 +52,28 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_created ON users(created_at);
+
+-- Page comments table (per-article comments with threading)
+CREATE TABLE IF NOT EXISTS page_comments (
+  id TEXT PRIMARY KEY,
+  slug TEXT NOT NULL,
+  author TEXT,
+  body TEXT NOT NULL,
+  created_at INTEGER NOT NULL,
+  created_by TEXT,
+  parent_id TEXT,
+  user_id TEXT,
+  FOREIGN KEY(user_id) REFERENCES users(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_page_comments_slug ON page_comments(slug);
+CREATE INDEX IF NOT EXISTS idx_page_comments_created ON page_comments(created_at);
+CREATE INDEX IF NOT EXISTS idx_page_comments_parent ON page_comments(parent_id);
+CREATE INDEX IF NOT EXISTS idx_page_comments_user ON page_comments(user_id);
+
+-- Add user_id to existing tables for full user integration
+-- Note: Run these ALTER statements on your D1 database via Cloudflare Dashboard or Wrangler
+-- ALTER TABLE topics ADD COLUMN user_id TEXT;
+-- ALTER TABLE comments ADD COLUMN user_id TEXT;
+-- CREATE INDEX idx_topics_user ON topics(user_id);
+-- CREATE INDEX idx_comments_user ON comments(user_id);
