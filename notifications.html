@@ -100,8 +100,8 @@
     };
 
     // Minimal demo data for notifications (client-side only)
-    const UNREAD_KEY = 'tt_notifications_unread_v1';
-    const LIST_KEY = 'tt_notifications_list_v1';
+  const UNREAD_KEY = 'tt_notifications_unread_v1';
+  const LIST_KEY = 'tt_notifications_list_v1';
 
     function getUnread() {
       const n = parseInt(localStorage.getItem(UNREAD_KEY) || '0', 10);
@@ -121,6 +121,13 @@
       localStorage.setItem(LIST_KEY, JSON.stringify(arr));
     }
 
+    function computeUnread(list) {
+      return (list || []).reduce((acc, n) => acc + (n && n.read ? 0 : 1), 0);
+    }
+    function setUnreadFromList(list) {
+      const n = computeUnread(list);
+      setUnread(n);
+    }
     function render() {
       const list = getList();
       const wrap = document.getElementById('notif-list');
@@ -130,12 +137,15 @@
         wrap.innerHTML = '<div class="no-results">No notifications yet.</div>';
         return;
       }
-      wrap.innerHTML = list.map(n => `
-        <article class="topic-card">
+      wrap.innerHTML = list.map((n, idx) => `
+        <article class="topic-card ${n.read ? '' : 'unread'}" data-idx="${idx}">
           <header class="topic-header">
             <h3 class="topic-title"><i class="fas fa-bell"></i> ${escapeHtml(n.title || 'Notification')}</h3>
             <div class="topic-meta">
+              ${n.read ? '' : '<span class="pill tiny" style="background: rgba(255,77,79,0.1); border-color: rgba(255,77,79,0.4); color:#ff4d4f;"><i class="fas fa-circle"></i> Unread</span>'}
               <span class="meta-item"><i class="fas fa-clock"></i> ${new Date(n.ts||Date.now()).toLocaleString()}</span>
+              <button class="pill tiny notif-toggle" title="Mark ${n.read ? 'unread' : 'read'}"><i class="fas ${n.read ? 'fa-envelope-open' : 'fa-envelope'}"></i> ${n.read ? 'Mark Unread' : 'Mark Read'}</button>
+              <button class="pill tiny notif-delete" title="Delete"><i class="fas fa-trash"></i> Delete</button>
             </div>
           </header>
           <div class="topic-body">${escapeHtml(n.body||'')}</div>
@@ -146,15 +156,39 @@
 
     // Wire buttons
     document.getElementById('mark-read').addEventListener('click', () => {
-      setUnread(0);
+      const list = getList().map(n => Object.assign({}, n, { read: true }));
+      setList(list);
+      setUnreadFromList(list);
       render();
     });
     document.getElementById('add-sample').addEventListener('click', () => {
       const list = getList();
-      list.unshift({ title: 'New reply on your topic', body: 'Someone responded to your question.', ts: Date.now() });
+      list.unshift({ title: 'New reply on your topic', body: 'Someone responded to your question.', ts: Date.now(), read: false });
       setList(list);
-      setUnread(getUnread() + 1);
+      setUnreadFromList(list);
       render();
+    });
+
+    // Delegated item actions
+    document.getElementById('notif-list').addEventListener('click', (e) => {
+      const card = e.target.closest('article.topic-card');
+      if (!card) return;
+      const idx = parseInt(card.getAttribute('data-idx'), 10);
+      if (Number.isNaN(idx)) return;
+      const list = getList();
+      const item = list[idx];
+      if (!item) return;
+      if (e.target.closest('.notif-toggle')) {
+        item.read = !item.read;
+        setList(list);
+        setUnreadFromList(list);
+        render();
+      } else if (e.target.closest('.notif-delete')) {
+        list.splice(idx, 1);
+        setList(list);
+        setUnreadFromList(list);
+        render();
+      }
     });
 
     // Initial render
