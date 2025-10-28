@@ -207,6 +207,17 @@
         document.getElementById('profile-member-since').textContent = '';
       }
 
+      // Last login
+      const lastLoginEl = document.getElementById('profile-last-login');
+      if (lastLoginEl) {
+        if (user.lastLogin) {
+          const last = new Date(user.lastLogin);
+          lastLoginEl.textContent = `Last login ${last.toLocaleString()}`;
+        } else {
+          lastLoginEl.textContent = '';
+        }
+      }
+
       // Avatar fallback
       var avatar = document.getElementById('profile-avatar');
       if (user.avatarUrl) {

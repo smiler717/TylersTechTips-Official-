@@ -38,8 +38,13 @@ export async function onRequestPost({ request, env }) {
       return error(401, 'Invalid credentials');
     }
 
-    // Optionally update last login if column exists
-    // (Column not present in current schema)
+    // Optionally update last login if column exists (ignore if not present)
+    try {
+      await DB.prepare('UPDATE users SET last_login = ? WHERE id = ?')
+        .bind(Date.now(), user.id).run();
+    } catch (e) {
+      // no-op if column does not exist
+    }
 
     // Generate token
     const { token, expiresAt } = await generateToken(user.id, user.username, env);
