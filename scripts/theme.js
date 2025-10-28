@@ -177,10 +177,10 @@
                 ensureUnreadDot(wrapper);
                 updateUnreadDot(wrapper);
             } else {
-                // Logged out: default Join Community button
+                // Logged out: show Login button
                 btn.href = 'profile.html';
-                btn.innerHTML = '<i class="fas fa-users"></i> Join Community';
-                btn.title = 'Join the community';
+                btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+                btn.title = 'Login or create an account';
             }
         } catch (err) {
             // no-op

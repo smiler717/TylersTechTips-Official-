@@ -45,11 +45,13 @@
   }
 
   // Switch between login/register tabs
-  window.switchTab = function(tab) {
+  window.switchTab = function(tab, event) {
     document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
     
-    event.target.classList.add('active');
+    if (event && event.target) {
+      event.target.classList.add('active');
+    }
     document.getElementById(`${tab}-form`).classList.add('active');
   };
 
