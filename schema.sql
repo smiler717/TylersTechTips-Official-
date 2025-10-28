@@ -35,3 +35,20 @@ CREATE INDEX IF NOT EXISTS idx_topics_category ON topics(category);
 CREATE INDEX IF NOT EXISTS idx_comments_created ON comments(created_at);
 CREATE INDEX IF NOT EXISTS idx_feedback_created ON feedback(created_at);
 CREATE INDEX IF NOT EXISTS idx_feedback_type ON feedback(type);
+-- Users table for authentication and profiles
+CREATE TABLE IF NOT EXISTS users (
+  id TEXT PRIMARY KEY,
+  username TEXT UNIQUE NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  display_name TEXT,
+  bio TEXT,
+  avatar_url TEXT,
+  created_at INTEGER NOT NULL,
+  last_login INTEGER,
+  is_verified INTEGER DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_created ON users(created_at);
