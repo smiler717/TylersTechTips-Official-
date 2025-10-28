@@ -106,33 +106,72 @@
             if (!navbar) return;
             const btn = navbar.querySelector('.join-community-btn');
             if (!btn) return;
+
+            // Ensure wrapper for dropdown positioning
+            let wrapper = btn.closest('.user-menu');
+            if (!wrapper) {
+                wrapper = document.createElement('div');
+                wrapper.className = 'user-menu';
+                // Keep inline in navbar
+                btn.replaceWith(wrapper);
+                wrapper.appendChild(btn);
+            }
+
+            // Remove any existing toggle/menu to rebuild cleanly
+            wrapper.querySelector('.user-menu-toggle')?.remove();
+            wrapper.querySelector('.user-menu-dropdown')?.remove();
+
             if (isLoggedIn()) {
                 const user = getUser() || {};
                 const name = (user.displayName || user.username || 'My Profile');
-                // Switch button to profile with name
+                const initial = (name || 'U').trim().charAt(0).toUpperCase();
+                const avatarUrl = user.avatarUrl || '';
+                // Switch button to profile with avatar + name
                 btn.href = 'profile.html';
-                btn.innerHTML = `<i class="fas fa-user-circle"></i> ${escapeHtml(name)}`;
                 btn.title = 'View your profile';
-                // Ensure a logout pill exists to the right
-                let logout = navbar.querySelector('.nav-logout-pill');
-                if (!logout) {
-                    logout = document.createElement('button');
-                    logout.className = 'nav-logout-pill pill';
-                    logout.type = 'button';
-                    logout.style.marginLeft = '8px';
-                    logout.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
-                    logout.addEventListener('click', (e) => { e.preventDefault(); clearAuthAndReload(); });
-                    // Insert after the profile button
-                    btn.insertAdjacentElement('afterend', logout);
-                }
+                btn.innerHTML = `
+                  <span class="user-avatar-chip" ${avatarUrl ? `style=\"background-image:url('${escapeAttr(avatarUrl)}')\"` : ''}>${avatarUrl ? '' : escapeHtml(initial)}</span>
+                  <span class="user-name">${escapeHtml(name)}</span>
+                `;
+
+                // Add a small caret toggle to open dropdown
+                const toggle = document.createElement('button');
+                toggle.className = 'user-menu-toggle';
+                toggle.type = 'button';
+                toggle.setAttribute('aria-expanded', 'false');
+                toggle.innerHTML = '<i class="fas fa-caret-down"></i>';
+                wrapper.appendChild(toggle);
+
+                // Build dropdown
+                const menu = document.createElement('div');
+                menu.className = 'user-menu-dropdown';
+                menu.innerHTML = `
+                  <a href="profile.html"><i class="fas fa-user"></i> My Profile</a>
+                  <button type="button" class="logout-item"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                `;
+                wrapper.appendChild(menu);
+
+                // Wire interactions
+                toggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const open = menu.classList.toggle('open');
+                    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+                });
+                menu.querySelector('.logout-item')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    clearAuthAndReload();
+                });
+                document.addEventListener('click', (e) => {
+                    if (!wrapper.contains(e.target)) {
+                        menu.classList.remove('open');
+                        toggle.setAttribute('aria-expanded', 'false');
+                    }
+                }, { capture: true });
             } else {
-                // Logged out: ensure default Join Community button
+                // Logged out: default Join Community button
                 btn.href = 'profile.html';
                 btn.innerHTML = '<i class="fas fa-users"></i> Join Community';
                 btn.title = 'Join the community';
-                // Remove logout pill if present
-                const logout = navbar.querySelector('.nav-logout-pill');
-                if (logout) logout.remove();
             }
         } catch (err) {
             // no-op
@@ -143,5 +182,8 @@
         const d = document.createElement('div');
         d.textContent = String(str ?? '');
         return d.innerHTML;
+    }
+    function escapeAttr(str){
+        return String(str ?? '').replace(/"/g, '&quot;');
     }
 })();
