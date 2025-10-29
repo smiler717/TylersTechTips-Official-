@@ -14,8 +14,8 @@ compatibility_flags = ["nodejs_compat"]
 # TYLERS_TECH_KV → ttt-rate-limit
 # RATE_LIMIT → ttt-rate-limit
 
-# R2 Bucket Binding
-[[r2_buckets]]
-binding = "R2_BUCKET"
-bucket_name = "tylers-tech-uploads"
+## R2 Bucket Binding (disabled for Pages; add in dashboard if needed)
+# [[r2_buckets]]
+# binding = "R2_BUCKET"
+# bucket_name = "tylers-tech-uploads"
 
