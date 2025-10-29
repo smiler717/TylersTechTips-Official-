@@ -4,6 +4,7 @@
 name = "tylers-tech-tips"
 compatibility_date = "2025-10-29"
 pages_build_output_dir = "."
+compatibility_flags = ["nodejs_compat"]
 
 # D1 Database Bindings (Already configured in Cloudflare Pages)
 # DB → community_db
@@ -17,36 +18,4 @@ pages_build_output_dir = "."
 [[r2_buckets]]
 binding = "R2_BUCKET"
 bucket_name = "tylers-tech-uploads"
-
-# Durable Objects
-[[durable_objects.bindings]]
-name = "REALTIME"
-class_name = "RealtimeConnection"
-script_name = "tylers-tech-tips"
-
-# Migrations for Durable Objects
-[[migrations]]
-tag = "v1"
-new_classes = ["RealtimeConnection"]
-
-# Environment Variables (set in Cloudflare dashboard)
-[vars]
-# Note: Secrets should be set via dashboard, not here
-# ADMIN_KEY = "set-in-dashboard"
-# CF_ACCOUNT_ID = "set-in-dashboard"
-# CF_API_TOKEN = "set-in-dashboard"
-# CF_IMAGES_ACCOUNT_HASH = "set-in-dashboard"
-# R2_PUBLIC_URL = "https://your-bucket.r2.dev"
-
-# Build Configuration
-[build]
-command = "echo 'No build required for static site'"
-
-# Route Configuration
-[[routes]]
-pattern = "tylerstechtips.com/*"
-zone_name = "tylerstechtips.com"
-
-# Compatibility Flags
-compatibility_flags = ["nodejs_compat"]
 
