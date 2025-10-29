@@ -79,15 +79,24 @@ export async function onRequest(context) {
       t.canDelete = admin;
       t.views = await getViews(env, t.id);
       
-      // Get vote counts
+      // Get vote counts from KV (if available)
       const upvotesKey = `votes:topic:${t.id}:up`;
       const downvotesKey = `votes:topic:${t.id}:down`;
-      t.upvotes = parseInt(await env.RATE_LIMIT.get(upvotesKey) || '0');
-      t.downvotes = parseInt(await env.RATE_LIMIT.get(downvotesKey) || '0');
+      if (env.RATE_LIMIT) {
+        t.upvotes = parseInt(await env.RATE_LIMIT.get(upvotesKey) || '0');
+        t.downvotes = parseInt(await env.RATE_LIMIT.get(downvotesKey) || '0');
+      } else {
+        t.upvotes = 0;
+        t.downvotes = 0;
+      }
       
-      // Check user's vote
+      // Check user's vote (if KV available)
       const voteKey = `vote:topic:${t.id}:${deviceId}`;
-      t.userVote = await env.RATE_LIMIT.get(voteKey);
+      if (env.RATE_LIMIT) {
+        t.userVote = await env.RATE_LIMIT.get(voteKey);
+      } else {
+        t.userVote = null;
+      }
       
       delete t.created_at;
       delete t.created_by;
