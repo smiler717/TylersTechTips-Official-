@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Diagnostics - Tyler's Tech Tips</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .diagnostic-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        .test-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border-radius: 8px;
+        }
+        .test-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .success { background: #1a472a; color: #4ade80; border-left: 4px solid #4ade80; }
+        .error { background: #4a1a1a; color: #f87171; border-left: 4px solid #f87171; }
+        .pending { background: var(--secondary-bg); color: var(--secondary-text); }
+        .test-button {
+            margin: 0.5rem 0.5rem 0.5rem 0;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .test-button:hover {
+            opacity: 0.9;
+        }
+        .test-button:disabled {
+            opacity: 0.5;
+            cursor: not-started;
+        }
+    </style>
+</head>
+<body>
+    <div class="diagnostic-container">
+        <h1>🔧 API Diagnostics</h1>
+        <p>This page tests all API endpoints to identify issues.</p>
+
+        <div class="test-section">
+            <h2>Test 1: Topics API</h2>
+            <button class="test-button" onclick="testTopics()">Test /api/topics</button>
+            <div id="test-topics" class="test-result pending">Click button to test...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 2: Auth API</h2>
+            <button class="test-button" onclick="testAuth()">Test /api/auth/me</button>
+            <div id="test-auth" class="test-result pending">Click button to test...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 3: Vote API</h2>
+            <button class="test-button" onclick="testVote()">Test /api/vote</button>
+            <div id="test-vote" class="test-result pending">Click button to test...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 4: Leaderboard API</h2>
+            <button class="test-button" onclick="testLeaderboard()">Test /api/leaderboard</button>
+            <div id="test-leaderboard" class="test-result pending">Click button to test...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test All</h2>
+            <button class="test-button" onclick="testAll()">Run All Tests</button>
+        </div>
+
+        <div class="test-section">
+            <h2>Environment Info</h2>
+            <div class="test-result pending">
+                <strong>Current URL:</strong> <span id="current-url"></span>
+                <br><strong>Protocol:</strong> <span id="protocol"></span>
+                <br><strong>Host:</strong> <span id="host"></span>
+                <br><strong>User Agent:</strong> <span id="user-agent"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Display environment info
+        document.getElementById('current-url').textContent = window.location.href;
+        document.getElementById('protocol').textContent = window.location.protocol;
+        document.getElementById('host').textContent = window.location.host;
+        document.getElementById('user-agent').textContent = navigator.userAgent;
+
+        function displayResult(elementId, success, message, data = null) {
+            const el = document.getElementById(elementId);
+            el.className = `test-result ${success ? 'success' : 'error'}`;
+            let text = message;
+            if (data) {
+                text += '\n\n' + JSON.stringify(data, null, 2);
+            }
+            el.textContent = text;
+        }
+
+        async function testTopics() {
+            const el = document.getElementById('test-topics');
+            el.className = 'test-result pending';
+            el.textContent = 'Testing...';
+
+            try {
+                const startTime = Date.now();
+                const response = await fetch('/api/topics');
+                const duration = Date.now() - startTime;
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    displayResult('test-topics', false, 
+                        `❌ FAILED\nStatus: ${response.status} ${response.statusText}\nDuration: ${duration}ms\n\nResponse:`, 
+                        errorText);
+                    return;
+                }
+
+                const data = await response.json();
+                displayResult('test-topics', true, 
+                    `✅ SUCCESS\nStatus: ${response.status}\nDuration: ${duration}ms\nTopics found: ${data.topics?.length || 0}`, 
+                    data);
+            } catch (error) {
+                displayResult('test-topics', false, 
+                    `❌ NETWORK ERROR\n${error.message}`, 
+                    { error: error.toString(), stack: error.stack });
+            }
+        }
+
+        async function testAuth() {
+            const el = document.getElementById('test-auth');
+            el.className = 'test-result pending';
+            el.textContent = 'Testing...';
+
+            try {
+                const startTime = Date.now();
+                const response = await fetch('/api/auth/me');
+                const duration = Date.now() - startTime;
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    displayResult('test-auth', false, 
+                        `❌ FAILED (Expected for logged out users)\nStatus: ${response.status} ${response.statusText}\nDuration: ${duration}ms\n\nResponse:`, 
+                        errorText);
+                    return;
+                }
+
+                const data = await response.json();
+                displayResult('test-auth', true, 
+                    `✅ SUCCESS\nStatus: ${response.status}\nDuration: ${duration}ms`, 
+                    data);
+            } catch (error) {
+                displayResult('test-auth', false, 
+                    `❌ NETWORK ERROR\n${error.message}`, 
+                    { error: error.toString() });
+            }
+        }
+
+        async function testVote() {
+            const el = document.getElementById('test-vote');
+            el.className = 'test-result pending';
+            el.textContent = 'Testing...';
+
+            try {
+                const startTime = Date.now();
+                // Just test if endpoint exists with GET (should return 405 Method Not Allowed)
+                const response = await fetch('/api/vote');
+                const duration = Date.now() - startTime;
+                
+                const text = await response.text();
+                if (response.status === 405 || response.status === 404) {
+                    displayResult('test-vote', true, 
+                        `✅ ENDPOINT EXISTS (${response.status})\nDuration: ${duration}ms\n\nNote: POST method required for actual votes`,
+                        text);
+                } else {
+                    displayResult('test-vote', false, 
+                        `Status: ${response.status}\nDuration: ${duration}ms`, 
+                        text);
+                }
+            } catch (error) {
+                displayResult('test-vote', false, 
+                    `❌ NETWORK ERROR\n${error.message}`, 
+                    { error: error.toString() });
+            }
+        }
+
+        async function testLeaderboard() {
+            const el = document.getElementById('test-leaderboard');
+            el.className = 'test-result pending';
+            el.textContent = 'Testing...';
+
+            try {
+                const startTime = Date.now();
+                const response = await fetch('/api/leaderboard');
+                const duration = Date.now() - startTime;
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    displayResult('test-leaderboard', false, 
+                        `❌ FAILED\nStatus: ${response.status} ${response.statusText}\nDuration: ${duration}ms\n\nResponse:`, 
+                        errorText);
+                    return;
+                }
+
+                const data = await response.json();
+                displayResult('test-leaderboard', true, 
+                    `✅ SUCCESS\nStatus: ${response.status}\nDuration: ${duration}ms\nUsers found: ${data.users?.length || 0}`, 
+                    data);
+            } catch (error) {
+                displayResult('test-leaderboard', false, 
+                    `❌ NETWORK ERROR\n${error.message}`, 
+                    { error: error.toString() });
+            }
+        }
+
+        async function testAll() {
+            await testTopics();
+            await new Promise(r => setTimeout(r, 500));
+            await testAuth();
+            await new Promise(r => setTimeout(r, 500));
+            await testVote();
+            await new Promise(r => setTimeout(r, 500));
+            await testLeaderboard();
+        }
+
+        // Auto-run tests on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(testAll, 1000);
+        });
+    </script>
+</body>
+</html>
