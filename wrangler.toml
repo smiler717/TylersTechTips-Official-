@@ -48,6 +48,5 @@ pattern = "tylerstechtips.com/*"
 zone_name = "tylerstechtips.com"
 
 # Compatibility Flags
-[compatibility_flags]
-nodejs_compat = true
+compatibility_flags = ["nodejs_compat"]
 
