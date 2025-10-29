@@ -2,6 +2,7 @@ import { json, error, readJson, getDeviceId, checkRateLimit, isAdmin } from '../
 import { getCurrentUser } from '../../_auth.js';
 import { sanitizeText, validateDeviceId } from '../../_sanitize.js';
 import { getCached, setCached, CacheKey, invalidateComments, cacheResponse } from '../../_cache.js';
+import { logAudit, getRequestMetadata, AuditAction } from '../../_audit.js';
 
 export async function onRequest(context) {
   const { request, env, params } = context;
@@ -97,6 +98,18 @@ export async function onRequest(context) {
     
     // Invalidate comment caches for this topic
     await invalidateComments(env, topicId);
+    
+    // Audit comment creation
+    const { ipAddress, userAgent } = getRequestMetadata(request);
+    await logAudit(env, {
+      userId: currentUser.userId,
+      action: AuditAction.COMMENT_CREATE,
+      resourceType: 'comment',
+      resourceId: id,
+      ipAddress,
+      userAgent,
+      metadata: { topicId }
+    });
     
     return json({ comment: { id, author: displayAuthor, body: content, createdAt, canDelete: admin } }, { status: 201 });
   }

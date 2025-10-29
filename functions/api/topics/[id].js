@@ -1,5 +1,7 @@
 import { json, error, getDeviceId, isAdmin } from '../_utils.js';
 import { getCached, setCached, CacheKey, invalidateTopic, cacheResponse } from '../_cache.js';
+import { logAudit, getRequestMetadata, AuditAction } from '../_audit.js';
+import { getCurrentUser } from '../_auth.js';
 
 export async function onRequest(context) {
   const { request, env, params } = context;
@@ -56,11 +58,28 @@ export async function onRequest(context) {
   if (method === 'DELETE') {
     // Admin-only delete
     if (!admin) return error(403, 'Forbidden');
+    
+    // Get current user for audit
+    const currentUser = await getCurrentUser(request, env);
+    
     await DB.prepare('DELETE FROM topics WHERE id = ?').bind(id).run();
     await DB.prepare('DELETE FROM comments WHERE topic_id = ?').bind(id).run();
     
     // Invalidate caches
     await invalidateTopic(env, id);
+    
+    // Audit topic deletion
+    if (currentUser) {
+      const { ipAddress, userAgent } = getRequestMetadata(request);
+      await logAudit(env, {
+        userId: currentUser.userId,
+        action: AuditAction.TOPIC_DELETE,
+        resourceType: 'topic',
+        resourceId: id,
+        ipAddress,
+        userAgent
+      });
+    }
     
     return new Response(null, { status: 204 });
   }

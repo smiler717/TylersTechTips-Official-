@@ -2,6 +2,7 @@ import { json, error, readJson, getDeviceId, checkRateLimit, isAdmin, getViews }
 import { getCurrentUser } from './_auth.js';
 import { sanitizeTopicInput, validateDeviceId } from './_sanitize.js';
 import { getCached, setCached, CacheKey, invalidateCache, cacheResponse } from './_cache.js';
+import { logAudit, getRequestMetadata, AuditAction } from './_audit.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -145,6 +146,18 @@ export async function onRequest(context) {
       
       // Invalidate topic list caches
       await invalidateCache(env, 'topics');
+      
+      // Audit topic creation
+      const { ipAddress, userAgent } = getRequestMetadata(request);
+      await logAudit(env, {
+        userId: currentUser.userId,
+        action: AuditAction.TOPIC_CREATE,
+        resourceType: 'topic',
+        resourceId: id,
+        ipAddress,
+        userAgent,
+        metadata: { title, category }
+      });
       
       return json({
         topic: { id, title, body: content, author: displayAuthor, category, createdAt, comments: [], canDelete: admin }

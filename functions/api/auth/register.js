@@ -6,6 +6,7 @@
 import { json, error, readJson } from '../_utils.js';
 import { sanitizeText } from '../_sanitize.js';
 import { hashPassword, isValidEmail, isValidUsername } from '../_auth.js';
+import { logAudit, getRequestMetadata, AuditAction } from '../_audit.js';
 
 export async function onRequestOptions({ request }) {
   return new Response(null, { status: 204, headers: {
@@ -105,6 +106,18 @@ export async function onRequestPost({ request, env }) {
     if (kv) {
       await kv.put(rlKey, String(Date.now()), { expirationTtl: 60 });
     }
+
+    // Audit successful registration
+    const { ipAddress, userAgent } = getRequestMetadata(request);
+    await logAudit(env, {
+      userId: user.id,
+      action: AuditAction.REGISTER,
+      resourceType: 'user',
+      resourceId: String(user.id),
+      ipAddress,
+      userAgent,
+      metadata: { username, email }
+    });
 
     const payload = { success: true, user };
     // Provide a development-time verification link if token stored

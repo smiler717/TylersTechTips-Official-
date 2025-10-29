@@ -6,6 +6,7 @@
 import { json, error, readJson } from '../_utils.js';
 import { getCurrentUser, hashPassword, verifyPassword } from '../_auth.js';
 import { sanitizeText, sanitizeUrl } from '../_sanitize.js';
+import { logAudit, getRequestMetadata, AuditAction } from '../_audit.js';
 
 export async function onRequestOptions({ request }) {
   return new Response(null, { status: 204, headers: {
@@ -94,6 +95,21 @@ export async function onRequestPatch({ request, env }) {
       FROM users
       WHERE id = ?
     `).bind(currentUser.userId).first();
+
+    // Audit profile update
+    const { ipAddress, userAgent } = getRequestMetadata(request);
+    await logAudit(env, {
+      userId: currentUser.userId,
+      action: newPassword ? AuditAction.PASSWORD_CHANGE : AuditAction.PROFILE_UPDATE,
+      resourceType: 'user',
+      resourceId: String(currentUser.userId),
+      ipAddress,
+      userAgent,
+      metadata: { 
+        updatedFields: updates.map(u => u.split(' = ')[0]),
+        passwordChanged: !!newPassword
+      }
+    });
 
     return json({
       success: true,

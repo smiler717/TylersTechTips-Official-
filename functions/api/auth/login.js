@@ -5,6 +5,7 @@
 
 import { json, error, readJson } from '../_utils.js';
 import { verifyPassword, generateToken } from '../_auth.js';
+import { logAudit, getRequestMetadata, AuditAction } from '../_audit.js';
 
 export async function onRequestOptions({ request }) {
   return new Response(null, { status: 204, headers: {
@@ -64,6 +65,19 @@ export async function onRequestPost({ request, env }) {
         const cur = parseInt((await kv.get(attemptKey)) || '0', 10) || 0;
         await kv.put(attemptKey, String(cur + 1), { expirationTtl: 15 * 60 });
       }
+      
+      // Audit failed login attempt
+      const { ipAddress, userAgent } = getRequestMetadata(request);
+      await logAudit(env, {
+        userId: null,
+        action: AuditAction.LOGIN_FAILED,
+        resourceType: 'user',
+        resourceId: usernameOrEmail,
+        ipAddress,
+        userAgent,
+        metadata: { reason: 'user_not_found' }
+      });
+      
       return error(401, 'Invalid credentials');
     }
 
@@ -75,6 +89,19 @@ export async function onRequestPost({ request, env }) {
         const cur = parseInt((await kv.get(attemptKey)) || '0', 10) || 0;
         await kv.put(attemptKey, String(cur + 1), { expirationTtl: 15 * 60 });
       }
+      
+      // Audit failed login attempt
+      const { ipAddress, userAgent } = getRequestMetadata(request);
+      await logAudit(env, {
+        userId: user.id,
+        action: AuditAction.LOGIN_FAILED,
+        resourceType: 'user',
+        resourceId: String(user.id),
+        ipAddress,
+        userAgent,
+        metadata: { reason: 'invalid_password' }
+      });
+      
       return error(401, 'Invalid credentials');
     }
 
@@ -93,6 +120,18 @@ export async function onRequestPost({ request, env }) {
     if (kv) {
       await kv.delete(attemptKey);
     }
+
+    // Audit successful login
+    const { ipAddress, userAgent } = getRequestMetadata(request);
+    await logAudit(env, {
+      userId: user.id,
+      action: AuditAction.LOGIN,
+      resourceType: 'user',
+      resourceId: String(user.id),
+      ipAddress,
+      userAgent,
+      metadata: { username: user.username }
+    });
 
     return json({
       success: true,
