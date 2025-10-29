@@ -7,17 +7,27 @@ import { json, error, readJson } from '../_utils.js';
 import { sanitizeText } from '../_sanitize.js';
 import { hashPassword, isValidEmail, isValidUsername } from '../_auth.js';
 import { logAudit, getRequestMetadata, AuditAction } from '../_audit.js';
+import { validateCsrf } from '../_csrf-middleware.js';
 
 export async function onRequestOptions({ request }) {
   return new Response(null, { status: 204, headers: {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, x-device-id, x-admin-key, Authorization',
+    'Access-Control-Allow-Headers': 'Content-Type, x-device-id, x-admin-key, Authorization, x-csrf-token',
     'Access-Control-Max-Age': '86400'
   }});
 }
 
 export async function onRequestPost({ request, env }) {
+  // Validate CSRF token
+  const deviceId = request.headers.get('x-device-id');
+  if (!deviceId) {
+    return error(400, 'Device ID required');
+  }
+  const csrfValid = await validateCsrf(request, env, deviceId);
+  if (!csrfValid) {
+    return error(403, 'Invalid CSRF token');
+  }
   const DB = env.DB || env.TYLERS_TECH_DB;
   if (!DB) return error(500, 'Database not configured');
 

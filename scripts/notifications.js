@@ -218,10 +218,38 @@ class NotificationManager {
   }
 
   startPolling() {
-    // Poll every 30 seconds
-    this.pollInterval = setInterval(() => {
+    // Use WebSocket if available, otherwise fall back to polling
+    if (window.realtimeClient && window.realtimeClient.connected) {
+      console.log('Using WebSocket for notifications');
+      window.realtimeClient.on('notification', (data) => {
+        this.handleRealtimeNotification(data);
+      });
+    } else {
+      // Fallback to polling every 30 seconds
+      console.log('Using polling for notifications');
+      this.pollInterval = setInterval(() => {
+        this.loadNotifications();
+      }, 30000);
+    }
+  }
+
+  handleRealtimeNotification(data) {
+    // Increment badge
+    this.unreadCount++;
+    this.updateBadge();
+
+    // Add to dropdown if open
+    if (this.dropdown.style.display === 'block') {
       this.loadNotifications();
-    }, 30000);
+    }
+
+    // Show browser notification if supported
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('New Notification', {
+        body: data.message || 'You have a new notification',
+        icon: '/favicon.svg'
+      });
+    }
   }
 
   stopPolling() {

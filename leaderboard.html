@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard - Tyler's Tech Tips</title>
+    <meta name="description" content="Top contributors in the Tyler's Tech Tips community. View reputation rankings and user achievements.">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="scripts/theme.js"></script>
+    <script defer src="scripts/csrf.js"></script>
+    <script defer src="scripts/search.js"></script>
+    <script defer src="scripts/auth.js"></script>
+    <style>
+        .leaderboard-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        .leaderboard-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .leaderboard-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .leaderboard-header p {
+            color: var(--secondary-text);
+            font-size: 1.1rem;
+        }
+        .podium {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 20px;
+            margin: 3rem 0;
+        }
+        .podium-place {
+            text-align: center;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .podium-place:hover {
+            transform: translateY(-5px);
+        }
+        .podium-place.first {
+            order: 2;
+            padding: 30px;
+        }
+        .podium-place.second {
+            order: 1;
+        }
+        .podium-place.third {
+            order: 3;
+        }
+        .podium-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            border: 4px solid;
+        }
+        .podium-place.first .podium-avatar {
+            width: 100px;
+            height: 100px;
+            border-color: #ffd700;
+        }
+        .podium-place.second .podium-avatar {
+            border-color: #c0c0c0;
+        }
+        .podium-place.third .podium-avatar {
+            border-color: #cd7f32;
+        }
+        .podium-rank {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        .podium-place.first .podium-rank {
+            color: #ffd700;
+        }
+        .podium-place.second .podium-rank {
+            color: #c0c0c0;
+        }
+        .podium-place.third .podium-rank {
+            color: #cd7f32;
+        }
+        .podium-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .podium-reputation {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+        .rest-of-list {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 2rem;
+        }
+        .loading-spinner {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2rem;
+            color: var(--secondary-text);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <h1><a href="index.html"><i class="fas fa-laptop-code"></i> Tyler's Tech Tips</a></h1>
+            </div>
+            <div class="search-container">
+                <input type="text" class="search-bar" placeholder="Search articles...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="community.html"><i class="fas fa-comments"></i> Community</a></li>
+                <li><a href="leaderboard.html" class="active"><i class="fas fa-trophy"></i> Leaderboard</a></li>
+                <li><a href="profile.html" id="profile-link"><i class="fas fa-user"></i> <span id="nav-username">Profile</span></a></li>
+                <li><button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                    <i class="fas fa-sun"></i>
+                </button></li>
+            </ul>
+            <div class="mobile-menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="leaderboard-container">
+            <div class="leaderboard-header">
+                <h1><i class="fas fa-trophy"></i> Community Leaderboard</h1>
+                <p>Top contributors ranked by reputation and community engagement</p>
+            </div>
+
+            <div id="podium" class="podium" style="display: none;">
+                <!-- Top 3 will be inserted here -->
+            </div>
+
+            <div class="rest-of-list">
+                <h2>Top Contributors</h2>
+                <div id="leaderboard-content">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i> Loading leaderboard...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Tyler's Tech Tips. All rights reserved.</p>
+        <div class="social-links">
+            <a href="#"><i class="fab fa-youtube"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-github"></i></a>
+        </div>
+    </footer>
+
+    <script>
+        // Load leaderboard
+        async function loadLeaderboard() {
+            try {
+                const response = await fetch('/api/leaderboard?limit=100');
+                if (!response.ok) throw new Error('Failed to load leaderboard');
+
+                const data = await response.json();
+                const users = data.users || [];
+
+                if (users.length === 0) {
+                    document.getElementById('leaderboard-content').innerHTML = '<p style="text-align: center; padding: 40px; color: var(--secondary-text);">No users to display yet.</p>';
+                    return;
+                }
+
+                // Show top 3 in podium
+                if (users.length >= 3) {
+                    const podium = document.getElementById('podium');
+                    podium.style.display = 'flex';
+                    podium.innerHTML = `
+                        <div class="podium-place second">
+                            <div class="podium-avatar" style="background-image: url('${users[1].avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(users[1].username)}'); background-size: cover;"></div>
+                            <div class="podium-rank">2</div>
+                            <div class="podium-name">${users[1].display_name || users[1].username}</div>
+                            <div class="podium-reputation">${users[1].reputation} <i class="fas fa-star"></i></div>
+                        </div>
+                        <div class="podium-place first">
+                            <div class="podium-avatar" style="background-image: url('${users[0].avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(users[0].username)}'); background-size: cover;"></div>
+                            <div class="podium-rank">1</div>
+                            <div class="podium-name">${users[0].display_name || users[0].username}</div>
+                            <div class="podium-reputation">${users[0].reputation} <i class="fas fa-star"></i></div>
+                        </div>
+                        <div class="podium-place third">
+                            <div class="podium-avatar" style="background-image: url('${users[2].avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(users[2].username)}'); background-size: cover;"></div>
+                            <div class="podium-rank">3</div>
+                            <div class="podium-name">${users[2].display_name || users[2].username}</div>
+                            <div class="podium-reputation">${users[2].reputation} <i class="fas fa-star"></i></div>
+                        </div>
+                    `;
+                }
+
+                // Show rest in table
+                const tableHTML = `
+                    <table class="leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>User</th>
+                                <th>Reputation</th>
+                                <th>Topics</th>
+                                <th>Comments</th>
+                                <th>Badges</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${users.slice(3).map((user, idx) => {
+                                const rank = idx + 4;
+                                return `
+                                    <tr>
+                                        <td><span class="leaderboard-rank">${rank}</span></td>
+                                        <td>
+                                            <div class="leaderboard-user">
+                                                <img src="${user.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.username)}" 
+                                                     alt="${user.username}" class="leaderboard-avatar">
+                                                <div>
+                                                    <div style="font-weight: 600;">${user.display_name || user.username}</div>
+                                                    <div style="font-size: 12px; color: var(--secondary-text);">@${user.username}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td><span class="reputation-badge">${user.reputation} <i class="fas fa-star"></i></span></td>
+                                        <td>${user.topic_count || 0}</td>
+                                        <td>${user.comment_count || 0}</td>
+                                        <td>${user.badge_count || 0}</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                `;
+
+                document.getElementById('leaderboard-content').innerHTML = tableHTML;
+
+            } catch (error) {
+                console.error('Leaderboard error:', error);
+                document.getElementById('leaderboard-content').innerHTML = `
+                    <p style="text-align: center; padding: 40px; color: #dc3545;">
+                        <i class="fas fa-exclamation-triangle"></i> Failed to load leaderboard
+                    </p>
+                `;
+            }
+        }
+
+        // Load on page ready
+        document.addEventListener('DOMContentLoaded', loadLeaderboard);
+    </script>
+</body>
+</html>

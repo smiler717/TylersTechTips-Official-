@@ -2560,3 +2560,524 @@ footer {
 .delete-btn:hover {
     color: #dc3545;
 }
+
+/* ==================== Voting Styles ==================== */
+
+.vote-widget {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin-right: 12px;
+}
+
+.vote-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 10px;
+    font-size: 18px;
+    color: var(--secondary-text);
+    transition: all 0.2s;
+    border-radius: 4px;
+}
+
+.vote-btn:hover {
+    background: rgba(0, 217, 255, 0.1);
+    color: var(--primary-color);
+}
+
+.vote-btn.active.vote-up {
+    color: #28a745;
+}
+
+.vote-btn.active.vote-down {
+    color: #dc3545;
+}
+
+.vote-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.vote-score {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-color);
+    min-width: 30px;
+    text-align: center;
+}
+
+/* Reputation badge */
+.reputation-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.reputation-badge i {
+    font-size: 10px;
+}
+
+/* Badge display */
+.badge-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.badge i {
+    font-size: 14px;
+}
+
+.badge.bronze {
+    background: linear-gradient(135deg, #cd7f32 0%, #8b5a2b 100%);
+    color: white;
+}
+
+.badge.silver {
+    background: linear-gradient(135deg, #c0c0c0 0%, #808080 100%);
+    color: white;
+}
+
+.badge.gold {
+    background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+    color: #333;
+}
+
+.badge.platinum {
+    background: linear-gradient(135deg, #e5e4e2 0%, #a8a8a8 100%);
+    color: #333;
+}
+
+/* Leaderboard */
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.leaderboard-table th {
+    background: var(--card-bg);
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.leaderboard-table tr:hover {
+    background: rgba(0, 217, 255, 0.05);
+}
+
+.leaderboard-rank {
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--primary-color);
+}
+
+.leaderboard-rank.top3 {
+    font-size: 24px;
+}
+
+.leaderboard-rank.rank-1 {
+    color: #ffd700;
+}
+
+.leaderboard-rank.rank-2 {
+    color: #c0c0c0;
+}
+
+.leaderboard-rank.rank-3 {
+    color: #cd7f32;
+}
+
+.leaderboard-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.leaderboard-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.leaderboard-stats {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--secondary-text);
+}
+
+/* ==================== File Upload Styles ==================== */
+
+.file-uploader {
+    margin: 1rem 0;
+}
+
+.upload-zone {
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.upload-zone:hover,
+.upload-zone.drag-over {
+    border-color: var(--primary-color);
+    background: rgba(0, 217, 255, 0.05);
+}
+
+.upload-zone i {
+    font-size: 48px;
+    color: var(--primary-color);
+    margin-bottom: 12px;
+}
+
+.upload-zone p {
+    color: var(--secondary-text);
+    margin: 0;
+}
+
+.browse-link {
+    color: var(--primary-color);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.file-list {
+    margin-top: 1rem;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--card-bg);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: all 0.2s;
+}
+
+.file-item.complete {
+    background: rgba(40, 167, 69, 0.1);
+}
+
+.file-item.error {
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.file-preview {
+    width: 60px;
+    height: 60px;
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-color);
+}
+
+.file-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.file-preview i {
+    font-size: 32px;
+    color: var(--secondary-text);
+}
+
+.file-info {
+    flex: 1;
+}
+
+.file-name {
+    font-weight: 600;
+    margin-bottom: 4px;
+    word-break: break-word;
+}
+
+.file-size {
+    font-size: 12px;
+    color: var(--secondary-text);
+}
+
+.file-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.file-progress .progress-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--border-color);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.file-progress .progress-fill {
+    height: 100%;
+    background: var(--primary-color);
+    transition: width 0.3s;
+}
+
+.file-progress .progress-text {
+    font-size: 12px;
+    font-weight: 600;
+    min-width: 40px;
+    text-align: right;
+}
+
+.file-remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    color: var(--secondary-text);
+    font-size: 18px;
+    transition: color 0.2s;
+}
+
+.file-remove:hover {
+    color: #dc3545;
+}
+
+.attachment-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+    margin: 1rem 0;
+}
+
+.attachment-item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--card-bg);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.attachment-item:hover {
+    transform: scale(1.05);
+}
+
+.attachment-item img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.attachment-file {
+    padding: 20px;
+    text-align: center;
+}
+
+.attachment-file i {
+    font-size: 36px;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+}
+
+.attachment-name {
+    font-size: 12px;
+    word-break: break-word;
+}
+
+/* ==================== PWA Styles ==================== */
+
+.pwa-install-banner {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: var(--card-bg);
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 10000;
+    max-width: 90%;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateX(-50%) translateY(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+.install-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.install-content i {
+    font-size: 24px;
+    color: var(--primary-color);
+}
+
+.install-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.install-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.install-btn:hover {
+    background: #00b8d4;
+    transform: translateY(-2px);
+}
+
+.dismiss-btn {
+    background: none;
+    border: none;
+    color: var(--secondary-text);
+    cursor: pointer;
+    padding: 8px;
+    font-size: 18px;
+    transition: color 0.2s;
+}
+
+.dismiss-btn:hover {
+    color: var(--text-color);
+}
+
+.pwa-update-notification {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--card-bg);
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 10000;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.update-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.update-content i {
+    font-size: 20px;
+    color: var(--primary-color);
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.update-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.update-btn:hover {
+    background: #00b8d4;
+}
+
+/* Responsive PWA banners */
+@media (max-width: 768px) {
+    .pwa-install-banner {
+        flex-direction: column;
+        align-items: stretch;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        max-width: 100%;
+        transform: none;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .install-content {
+        justify-content: center;
+    }
+
+    .install-actions {
+        justify-content: center;
+    }
+
+    .pwa-update-notification {
+        right: 10px;
+        left: 10px;
+        top: 70px;
+    }
+}
+
+
+
