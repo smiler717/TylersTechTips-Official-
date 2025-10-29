@@ -1,4 +1,4 @@
-SELECT COUNT(*) AS badge_count FROM badges;# Cloudflare Pages Configuration
+# Cloudflare Pages Configuration
 # For Tyler's Tech Tips Platform
 
 name = "tylers-tech-tips"
