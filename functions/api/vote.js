@@ -5,7 +5,7 @@
  */
 
 import { json, error, readJson } from './_utils.js';
-import { getUserFromToken } from './_auth.js';
+import { getCurrentUser } from './_auth.js';
 import { castVote, getUserVote } from './_reputation.js';
 import { logAudit, getRequestMetadata, AuditAction } from './_audit.js';
 import { validateCsrf } from './_csrf-middleware.js';

@@ -4,7 +4,7 @@
  */
 
 import { json, error } from './_utils.js';
-import { getUserFromToken } from './_auth.js';
+import { getCurrentUser } from './_auth.js';
 import { validateCsrf } from './_csrf-middleware.js';
 import {
   validateFile,
