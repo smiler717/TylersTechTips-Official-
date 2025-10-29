@@ -3,9 +3,9 @@
  * Handle file uploads
  */
 
-import { json, error } from '../_utils.js';
-import { getUserFromToken } from '../_auth.js';
-import { validateCsrf } from '../_csrf-middleware.js';
+import { json, error } from './_utils.js';
+import { getUserFromToken } from './_auth.js';
+import { validateCsrf } from './_csrf-middleware.js';
 import {
   validateFile,
   generateStorageKey,
@@ -14,7 +14,7 @@ import {
   createAttachment,
   getAttachmentUrl,
   ALLOWED_IMAGE_TYPES
-} from '../_attachments.js';
+} from './_attachments.js';
 
 export async function onRequestOptions({ request }) {
   return new Response(null, { status: 204, headers: {
