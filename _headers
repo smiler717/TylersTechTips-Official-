@@ -19,9 +19,34 @@
   # API-specific headers
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
+  Cache-Control: no-store, no-cache, must-revalidate, private
   
   # CORS for API endpoints (adjust as needed)
-  Access-Control-Allow-Origin: https://tylerstechtips.com
-  Access-Control-Allow-Methods: GET, POST, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, x-device-id, x-admin-key
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, x-device-id, x-admin-key, Authorization
   Access-Control-Max-Age: 86400
+
+# Static assets - aggressive caching
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.png
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.jpg
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.svg
+  Cache-Control: public, max-age=31536000, immutable
+
+# HTML pages - short cache with revalidation
+/*.html
+  Cache-Control: public, max-age=300, must-revalidate
+

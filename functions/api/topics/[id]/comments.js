@@ -1,6 +1,7 @@
 import { json, error, readJson, getDeviceId, checkRateLimit, isAdmin } from '../../_utils.js';
 import { getCurrentUser } from '../../_auth.js';
 import { sanitizeText, validateDeviceId } from '../../_sanitize.js';
+import { getCached, setCached, CacheKey, invalidateComments, cacheResponse } from '../../_cache.js';
 
 export async function onRequest(context) {
   const { request, env, params } = context;
@@ -28,9 +29,23 @@ export async function onRequest(context) {
     const url = new URL(request.url);
     const limit = Math.max(1, Math.min(200, parseInt(url.searchParams.get('limit') || '200', 10)));
     const offset = Math.max(0, parseInt(url.searchParams.get('offset') || '0', 10));
+    
+    // Try cache first
+    const cacheKey = CacheKey.topicComments(topicId, limit, offset);
+    const cached = await getCached(env, cacheKey);
+    if (cached) {
+      return cacheResponse(cached, {}, 'public, max-age=300');
+    }
+    
     const res = await DB.prepare(`SELECT id, author, body, created_at, created_by FROM comments WHERE topic_id = ? ORDER BY created_at ASC LIMIT ? OFFSET ?`).bind(topicId, limit, offset).all();
     const comments = (res.results || []).map(c => ({ id: c.id, author: c.author, body: c.body, createdAt: c.created_at, canDelete: admin }));
-    return json({ comments });
+    
+    const result = { comments };
+    
+    // Cache result
+    await setCached(env, cacheKey, result, 300); // 5min TTL
+    
+    return json(result);
   }
 
   if (method === 'POST') {
@@ -79,6 +94,10 @@ export async function onRequest(context) {
 
     await DB.prepare('INSERT INTO comments (id, topic_id, author, body, created_at, created_by) VALUES (?, ?, ?, ?, ?, ?)')
       .bind(id, topicId, displayAuthor, content, createdAt, deviceId).run();
+    
+    // Invalidate comment caches for this topic
+    await invalidateComments(env, topicId);
+    
     return json({ comment: { id, author: displayAuthor, body: content, createdAt, canDelete: admin } }, { status: 201 });
   }
 

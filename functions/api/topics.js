@@ -1,6 +1,7 @@
 import { json, error, readJson, getDeviceId, checkRateLimit, isAdmin, getViews } from './_utils.js';
 import { getCurrentUser } from './_auth.js';
 import { sanitizeTopicInput, validateDeviceId } from './_sanitize.js';
+import { getCached, setCached, CacheKey, invalidateCache, cacheResponse } from './_cache.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -29,6 +30,13 @@ export async function onRequest(context) {
     const sort = (url.searchParams.get('sort') || 'new').toLowerCase();
     const limit = Math.max(1, Math.min(100, parseInt(url.searchParams.get('limit') || '50', 10)));
     const offset = Math.max(0, parseInt(url.searchParams.get('offset') || '0', 10));
+
+    // Try cache first
+    const cacheKey = CacheKey.topicList(limit, offset, category);
+    const cached = await getCached(env, cacheKey);
+    if (cached && !query && sort === 'new') { // Only cache default sorted view
+      return cacheResponse(cached, {}, 'public, max-age=300');
+    }
 
   // Fetch topics
   let topics = await DB.prepare('SELECT id, title, body, author, category, created_at, created_by FROM topics').all();
@@ -84,7 +92,14 @@ export async function onRequest(context) {
       delete t.created_by;
     }
 
-    return json({ topics });
+    const result = { topics };
+    
+    // Cache if default view
+    if (!query && sort === 'new') {
+      await setCached(env, cacheKey, result, 300); // 5min TTL
+    }
+
+    return json(result);
   }
 
   if (method === 'POST') {
@@ -127,6 +142,10 @@ export async function onRequest(context) {
     try {
       await DB.prepare('INSERT INTO topics (id, title, body, author, category, created_at, created_by) VALUES (?, ?, ?, ?, ?, ?, ?)')
         .bind(id, title, content, displayAuthor, category, createdAt, deviceId).run();
+      
+      // Invalidate topic list caches
+      await invalidateCache(env, 'topics');
+      
       return json({
         topic: { id, title, body: content, author: displayAuthor, category, createdAt, comments: [], canDelete: admin }
       }, { status: 201 });
