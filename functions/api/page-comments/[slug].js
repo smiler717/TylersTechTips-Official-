@@ -1,10 +1,12 @@
 import { json, error, readJson, getDeviceId, checkRateLimit } from '../_utils.js';
+import { getCurrentUser } from '../_auth.js';
 import { sanitizeText, validateDeviceId } from '../_sanitize.js';
 
 /**
  * Per-page comments stored in D1 by slug
  * GET  /api/page-comments/[slug]
  * POST /api/page-comments/[slug]
+ * POST /api/page-comments/[slug] with parentId for threaded replies
  */
 export async function onRequest(context) {
   const { request, env, params } = context;
@@ -63,13 +65,16 @@ export async function onRequest(context) {
       return error(400, 'Invalid device identifier');
     }
 
-  // Use whichever KV binding exists for rate limit
-  const rl = await checkRateLimit({ RATE_LIMIT: KV }, `page-comment:${slug}:${deviceId}`, 20000);
+    // Use whichever KV binding exists for rate limit
+    const rl = await checkRateLimit({ RATE_LIMIT: KV }, `page-comment:${slug}:${deviceId}`, 20000);
     if (!rl.ok) return error(429, 'Rate limited', { waitMs: rl.waitMs });
 
     const body = await readJson(request);
     if (!body) return error(400, 'Invalid JSON');
 
+    // Check if user is logged in
+    const currentUser = await getCurrentUser(request, env);
+    
     // If user is logged in, use their profile info
     const author = currentUser ? (currentUser.displayName || currentUser.username) : (sanitizeText(body.author || 'Anonymous', 60) || 'Anonymous');
     const userId = currentUser ? currentUser.userId : null;
@@ -107,17 +112,21 @@ async function ensurePageCommentsSchema(DB) {
       body TEXT NOT NULL,
       created_at INTEGER NOT NULL,
       created_by TEXT,
-      parent_id TEXT
+      parent_id TEXT,
+      user_id TEXT
     );`).run();
   await DB.prepare(`CREATE INDEX IF NOT EXISTS idx_page_comments_slug ON page_comments(slug);`).run();
   await DB.prepare(`CREATE INDEX IF NOT EXISTS idx_page_comments_created ON page_comments(created_at);`).run();
-  // Try to add parent_id if missing
+  // Try to add parent_id and user_id if missing (for backwards compatibility)
   try {
     const info = await DB.prepare(`PRAGMA table_info(page_comments);`).all();
     const cols = (info && info.results) ? info.results.map(r => (r.name || r.column || '').toLowerCase()) : [];
     if (!cols.includes('parent_id')) {
       await DB.prepare(`ALTER TABLE page_comments ADD COLUMN parent_id TEXT;`).run();
       await DB.prepare(`CREATE INDEX IF NOT EXISTS idx_page_comments_parent ON page_comments(parent_id);`).run();
+    }
+    if (!cols.includes('user_id')) {
+      await DB.prepare(`ALTER TABLE page_comments ADD COLUMN user_id TEXT;`).run();
     }
   } catch (_) {
     // best-effort migration; ignore if not supported
