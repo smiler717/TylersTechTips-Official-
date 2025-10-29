@@ -1,4 +1,4 @@
-# Cloudflare Pages Configuration
+SELECT COUNT(*) AS badge_count FROM badges;# Cloudflare Pages Configuration
 # For Tyler's Tech Tips Platform
 
 name = "tylers-tech-tips"
@@ -48,5 +48,4 @@ pattern = "tylerstechtips.com/*"
 zone_name = "tylerstechtips.com"
 
 # Compatibility Flags
-[compatibility_flags]
-nodejs_compat = true
+compatibility_flags = ["nodejs_compat"]
