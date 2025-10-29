@@ -5,16 +5,13 @@ name = "tylers-tech-tips"
 compatibility_date = "2025-10-29"
 pages_build_output_dir = "."
 
-# D1 Database Binding
-[[d1_databases]]
-binding = "DB"
-database_name = "tylers-tech-tips-db"
-database_id = "<your-d1-database-id>"
+# D1 Database Bindings (Already configured in Cloudflare Pages)
+# DB → community_db
+# TYLERS_TECH_DB → community_db
 
-# KV Namespace Bindings
-[[kv_namespaces]]
-binding = "TYLERS_TECH_KV"
-id = "<your-kv-namespace-id>"
+# KV Namespace Bindings (Already configured in Cloudflare Pages)
+# TYLERS_TECH_KV → ttt-rate-limit
+# RATE_LIMIT → ttt-rate-limit
 
 # R2 Bucket Binding
 [[r2_buckets]]
