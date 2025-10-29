@@ -37,6 +37,14 @@ async function handleVote(request, env, topicId) {
       });
     }
     
+    const KV = env.RATE_LIMIT || env.TYLERS_TECH_KV;
+    if (!KV) {
+      return new Response(JSON.stringify({ error: 'KV namespace not configured' }), {
+        status: 500,
+        headers: { 'content-type': 'application/json' }
+      });
+    }
+    
     const deviceId = getDeviceId(request);
     
     // Validate device ID
@@ -54,23 +62,23 @@ async function handleVote(request, env, topicId) {
     const downvotesKey = `votes:topic:${topicId}:down`;
     
     // Check if user already voted
-    const existingVote = await env.RATE_LIMIT.get(voteKey);
+    const existingVote = await KV.get(voteKey);
     
     if (existingVote) {
       // Remove old vote
       if (existingVote === 'up') {
-        const current = parseInt(await env.RATE_LIMIT.get(upvotesKey) || '0');
-        await env.RATE_LIMIT.put(upvotesKey, Math.max(0, current - 1).toString());
+        const current = parseInt(await KV.get(upvotesKey) || '0');
+        await KV.put(upvotesKey, Math.max(0, current - 1).toString());
       } else {
-        const current = parseInt(await env.RATE_LIMIT.get(downvotesKey) || '0');
-        await env.RATE_LIMIT.put(downvotesKey, Math.max(0, current - 1).toString());
+        const current = parseInt(await KV.get(downvotesKey) || '0');
+        await KV.put(downvotesKey, Math.max(0, current - 1).toString());
       }
       
       // If same vote, remove it (toggle off)
       if (existingVote === vote) {
-        await env.RATE_LIMIT.delete(voteKey);
-        const upvotes = parseInt(await env.RATE_LIMIT.get(upvotesKey) || '0');
-        const downvotes = parseInt(await env.RATE_LIMIT.get(downvotesKey) || '0');
+        await KV.delete(voteKey);
+        const upvotes = parseInt(await KV.get(upvotesKey) || '0');
+        const downvotes = parseInt(await KV.get(downvotesKey) || '0');
         
         return new Response(JSON.stringify({
           upvotes,
@@ -117,11 +125,19 @@ async function handleVote(request, env, topicId) {
 
 async function getVotes(env, topicId) {
   try {
+    const KV = env.RATE_LIMIT || env.TYLERS_TECH_KV;
+    if (!KV) {
+      return new Response(JSON.stringify({ upvotes: 0, downvotes: 0 }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' }
+      });
+    }
+    
     const upvotesKey = `votes:topic:${topicId}:up`;
     const downvotesKey = `votes:topic:${topicId}:down`;
     
-    const upvotes = parseInt(await env.RATE_LIMIT.get(upvotesKey) || '0');
-    const downvotes = parseInt(await env.RATE_LIMIT.get(downvotesKey) || '0');
+    const upvotes = parseInt(await KV.get(upvotesKey) || '0');
+    const downvotes = parseInt(await KV.get(downvotesKey) || '0');
     
     return new Response(JSON.stringify({
       upvotes,

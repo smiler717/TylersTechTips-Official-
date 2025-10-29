@@ -44,22 +44,34 @@ export async function onRequestPost({ request, env }) {
     
     // Rate limiting: 1 feedback per 60 seconds per device
     const rateLimitKey = `feedback:${deviceId}`;
-    const lastSubmit = await env.TYLERS_TECH_KV.get(rateLimitKey);
+    const KV = env.RATE_LIMIT || env.TYLERS_TECH_KV;
     
-    if (lastSubmit) {
-      const elapsed = Date.now() - parseInt(lastSubmit, 10);
-      const waitMs = 60000 - elapsed;
+    if (KV) {
+      const lastSubmit = await KV.get(rateLimitKey);
       
-      if (waitMs > 0) {
-        return new Response(JSON.stringify({ error: 'Rate limit exceeded', waitMs }), {
-          status: 429,
-          headers: { 'Content-Type': 'application/json' }
-        });
+      if (lastSubmit) {
+        const elapsed = Date.now() - parseInt(lastSubmit, 10);
+        const waitMs = 60000 - elapsed;
+        
+        if (waitMs > 0) {
+          return new Response(JSON.stringify({ error: 'Rate limit exceeded', waitMs }), {
+            status: 429,
+            headers: { 'Content-Type': 'application/json' }
+          });
+        }
       }
     }
 
     // Store feedback in D1 database
-    const stmt = env.TYLERS_TECH_DB.prepare(`
+    const DB = env.DB || env.TYLERS_TECH_DB;
+    if (!DB) {
+      return new Response(JSON.stringify({ error: 'Database not configured' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
+    const stmt = DB.prepare(`
       INSERT INTO feedback (name, email, type, message, device_id, created_at)
       VALUES (?, ?, ?, ?, ?, ?)
     `);
@@ -76,9 +88,11 @@ export async function onRequestPost({ request, env }) {
       .run();
 
     // Update rate limit
-    await env.TYLERS_TECH_KV.put(rateLimitKey, Date.now().toString(), {
-      expirationTtl: 60
-    });
+    if (KV) {
+      await KV.put(rateLimitKey, Date.now().toString(), {
+        expirationTtl: 60
+      });
+    }
 
     return new Response(JSON.stringify({ 
       success: true, 
@@ -128,7 +142,15 @@ export async function onRequestGet({ request, env }) {
     query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
     params.push(limit, offset);
 
-    const stmt = env.TYLERS_TECH_DB.prepare(query);
+    const DB = env.DB || env.TYLERS_TECH_DB;
+    if (!DB) {
+      return new Response(JSON.stringify({ error: 'Database not configured' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const stmt = DB.prepare(query);
     const { results } = await stmt.bind(...params).all();
 
     return new Response(JSON.stringify({ 

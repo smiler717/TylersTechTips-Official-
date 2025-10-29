@@ -2,8 +2,8 @@ import { error, getDeviceId, isAdmin } from '../../../_utils.js';
 
 export async function onRequest(context) {
   const { request, env, params } = context;
-  const DB = env.DB;
-  if (!DB) return error(500, 'Database binding DB is not configured');
+  const DB = env.DB || env.TYLERS_TECH_DB;
+  if (!DB) return error(500, 'Database binding DB or TYLERS_TECH_DB is not configured');
   // Schema is expected to be pre-initialized via schema.sql
 
   const method = request.method.toUpperCase();
