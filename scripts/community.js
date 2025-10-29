@@ -10,6 +10,7 @@
   const VIEWED_KEY = 'ttt_viewed_topics_session_v1';
   let viewed = new Set();
   const LOGIN_PAGE = 'profile.html';
+  let EMAIL_VERIFIED = true;
 
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
@@ -233,11 +234,26 @@
     if (!title || !body) return;
     if (SERVER_MODE) {
       try {
+        const headers = { 'content-type': 'application/json', 'x-device-id': getDeviceId() };
+        if (window.TT_Auth && typeof window.TT_Auth.getToken === 'function') {
+          const tok = window.TT_Auth.getToken();
+          if (tok) headers['Authorization'] = `Bearer ${tok}`;
+        }
         const res = await fetch('/api/topics', {
           method: 'POST',
-          headers: { 'content-type': 'application/json', 'x-device-id': getDeviceId() },
+          headers,
           body: JSON.stringify({ author, title, body, category })
         });
+        if (res.status === 403) {
+          let msg = 'Forbidden';
+          try { const j = await res.json(); msg = j?.error || msg; } catch {}
+          if (/verify/i.test(msg)) {
+            alert('Please verify your email to post. You can resend the verification from your profile.');
+          } else {
+            alert(msg);
+          }
+          return;
+        }
         if (res.status === 429) {
           const j = await res.json();
           alert(`Please wait ${Math.ceil((j.waitMs||20000)/1000)}s before posting again.`);
@@ -292,11 +308,26 @@
     if (!body) return;
     if (SERVER_MODE) {
       try {
+        const headers = { 'content-type': 'application/json', 'x-device-id': getDeviceId() };
+        if (window.TT_Auth && typeof window.TT_Auth.getToken === 'function') {
+          const tok = window.TT_Auth.getToken();
+          if (tok) headers['Authorization'] = `Bearer ${tok}`;
+        }
         const res = await fetch(`/api/topics/${encodeURIComponent(id)}/comments`, {
           method: 'POST',
-          headers: { 'content-type': 'application/json', 'x-device-id': getDeviceId() },
+          headers,
           body: JSON.stringify({ author, body })
         });
+        if (res.status === 403) {
+          let msg = 'Forbidden';
+          try { const j = await res.json(); msg = j?.error || msg; } catch {}
+          if (/verify/i.test(msg)) {
+            alert('Please verify your email to comment. You can resend the verification from your profile.');
+          } else {
+            alert(msg);
+          }
+          return;
+        }
         if (res.status === 429) {
           const j = await res.json();
           alert(`Please wait ${Math.ceil((j.waitMs||20000)/1000)}s before commenting again.`);
@@ -540,6 +571,19 @@
     loadViewed();
     // If not logged in, add a subtle notice above the form and adjust submit button label for clarity
     const isLoggedIn = !!(window.TT_Auth && typeof window.TT_Auth.isLoggedIn === 'function' && window.TT_Auth.isLoggedIn());
+
+    // If logged in, fetch current user to determine email verification status
+    if (isLoggedIn && window.TT_Auth && typeof window.TT_Auth.getToken === 'function') {
+      try {
+        const tok = window.TT_Auth.getToken();
+        const res = await fetch('/api/auth/me', { headers: { 'Authorization': `Bearer ${tok}` } });
+        if (res.ok) {
+          const data = await res.json();
+          EMAIL_VERIFIED = !!data?.user?.emailVerified;
+        }
+      } catch (_) {}
+    }
+
     if (!isLoggedIn) {
       const formWrap = document.querySelector('.topic-form');
       if (formWrap && !formWrap.querySelector('.login-required-note')) {
@@ -590,6 +634,48 @@
           </span>
         `;
         header.insertAdjacentElement('afterend', banner);
+      }
+    }
+    else if (!EMAIL_VERIFIED) {
+      const header = document.querySelector('.article-header');
+      if (header && !document.querySelector('.verify-banner')) {
+        const banner = document.createElement('div');
+        banner.className = 'verify-banner';
+        banner.style.margin = '1rem 0';
+        banner.style.padding = '0.75rem 1rem';
+        banner.style.background = 'var(--card-bg)';
+        banner.style.border = '1px solid var(--secondary-bg)';
+        banner.style.borderRadius = '8px';
+        banner.style.display = 'flex';
+        banner.style.alignItems = 'center';
+        banner.style.justifyContent = 'space-between';
+        banner.innerHTML = `
+          <span style="color: var(--secondary-text);"><i class="fas fa-shield-alt"></i> Please verify your email to fully participate.</span>
+          <span style="display:flex;gap:0.5rem;">
+            <button class="pill" id="resend-verify-community" style="white-space:nowrap;background:var(--secondary-bg);color:var(--text-color)"><i class="fas fa-paper-plane"></i> Resend Verification</button>
+            <a class="pill" href="${LOGIN_PAGE}" style="white-space:nowrap;"><i class="fas fa-user"></i> Profile</a>
+          </span>
+        `;
+        header.insertAdjacentElement('afterend', banner);
+        document.getElementById('resend-verify-community')?.addEventListener('click', async () => {
+          try {
+            const tok = window.TT_Auth?.getToken?.();
+            if (!tok) return;
+            const res = await fetch('/api/auth/resend-verification', { method: 'POST', headers: { 'Authorization': `Bearer ${tok}` } });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+              alert(data.error || 'Failed to resend verification');
+              return;
+            }
+            if (window.TT_UI?.toast) window.TT_UI.toast('Verification email sent (or link generated)', 'success');
+            if (data?.verify?.endpoint) {
+              const link = `${location.origin}${data.verify.endpoint}`;
+              try { await navigator.clipboard?.writeText(link); if (window.TT_UI?.toast) window.TT_UI.toast('Link copied to clipboard', 'success'); } catch (_) {}
+            }
+          } catch (_) {
+            alert('Network error resending verification');
+          }
+        });
       }
     }
     // Try server first

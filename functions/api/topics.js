@@ -1,4 +1,5 @@
 import { json, error, readJson, getDeviceId, checkRateLimit, isAdmin, getViews } from './_utils.js';
+import { getCurrentUser } from './_auth.js';
 import { sanitizeTopicInput, validateDeviceId } from './_sanitize.js';
 
 export async function onRequest(context) {
@@ -12,11 +13,22 @@ export async function onRequest(context) {
   const deviceId = getDeviceId(request);
   const admin = await isAdmin(request, env);
 
+  if (method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, x-device-id, x-admin-key, Authorization',
+      'Access-Control-Max-Age': '86400'
+    }});
+  }
+
   if (method === 'GET') {
     // Optional: server-side filtering/sorting
     const query = (url.searchParams.get('query') || '').trim().toLowerCase();
     const category = (url.searchParams.get('category') || '').trim();
     const sort = (url.searchParams.get('sort') || 'new').toLowerCase();
+    const limit = Math.max(1, Math.min(100, parseInt(url.searchParams.get('limit') || '50', 10)));
+    const offset = Math.max(0, parseInt(url.searchParams.get('offset') || '0', 10));
 
   // Fetch topics
   let topics = await DB.prepare('SELECT id, title, body, author, category, created_at, created_by FROM topics').all();
@@ -39,6 +51,9 @@ export async function onRequest(context) {
     // Sort
     if (sort === 'old') topics.sort((a, b) => a.created_at - b.created_at);
     else topics.sort((a, b) => b.created_at - a.created_at);
+
+    // Pagination slice (in-memory for now)
+    topics = topics.slice(offset, offset + limit);
 
     // Fetch comments per topic and attach counts and views
     for (const t of topics) {
@@ -73,11 +88,14 @@ export async function onRequest(context) {
   }
 
   if (method === 'POST') {
+    // Require authenticated user for posting topics
+    const currentUser = await getCurrentUser(request, env);
+    if (!currentUser) return error(401, 'Authentication required');
     const body = await readJson(request);
     if (!body) return error(400, 'Invalid JSON');
     
     // Sanitize all inputs
-    const { title, body: content, author, category } = sanitizeTopicInput(body);
+    const { title, body: content, category } = sanitizeTopicInput(body);
     
     if (!title || !content) return error(400, 'Title and body are required');
     if (!deviceId) return error(400, 'Missing X-Device-Id');
@@ -94,11 +112,23 @@ export async function onRequest(context) {
 
     const id = crypto.randomUUID();
     const createdAt = Date.now();
+    // Derive author from authenticated user to prevent spoofing and optionally enforce email verification
+    let displayAuthor = '';
+    try {
+      const row = await DB.prepare('SELECT display_name, username, email_verified FROM users WHERE id = ?')
+        .bind(currentUser.userId).first();
+      if (env.REQUIRE_EMAIL_VERIFIED && Number(env.REQUIRE_EMAIL_VERIFIED)) {
+        if (!row || !row.email_verified) return error(403, 'Email verification required');
+      }
+      displayAuthor = (row?.display_name || row?.username || 'User');
+    } catch (_) {
+      displayAuthor = 'User';
+    }
     try {
       await DB.prepare('INSERT INTO topics (id, title, body, author, category, created_at, created_by) VALUES (?, ?, ?, ?, ?, ?, ?)')
-        .bind(id, title, content, author, category, createdAt, deviceId).run();
+        .bind(id, title, content, displayAuthor, category, createdAt, deviceId).run();
       return json({
-        topic: { id, title, body: content, author, category, createdAt, comments: [], canDelete: admin }
+        topic: { id, title, body: content, author: displayAuthor, category, createdAt, comments: [], canDelete: admin }
       }, { status: 201 });
     } catch (e) {
       return error(500, 'Failed to create topic');

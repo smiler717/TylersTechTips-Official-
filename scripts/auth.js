@@ -103,6 +103,11 @@
     const displayName = document.getElementById('register-display-name').value;
 
     try {
+      // Client-side password complexity check
+      if (!/^.{8,}$/.test(password) || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
+        showError('Password must be at least 8 chars and include uppercase, lowercase, number, and special character.');
+        return;
+      }
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -218,6 +223,12 @@
         }
       }
 
+      // Email verification banner
+      const verifyBanner = document.getElementById('verify-banner');
+      if (verifyBanner) {
+        verifyBanner.style.display = user.emailVerified ? 'none' : '';
+      }
+
       // Avatar fallback
       var avatar = document.getElementById('profile-avatar');
       if (user.avatarUrl) {
@@ -283,8 +294,8 @@
     if (!token) return;
     const current = document.getElementById('current-password').value;
     const next = document.getElementById('new-password').value;
-    if (!current || !next || next.length < 8) {
-      showError('Please enter your current password and a new password (min 8 chars).');
+    if (!current || !next || next.length < 8 || !/[A-Z]/.test(next) || !/[a-z]/.test(next) || !/\d/.test(next) || !/[^A-Za-z0-9]/.test(next)) {
+      showError('New password must be 8+ chars and include uppercase, lowercase, number, and special character.');
       return;
     }
     try {
@@ -304,6 +315,71 @@
       showSuccess('Password changed!');
       document.getElementById('change-password-form').reset();
     } catch (e) {
+      showError('Network error. Please try again.');
+    }
+  });
+
+  // Security actions: Refresh session
+  document.getElementById('refresh-session-btn')?.addEventListener('click', async () => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      const res = await fetch('/api/auth/refresh', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+      const data = await res.json();
+      if (!res.ok) {
+        showError(data.error || 'Failed to refresh session');
+        return;
+      }
+      setToken(data.token);
+      if (window.TT_UI?.toast) window.TT_UI.toast('Session refreshed', 'success'); else showSuccess('Session refreshed');
+    } catch (_) {
+      showError('Network error. Please try again.');
+    }
+  });
+
+  // Security actions: Logout all devices
+  document.getElementById('logout-all-btn')?.addEventListener('click', async () => {
+    const token = getToken();
+    if (!token) return;
+    if (!confirm('Logout from all devices? You will need to login again.')) return;
+    try {
+      const res = await fetch('/api/auth/logout-all', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        showError(data.error || 'Failed to logout all devices');
+        return;
+      }
+      if (window.TT_UI?.toast) window.TT_UI.toast('Logged out on all devices', 'success');
+      // Current token revoked too; clear and reload
+      clearAuth();
+      location.reload();
+    } catch (_) {
+      showError('Network error. Please try again.');
+    }
+  });
+
+  // Resend verification
+  document.getElementById('resend-verify-btn')?.addEventListener('click', async () => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      const res = await fetch('/api/auth/resend-verification', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        showError(data.error || 'Failed to resend verification');
+        return;
+      }
+      if (window.TT_UI?.toast) window.TT_UI.toast('Verification email sent (or link generated)', 'success'); else showSuccess('Verification email sent');
+      // Dev: if endpoint returned, try to copy the link
+      if (data?.verify?.endpoint) {
+        const site = location.origin || '';
+        const link = `${site}${data.verify.endpoint}`;
+        try {
+          await navigator.clipboard?.writeText(link);
+          if (window.TT_UI?.toast) window.TT_UI.toast('Verification link copied to clipboard', 'success');
+        } catch (_) {}
+      }
+    } catch (_) {
       showError('Network error. Please try again.');
     }
   });

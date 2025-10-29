@@ -278,7 +278,7 @@
                     <div class="form-group">
                         <label for="register-password">Password</label>
                         <input type="password" id="register-password" required minlength="8" autocomplete="new-password">
-                        <small style="color:var(--secondary-text);">At least 8 characters</small>
+                        <small style="color:var(--secondary-text);">Min 8 chars, including uppercase, lowercase, number, and special character</small>
                     </div>
                     <div class="form-group">
                         <label for="register-display-name">Display Name (Optional)</label>
@@ -317,6 +317,15 @@
                     <div class="stat-card">
                         <div class="stat-number" id="stat-days">0</div>
                         <div class="stat-label">Days Active</div>
+                    </div>
+                </div>
+
+                <div id="verify-banner" style="display:none;margin:-0.5rem 0 1.5rem 0;padding:0.75rem 1rem;border:1px solid var(--card-border);background:var(--card-bg);border-radius:8px;color:var(--secondary-text)">
+                    <div style="display:flex;gap:0.75rem;align-items:center;justify-content:space-between;flex-wrap:wrap;">
+                        <span><i class="fas fa-shield-alt"></i> Your email is not verified yet. Some actions may require verification.</span>
+                        <div style="display:flex;gap:0.5rem;">
+                            <button id="resend-verify-btn" class="pill" style="background:var(--secondary-bg);color:var(--text-color)"><i class="fas fa-paper-plane"></i> Resend verification</button>
+                        </div>
                     </div>
                 </div>
 
@@ -363,9 +372,22 @@
                     <div class="form-group">
                         <label for="new-password">New Password</label>
                         <input type="password" id="new-password" required minlength="8" autocomplete="new-password">
+                        <small style="color:var(--secondary-text);">Min 8 chars, including uppercase, lowercase, number, and special character</small>
                     </div>
                     <button type="submit" class="cta-button" style="width:100%"><i class="fas fa-key"></i> Change Password</button>
                 </form>
+
+                <hr class="profile-divider">
+
+                <h3><i class="fas fa-lock"></i> Security</h3>
+                <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;">
+                    <button id="refresh-session-btn" class="pill" style="flex:1;background:var(--secondary-bg);color:var(--text-color)">
+                        <i class="fas fa-sync"></i> Refresh Session
+                    </button>
+                    <button id="logout-all-btn" class="pill" style="flex:1;background:var(--secondary-bg);color:var(--text-color)">
+                        <i class="fas fa-sign-out-alt"></i> Logout All Devices
+                    </button>
+                </div>
             </div>
         </div>
     </section>

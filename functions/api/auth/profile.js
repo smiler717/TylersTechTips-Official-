@@ -5,7 +5,16 @@
 
 import { json, error, readJson } from '../_utils.js';
 import { getCurrentUser, hashPassword, verifyPassword } from '../_auth.js';
-import { sanitizeText } from '../_sanitize.js';
+import { sanitizeText, sanitizeUrl } from '../_sanitize.js';
+
+export async function onRequestOptions({ request }) {
+  return new Response(null, { status: 204, headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, x-device-id, x-admin-key, Authorization',
+    'Access-Control-Max-Age': '86400'
+  }});
+}
 
 export async function onRequestPatch({ request, env }) {
   const DB = env.DB || env.TYLERS_TECH_DB;
@@ -21,7 +30,7 @@ export async function onRequestPatch({ request, env }) {
 
   const displayName = body.displayName ? sanitizeText(body.displayName, 60) : null;
   const bio = body.bio ? sanitizeText(body.bio, 500) : null;
-  const avatarUrl = body.avatarUrl ? sanitizeText(body.avatarUrl, 500) : null;
+  const avatarUrl = body.avatarUrl ? sanitizeUrl(body.avatarUrl) : null;
   const newPassword = body.password ? String(body.password) : null;
   const currentPassword = body.currentPassword ? String(body.currentPassword) : null;
 
@@ -47,11 +56,18 @@ export async function onRequestPatch({ request, env }) {
       if (newPassword.length < 8) {
         return error(400, 'New password must be at least 8 characters');
       }
+      const complexity = [/[A-Z]/, /[a-z]/, /\d/, /[^A-Za-z0-9]/];
+      const okComplex = complexity.every((re) => re.test(newPassword));
+      if (!okComplex) {
+        return error(400, 'Password must include uppercase, lowercase, number, and special character');
+      }
       // Fetch current hash to verify
       const existing = await DB.prepare('SELECT password_hash FROM users WHERE id = ?')
         .bind(currentUser.userId).first();
       if (!existing) return error(404, 'User not found');
-      if (existing.password_hash && currentPassword) {
+      if (existing.password_hash) {
+        // If a password already exists, require the current password
+        if (!currentPassword) return error(400, 'Current password is required');
         const ok = await verifyPassword(currentPassword, existing.password_hash);
         if (!ok) return error(401, 'Current password is incorrect');
       }

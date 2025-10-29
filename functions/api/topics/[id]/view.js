@@ -3,6 +3,14 @@ import { json, error, getDeviceId, checkRateLimit, incrementViews } from '../../
 export async function onRequest(context) {
   const { request, env, params } = context;
   const method = request.method.toUpperCase();
+  if (method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, x-device-id, x-admin-key, Authorization',
+      'Access-Control-Max-Age': '86400'
+    }});
+  }
   if (method !== 'POST') return error(405, 'Method Not Allowed');
 
   const topicId = params.id;

@@ -5,6 +5,15 @@ export async function onRequest(context) {
   const { request, env, params } = context;
   const topicId = params.id; // Use string ID (UUID)
   
+  if (request.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, x-device-id, x-admin-key, Authorization',
+      'Access-Control-Max-Age': '86400'
+    }});
+  }
+
   if (request.method === 'POST') {
     return handleVote(request, env, topicId);
   }

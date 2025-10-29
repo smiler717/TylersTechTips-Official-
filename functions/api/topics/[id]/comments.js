@@ -1,4 +1,5 @@
 import { json, error, readJson, getDeviceId, checkRateLimit, isAdmin } from '../../_utils.js';
+import { getCurrentUser } from '../../_auth.js';
 import { sanitizeText, validateDeviceId } from '../../_sanitize.js';
 
 export async function onRequest(context) {
@@ -14,13 +15,28 @@ export async function onRequest(context) {
 
   if (!topicId) return error(400, 'Missing topic id');
 
+  if (method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, x-device-id, x-admin-key, Authorization',
+      'Access-Control-Max-Age': '86400'
+    }});
+  }
+
   if (method === 'GET') {
-    const res = await DB.prepare('SELECT id, author, body, created_at, created_by FROM comments WHERE topic_id = ? ORDER BY created_at ASC').bind(topicId).all();
+    const url = new URL(request.url);
+    const limit = Math.max(1, Math.min(200, parseInt(url.searchParams.get('limit') || '200', 10)));
+    const offset = Math.max(0, parseInt(url.searchParams.get('offset') || '0', 10));
+    const res = await DB.prepare(`SELECT id, author, body, created_at, created_by FROM comments WHERE topic_id = ? ORDER BY created_at ASC LIMIT ? OFFSET ?`).bind(topicId, limit, offset).all();
     const comments = (res.results || []).map(c => ({ id: c.id, author: c.author, body: c.body, createdAt: c.created_at, canDelete: admin }));
     return json({ comments });
   }
 
   if (method === 'POST') {
+    // Require authenticated user for commenting
+    const currentUser = await getCurrentUser(request, env);
+    if (!currentUser) return error(401, 'Authentication required');
     if (!deviceId) return error(400, 'Missing X-Device-Id');
     
     // Validate device ID
@@ -34,8 +50,7 @@ export async function onRequest(context) {
     if (!body) return error(400, 'Invalid JSON');
     
     // Sanitize inputs
-    const author = sanitizeText(body.author || 'Anonymous', 60);
-    const content = sanitizeText(body.body || '', 2000);
+  const content = sanitizeText(body.body || '', 2000);
     
     if (!content) return error(400, 'Body is required');
 
@@ -49,9 +64,22 @@ export async function onRequest(context) {
     const tRes = await DB.prepare('SELECT id FROM topics WHERE id = ?').bind(topicId).all();
     if (!(tRes.results || [])[0]) return error(404, 'Topic not found');
 
+    // Derive author from authenticated user to prevent spoofing and optionally enforce email verification
+    let displayAuthor = '';
+    try {
+      const row = await DB.prepare('SELECT display_name, username, email_verified FROM users WHERE id = ?')
+        .bind(currentUser.userId).first();
+      if (env.REQUIRE_EMAIL_VERIFIED && Number(env.REQUIRE_EMAIL_VERIFIED)) {
+        if (!row || !row.email_verified) return error(403, 'Email verification required');
+      }
+      displayAuthor = (row?.display_name || row?.username || 'User');
+    } catch (_) {
+      displayAuthor = 'User';
+    }
+
     await DB.prepare('INSERT INTO comments (id, topic_id, author, body, created_at, created_by) VALUES (?, ?, ?, ?, ?, ?)')
-      .bind(id, topicId, author, content, createdAt, deviceId).run();
-    return json({ comment: { id, author, body: content, createdAt, canDelete: admin } }, { status: 201 });
+      .bind(id, topicId, displayAuthor, content, createdAt, deviceId).run();
+    return json({ comment: { id, author: displayAuthor, body: content, createdAt, canDelete: admin } }, { status: 201 });
   }
 
   return error(405, 'Method Not Allowed');

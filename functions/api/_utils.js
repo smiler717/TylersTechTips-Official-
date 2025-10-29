@@ -6,7 +6,7 @@
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*', // Change to specific domain in production
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, x-device-id, x-admin-key',
+  'Access-Control-Allow-Headers': 'Content-Type, x-device-id, x-admin-key, Authorization',
   'Access-Control-Max-Age': '86400',
 };
 

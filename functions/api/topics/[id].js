@@ -18,7 +18,11 @@ export async function onRequest(context) {
     const tRes = await DB.prepare('SELECT id, title, body, author, created_at, created_by FROM topics WHERE id = ?').bind(id).all();
     const t = (tRes.results || [])[0];
     if (!t) return error(404, 'Not found');
-    const cRes = await DB.prepare('SELECT id, author, body, created_at, created_by FROM comments WHERE topic_id = ? ORDER BY created_at ASC').bind(id).all();
+    // Comments pagination support
+    const url = new URL(request.url);
+    const limit = Math.max(1, Math.min(200, parseInt(url.searchParams.get('limit') || '200', 10)));
+    const offset = Math.max(0, parseInt(url.searchParams.get('offset') || '0', 10));
+    const cRes = await DB.prepare('SELECT id, author, body, created_at, created_by FROM comments WHERE topic_id = ? ORDER BY created_at ASC LIMIT ? OFFSET ?').bind(id, limit, offset).all();
     const comments = (cRes.results || []).map(c => ({ id: c.id, author: c.author, body: c.body, createdAt: c.created_at, canDelete: admin }));
     return json({ topic: { id: t.id, title: t.title, body: t.body, author: t.author, createdAt: t.created_at, comments, canDelete: admin } });
   }

@@ -40,7 +40,8 @@ export async function verifyPassword(password, storedHash) {
 export async function generateToken(userId, username, env) {
   const tokenId = crypto.randomUUID();
   const token = `tt_${tokenId}`;
-  const expiresAt = Date.now() + (30 * 24 * 60 * 60 * 1000); // 30 days
+  const days = Number(env?.AUTH_TTL_DAYS) && Number(env.AUTH_TTL_DAYS) > 0 ? Number(env.AUTH_TTL_DAYS) : 7;
+  const expiresAt = Date.now() + (days * 24 * 60 * 60 * 1000); // default 7 days
   
   const tokenData = {
     userId,
@@ -53,7 +54,7 @@ export async function generateToken(userId, username, env) {
   const KV = env.RATE_LIMIT || env.TYLERS_TECH_KV;
   if (KV) {
     await KV.put(`auth:${token}`, JSON.stringify(tokenData), {
-      expirationTtl: 30 * 24 * 60 * 60 // 30 days in seconds
+      expirationTtl: days * 24 * 60 * 60 // seconds
     });
   }
   
@@ -102,6 +103,40 @@ export async function logout(token, env) {
   if (KV) {
     await KV.delete(`auth:${token}`);
   }
+}
+
+/**
+ * Logout all tokens for a user
+ */
+export async function logoutAllForUser(userId, env) {
+  const KV = env.RATE_LIMIT || env.TYLERS_TECH_KV;
+  if (!KV || !userId) return 0;
+  let cursor = undefined;
+  let deleted = 0;
+  do {
+    const list = await KV.list({ prefix: 'auth:tt_', cursor });
+    cursor = list.cursor;
+    const keys = list.keys || [];
+    if (!keys.length) continue;
+    // Fetch values in parallel in small batches to check userId
+    const batch = await Promise.all(keys.map(k => KV.get(k.name, 'json').then(v => ({ key: k.name, val: v })).catch(() => ({ key: k.name, val: null }))));
+    const mine = batch.filter(x => x.val && x.val.userId === userId);
+    await Promise.all(mine.map(x => KV.delete(x.key)));
+    deleted += mine.length;
+  } while (cursor);
+  return deleted;
+}
+
+/**
+ * Rotate a token: create a new token for the same user and delete the old one
+ */
+export async function rotateToken(oldToken, env) {
+  const data = await validateToken(oldToken, env);
+  if (!data) return null;
+  const { userId, username } = data;
+  const { token, expiresAt } = await generateToken(userId, username, env);
+  await logout(oldToken, env);
+  return { token, expiresAt };
 }
 
 /**
