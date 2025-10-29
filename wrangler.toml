@@ -4,48 +4,13 @@
 name = "tylers-tech-tips"
 compatibility_date = "2025-10-29"
 pages_build_output_dir = "."
-
-# D1 Database Bindings (Already configured in Cloudflare Pages)
-# DB → community_db
-# TYLERS_TECH_DB → community_db
-
-# KV Namespace Bindings (Already configured in Cloudflare Pages)
-# TYLERS_TECH_KV → ttt-rate-limit
-# RATE_LIMIT → ttt-rate-limit
-
-# R2 Bucket Binding
-[[r2_buckets]]
-binding = "R2_BUCKET"
-bucket_name = "tylers-tech-uploads"
-
-# Durable Objects
-[[durable_objects.bindings]]
-name = "REALTIME"
-class_name = "RealtimeConnection"
-script_name = "tylers-tech-tips"
-
-# Migrations for Durable Objects
-[[migrations]]
-tag = "v1"
-new_classes = ["RealtimeConnection"]
-
-# Environment Variables (set in Cloudflare dashboard)
-[vars]
-# Note: Secrets should be set via dashboard, not here
-# ADMIN_KEY = "set-in-dashboard"
-# CF_ACCOUNT_ID = "set-in-dashboard"
-# CF_API_TOKEN = "set-in-dashboard"
-# CF_IMAGES_ACCOUNT_HASH = "set-in-dashboard"
-# R2_PUBLIC_URL = "https://your-bucket.r2.dev"
-
-# Build Configuration
-[build]
-command = "echo 'No build required for static site'"
-
-# Route Configuration
-[[routes]]
-pattern = "tylerstechtips.com/*"
-zone_name = "tylerstechtips.com"
-
-# Compatibility Flags
 compatibility_flags = ["nodejs_compat"]
+
+# D1 Database Bindings (Already configured in Cloudflare Pages dashboard)
+# DB → community_db
+
+# KV Namespace Bindings (Already configured in Cloudflare Pages dashboard)
+# TYLERS_TECH_KV → ttt-rate-limit
+
+# Note: R2, Durable Objects, and other bindings are configured in the Cloudflare dashboard
+# This file is kept minimal to avoid TOML parsing issues during Pages deployment
