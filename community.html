@@ -45,7 +45,7 @@
             <ul class="nav-links">
                 <li><a href="index.html#home"><i class="fas fa-home"></i> Home</a></li>
                 <li class="dropdown">
-                    <a href="index.html#articles"><i class="fas fa-newspaper"></i> Articles</a>
+                    <a href="articles.html"><i class="fas fa-newspaper"></i> Articles</a>
                     <div class="dropdown-content">
                         <a href="build-pc.html"><i class="fas fa-tools"></i> Building Your First PC</a>
                         <a href="cpu-2025.html"><i class="fas fa-microchip"></i> Understanding CPUs in 2025</a>
@@ -53,7 +53,7 @@
                     </div>
                 </li>
                 <li class="dropdown">
-                    <a href="index.html#projects"><i class="fas fa-project-diagram"></i> Projects</a>
+                    <a href="projects.html"><i class="fas fa-project-diagram"></i> Projects</a>
                     <div class="dropdown-content">
                         <a href="windows-server-setup.html"><i class="fas fa-server"></i> Windows Server Setup</a>
                         <a href="intune-setup.html"><i class="fas fa-mobile-alt"></i> Intune Implementation</a>
@@ -76,6 +76,12 @@
         <div class="article-header" style="text-align:left;">
             <h1><i class="fas fa-users"></i> Community</h1>
             <p class="article-meta">Post questions, share tips, and help others. Posts are stored on the site and may be moderated.</p>
+        </div>
+
+        <div id="api-status-banner" style="display:none;margin:1rem 0;padding:1rem;border-radius:8px;border:2px solid #f39c12;background:rgba(243,156,18,0.1);color:#f39c12;">
+            <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+            <strong> Heads up:</strong> The live backend isn’t connected right now. You can browse topics in local mode, but posting/comments may be limited until the server is configured.
+            <a href="/api-test.html" style="margin-left:0.5rem; color:#f39c12; text-decoration:underline;">Check API status</a>
         </div>
 
         
@@ -211,6 +217,23 @@
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
     };
+
+        // Show a helpful banner if backend bindings aren’t active
+        (async function checkApiStatus(){
+            try {
+                const res = await fetch('/api/health', { method: 'GET' });
+                if (!res.ok) throw new Error('health not ok');
+                const data = await res.json();
+                const b = data && data.bindings || {};
+                if (!b.hasDB || !b.hasRateLimit) {
+                    document.getElementById('api-status-banner').style.display = 'block';
+                }
+            } catch {
+                // If health fails entirely, show banner so users understand fallback mode
+                const el = document.getElementById('api-status-banner');
+                if (el) el.style.display = 'block';
+            }
+        })();
     </script>
 </body>
 </html>
