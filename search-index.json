@@ -1,66 +1,93 @@
-[
+﻿[
+  {
+    "title": "Building Your First PC",
+    "url": "build-pc.html",
+    "type": "Article",
+    "keywords": ["build", "pc", "computer", "gaming", "hardware", "assembly", "components", "cpu", "gpu", "motherboard", "ram", "psu"],
+    "excerpt": "Step-by-step guide to building your first PC from scratch with component selection and assembly tips for a $500-$800 starter build."
+  },
+  {
+    "title": "Understanding CPUs in 2025",
+    "url": "cpu-2025.html",
+    "type": "Article",
+    "keywords": ["cpu", "processor", "2025", "quantum", "ai", "intel", "amd", "technology", "performance", "cores"],
+    "excerpt": "Deep dive into 2025 CPU trends: quantum integration, AI acceleration, and sustainable chip designs. Learn what to look for in modern processors."
+  },
   {
     "title": "How to Install an SSD",
     "url": "how-to-install-ssd.html",
-    "keywords": [
-      "how",
-      "to",
-      "install",
-      "an",
-      "ssd"
-    ],
-    "excerpt": "Adding an SSD is one of the fastest upgrades you can do to improve responsiveness and boot times."
+    "type": "Article",
+    "keywords": ["ssd", "install", "upgrade", "storage", "hard drive", "nvme", "m.2", "sata", "performance"],
+    "excerpt": "Adding an SSD is one of the fastest upgrades you can do to improve responsiveness and boot times. Step-by-step installation guide."
   },
   {
-    "title": "Setting Up Windows Server 2025",
+    "title": "Windows Server 2025 Setup",
     "url": "windows-server-setup.html",
-    "keywords": [
-      "setting",
-      "up",
-      "windows",
-      "server",
-      "2025",
-      "setup"
-    ],
-    "excerpt": "Setting up a Windows Server is a fundamental task for any IT professional. This guide walks through the basic setup and configuration of Windows Server 2025."
+    "type": "Project",
+    "keywords": ["windows", "server", "2025", "setup", "configuration", "active directory", "domain", "admin", "enterprise"],
+    "excerpt": "Setting up a Windows Server is a fundamental task for any IT professional. Complete guide to basic setup and configuration of Windows Server 2025."
   },
   {
-    "title": "Microsoft Intune Implementation Guide",
+    "title": "Microsoft Intune Implementation",
     "url": "intune-setup.html",
-    "keywords": [
-      "microsoft",
-      "intune",
-      "implementation",
-      "guide",
-      "setup"
-    ],
+    "type": "Project",
+    "keywords": ["intune", "microsoft", "mdm", "mobile", "device", "management", "azure", "endpoint", "security", "compliance"],
     "excerpt": "Microsoft Intune is a cloud-based service that focuses on mobile device management (MDM) and mobile application management (MAM)."
   },
   {
-    "title": "Setting Up Network Monitoring Tools",
+    "title": "Network Monitoring Setup",
     "url": "network-monitoring.html",
-    "keywords": [
-      "setting",
-      "up",
-      "network",
-      "monitoring",
-      "tools"
-    ],
-    "excerpt": "Effective network monitoring is crucial for maintaining a healthy IT infrastructure."
+    "type": "Project",
+    "keywords": ["network", "monitoring", "tools", "infrastructure", "nagios", "zabbix", "performance", "alerts", "uptime"],
+    "excerpt": "Effective network monitoring is crucial for maintaining a healthy IT infrastructure. Learn to set up comprehensive monitoring tools."
   },
   {
-    "title": "About Me",
+    "title": "About Tyler",
     "url": "about.html",
-    "keywords": [
-      "about",
-      "me"
-    ],
+    "type": "Page",
+    "keywords": ["about", "tyler", "bio", "certifications", "comptia", "a+", "network+", "security+", "cysa+", "contact"],
     "excerpt": "Welcome to my corner of the tech world! I'm passionate about IT, cybersecurity, and sharing knowledge with others."
   },
   {
-    "title": "Community",
+    "title": "Community Forum",
     "url": "community.html",
-    "keywords": ["community", "forum", "questions", "topics", "help", "discussion"],
-    "excerpt": "Ask questions, share tips, and help others in the Tyler's Tech Tips community. Posts are saved in your browser."
+    "type": "Page",
+    "keywords": ["community", "forum", "questions", "topics", "help", "discussion", "support", "ask"],
+    "excerpt": "Ask questions, share tips, and help others in the Tyler's Tech Tips community. Join the discussion and get support."
+  },
+  {
+    "title": "IT Cheat Sheet",
+    "url": "cheat-sheet.html",
+    "type": "Page",
+    "keywords": ["cheat sheet", "commands", "cmd", "powershell", "linux", "bash", "git", "network", "troubleshooting", "reference"],
+    "excerpt": "Quick reference guide for Windows CMD, PowerShell, Linux, networking commands, and common IT troubleshooting solutions."
+  },
+  {
+    "title": "All Articles",
+    "url": "articles.html",
+    "type": "Page",
+    "keywords": ["articles", "blog", "posts", "tutorials", "guides", "all"],
+    "excerpt": "Browse all tech articles, tutorials, and guides on Tyler's Tech Tips."
+  },
+  {
+    "title": "All Projects",
+    "url": "projects.html",
+    "type": "Page",
+    "keywords": ["projects", "portfolio", "guides", "enterprise", "all"],
+    "excerpt": "Explore enterprise IT projects, implementation guides, and real-world solutions."
+  },
+  {
+    "title": "Feedback",
+    "url": "feedback.html",
+    "type": "Page",
+    "keywords": ["feedback", "contact", "suggestions", "comments", "report"],
+    "excerpt": "Share your feedback, suggestions, or report issues. Help improve Tyler's Tech Tips."
+  },
+  {
+    "title": "Analytics Dashboard",
+    "url": "analytics.html",
+    "type": "Page",
+    "keywords": ["analytics", "stats", "dashboard", "metrics", "visitors"],
+    "excerpt": "View site analytics, visitor statistics, and popular content metrics."
   }
 ]
