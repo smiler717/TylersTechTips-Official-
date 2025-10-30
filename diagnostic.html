@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Navigation Diagnostic</title>
+    <style>
+        body { font-family: Arial; max-width: 900px; margin: 20px auto; padding: 20px; background: #1a1a1a; color: #fff; }
+        .test { background: #2a2a2a; border: 2px solid #00d9ff; padding: 15px; margin: 15px 0; border-radius: 8px; }
+        button, a.btn { background: #00d9ff; color: #000; border: none; padding: 10px 20px; margin: 5px; cursor: pointer; text-decoration: none; display: inline-block; border-radius: 4px; }
+        button:hover, a.btn:hover { background: #00b8e6; }
+        h1 { color: #00d9ff; }
+        .result { margin-top: 10px; padding: 10px; background: #000; border-radius: 4px; }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+    </style>
+</head>
+<body>
+    <h1> Navigation Diagnostic Tool</h1>
+    
+    <div class="test">
+        <h2>Test 1: Click Detection</h2>
+        <p>Click this button to test if JavaScript click events work:</p>
+        <button onclick="alert(' JavaScript works! Click events are functioning.')">Test Click</button>
+    </div>
+
+    <div class="test">
+        <h2>Test 2: Navigation Links (href)</h2>
+        <p>Try these links. They should navigate to the page:</p>
+        <a href="index.html" class="btn">Go to Home (index.html)</a>
+        <a href="community.html" class="btn">Go to Community</a>
+        <a href="articles.html" class="btn">Go to Articles</a>
+        <a href="profile.html" class="btn">Go to Profile</a>
+    </div>
+
+    <div class="test">
+        <h2>Test 3: JavaScript Navigation</h2>
+        <p>Try navigation via JavaScript:</p>
+        <button onclick="window.location.href='index.html'">JS Navigate to Home</button>
+        <button onclick="window.location.href='community.html'">JS Navigate to Community</button>
+    </div>
+
+    <div class="test">
+        <h2>Test 4: Current Page Info</h2>
+        <div class="result">
+            <strong>Current URL:</strong> <span id="currentUrl"></span><br>
+            <strong>Host:</strong> <span id="host"></span><br>
+            <strong>Protocol:</strong> <span id="protocol"></span><br>
+            <strong>Pathname:</strong> <span id="pathname"></span>
+        </div>
+    </div>
+
+    <div class="test">
+        <h2>Test 5: File Existence Check</h2>
+        <p>Checking if target pages exist...</p>
+        <div id="fileCheck" class="result">Testing...</div>
+    </div>
+
+    <div class="test">
+        <h2>Test 6: Console Errors</h2>
+        <p>Open DevTools (F12)  Console tab. Look for any errors in red.</p>
+        <button onclick="console.log(' Console is working'); alert('Check console for green checkmark')">Test Console</button>
+    </div>
+
+    <script>
+        // Test 4
+        document.getElementById('currentUrl').textContent = window.location.href;
+        document.getElementById('host').textContent = window.location.host;
+        document.getElementById('protocol').textContent = window.location.protocol;
+        document.getElementById('pathname').textContent = window.location.pathname;
+
+        // Test 5
+        async function checkFiles() {
+            const files = ['index.html', 'community.html', 'articles.html', 'projects.html', 'profile.html'];
+            let html = '';
+            for (const file of files) {
+                try {
+                    const res = await fetch(file, { method: 'HEAD' });
+                    if (res.ok) {
+                        html += `<div class="success"> ${file} - EXISTS (${res.status})</div>`;
+                    } else {
+                        html += `<div class="error"> ${file} - ERROR (${res.status})</div>`;
+                    }
+                } catch (e) {
+                    html += `<div class="error"> ${file} - FETCH FAILED: ${e.message}</div>`;
+                }
+            }
+            document.getElementById('fileCheck').innerHTML = html;
+        }
+        checkFiles();
+    </script>
+</body>
+</html>
