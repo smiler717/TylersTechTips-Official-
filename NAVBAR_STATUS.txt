@@ -1,0 +1,32 @@
+﻿Please confirm which specific pages/buttons are still broken:
+
+NAVIGATION BUTTONS TO TEST:
+1. Home button (should go to index.html)
+2. Tyler's Tech Tips logo (should go to index.html) 
+3. Community button (should go to community.html)
+4. Join Community button (should go to profile.html)
+5. Articles dropdown (should go to articles.html)
+6. Projects dropdown (should go to projects.html)
+
+Current local code status (all should be working):
+ Home button: href='index.html' (no #home anchor)
+ Logo: href='index.html'
+ Community: href='community.html'
+ Join Community: href='profile.html'
+ Articles: href='articles.html'
+ Projects: href='projects.html'
+
+Latest deployed commits:
+- dbb11e8: Enhanced search index
+- 2ac4615: Removed all #home anchors (17 files)
+- 3122add: Home button fix
+- dc6a752: Nav standardization
+
+TROUBLESHOOTING STEPS:
+1. Hard refresh the page: Ctrl+F5 (clears cache)
+2. Check deployment status at Cloudflare Pages dashboard
+3. Wait 1-2 minutes for Pages to finish deploying
+4. Clear browser cache completely if needed
+
+Which specific button(s) are not working?
+What happens when you click them?

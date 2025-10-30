@@ -1,0 +1,34 @@
+﻿URGENT: SITE IS COMPLETELY DOWN!
+==================================
+
+The screenshots show ERR_FAILED errors - this means:
+- The domain isn't resolving to Cloudflare Pages
+- OR Cloudflare Pages project is stopped/deleted
+- OR there's a DNS misconfiguration
+
+IMMEDIATE CHECKS NEEDED:
+========================
+
+1. Go to Cloudflare Dashboard  Pages
+   - Is 'tylerstechtips-official' project still there?
+   - What's the deployment status?
+   - Are there any error messages?
+
+2. Check Custom Domains in Pages:
+   - Click on the project  Custom domains tab
+   - Is 'tylerstechtips.com' listed?
+   - What status does it show?
+
+3. Check DNS Settings:
+   - Cloudflare Dashboard  DNS  Records
+   - Look for tylerstechtips.com
+   - Is there a CNAME record pointing to tylerstechtips-official.pages.dev?
+
+4. Try the default domain:
+   - Visit: https://tylerstechtips-official.pages.dev
+   - Does THIS work?
+
+If the .pages.dev domain works but tylerstechtips.com doesn't,
+then it's a DNS/custom domain configuration issue.
+
+ACTION NEEDED: Check your Cloudflare dashboard now!

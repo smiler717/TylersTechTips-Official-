@@ -1,0 +1,38 @@
+﻿ISSUE IDENTIFIED:
+================
+
+Your custom domain (tylerstechtips.com) is pointing to a DIFFERENT Cloudflare Pages 
+project than tylerstechtips-official.pages.dev!
+
+This means:
+ tylerstechtips-official.pages.dev = Has the latest code (navigation fixed)
+ tylerstechtips.com = Has OLD code (broken navigation)
+
+SOLUTION:
+=========
+
+You need to attach tylerstechtips.com to the CORRECT Pages project.
+
+Steps:
+1. Go to Cloudflare Dashboard  Pages
+2. Click on 'tylerstechtips-official' project
+3. Go to Custom Domains tab
+4. Add 'tylerstechtips.com' 
+5. Remove it from any other Pages project if it exists there
+
+OR find which project tylerstechtips.com is attached to and:
+1. Remove it from the old project
+2. Add it to 'tylerstechtips-official' project
+
+QUICK TEST:
+===========
+1. Visit: https://tylerstechtips-official.pages.dev
+   - Does navigation work? (should work)
+
+2. Visit: https://tylerstechtips.com
+   - Does navigation work? (currently broken)
+
+If #1 works but #2 doesn't, that confirms the custom domain is 
+pointing to the wrong project!
+
+Let me know if you need help moving the custom domain...
