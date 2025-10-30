@@ -53,7 +53,7 @@ class VotingUI {
   async handleVote(widget, type, id, voteType) {
     if (!window.authManager || !window.authManager.isAuthenticated()) {
       alert('Please log in to vote');
-      window.location.href = '/profile.html';
+      window.location.href = '/profile';
       return;
     }
 

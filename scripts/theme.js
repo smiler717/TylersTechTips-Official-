@@ -127,7 +127,7 @@
                 const initial = (name || 'U').trim().charAt(0).toUpperCase();
                 const avatarUrl = user.avatarUrl || '';
                 // Switch button to profile with avatar + name
-                btn.href = 'profile.html';
+                btn.href = '/profile';
                                 const uname = user.username ? ` (@${user.username})` : '';
                                 const last = user.lastLogin ? ` • Last login: ${new Date(user.lastLogin).toLocaleString()}` : '';
                                                 btn.title = `Logged in as ${name}${uname} • View your profile${last}`;
@@ -149,8 +149,8 @@
                 menu.className = 'user-menu-dropdown';
                 const unread = getUnreadCount();
                 menu.innerHTML = `
-                  <a href="notifications.html"><i class="fas fa-bell"></i> Notifications ${unread > 0 ? `<span class="count-pill">${unread}</span>` : ''}</a>
-                  <a href="profile.html"><i class="fas fa-user"></i> My Profile</a>
+                  <a href="/notifications"><i class="fas fa-bell"></i> Notifications ${unread > 0 ? `<span class="count-pill">${unread}</span>` : ''}</a>
+                  <a href="/profile"><i class="fas fa-user"></i> My Profile</a>
                   <button type="button" class="logout-item"><i class="fas fa-sign-out-alt"></i> Logout</button>
                 `;
                 wrapper.appendChild(menu);
@@ -179,7 +179,7 @@
                 updateUnreadDot(wrapper);
             } else {
                 // Logged out: show Login button
-                btn.href = 'profile.html';
+                btn.href = '/profile';
                 btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
                 btn.title = 'Login or create an account';
             }

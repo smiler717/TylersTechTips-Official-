@@ -9,7 +9,7 @@
   let SERVER_MODE = false;
   const VIEWED_KEY = 'ttt_viewed_topics_session_v1';
   let viewed = new Set();
-  const LOGIN_PAGE = 'profile.html';
+  const LOGIN_PAGE = '/profile';
   let EMAIL_VERIFIED = true;
 
   const $ = (sel, root = document) => root.querySelector(sel);

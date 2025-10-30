@@ -31,7 +31,7 @@
       const initial = displayName.charAt(0).toUpperCase();
 
       authLi.innerHTML = `
-        <a href="profile.html" class="profile-link" style="display:flex;align-items:center;gap:0.5rem;">
+        <a href="/profile" class="profile-link" style="display:flex;align-items:center;gap:0.5rem;">
           <div class="nav-avatar" style="width:32px;height:32px;border-radius:50%;background:var(--accent-color);color:white;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:0.9rem;">
             ${user.avatarUrl ? `<img src="${user.avatarUrl}" alt="Profile" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : initial}
           </div>
@@ -53,7 +53,7 @@
     } else {
       // User not logged in - show Join Community button
       authLi.innerHTML = `
-        <a href="profile.html" class="join-community-btn" style="background:var(--accent-color);color:white;padding:0.5rem 1rem;border-radius:6px;font-weight:600;transition:transform 0.2s;">
+        <a href="/profile" class="join-community-btn" style="background:var(--accent-color);color:white;padding:0.5rem 1rem;border-radius:6px;font-weight:600;transition:transform 0.2s;">
           <i class="fas fa-user-plus"></i> <span class="join-text">Join Community</span>
         </a>
       `;
