@@ -22,7 +22,8 @@ async function sendMailchannels(env, toEmail, subject, html, text) {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    return { sent: res.ok };
+    const body = await res.text().catch(() => '');
+    return { sent: res.ok, status: res.status, body: body?.slice(0, 500) };
   } catch (e) {
     return { sent: false, reason: e?.message || 'send failed' };
   }
@@ -173,7 +174,7 @@ export async function onRequestGet({ request, env }) {
   try {
     // Require admin key
     const adminKey = request.headers.get('x-admin-key');
-    const expectedKey = env.FEEDBACK_ADMIN_KEY;
+    const expectedKey = env.FEEDBACK_ADMIN_KEY || env.ADMIN_KEY;
     
     if (!adminKey || adminKey !== expectedKey) {
       return new Response(JSON.stringify({ error: 'Admin access required' }), {
@@ -187,6 +188,25 @@ export async function onRequestGet({ request, env }) {
     const limit = parseInt(url.searchParams.get('limit') || '50', 10);
     const offset = parseInt(url.searchParams.get('offset') || '0', 10);
     const type = url.searchParams.get('type');
+
+    // Optional: test email send
+    if (url.searchParams.get('action') === 'test-email') {
+      if (!env.ENABLE_EMAIL_SENDING) {
+        return new Response(JSON.stringify({ ok: true, email: { sent: false, reason: 'ENABLE_EMAIL_SENDING not set' } }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+      const to = url.searchParams.get('to') || env.MAIL_TO_FEEDBACK || 'feedback@tylerstechtips.com';
+      const subject = 'Test: Feedback email delivery check';
+      const html = '<p>This is a test email from /api/feedback?action=test-email</p>';
+      const text = 'This is a test email from /api/feedback?action=test-email';
+      const mail = await sendMailchannels(env, to, subject, html, text);
+      return new Response(JSON.stringify({ ok: true, email: mail, to }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
     let query = 'SELECT * FROM feedback';
     const params = [];
@@ -207,7 +227,7 @@ export async function onRequestGet({ request, env }) {
       });
     }
 
-    const stmt = DB.prepare(query);
+  const stmt = DB.prepare(query);
     const { results } = await stmt.bind(...params).all();
 
     return new Response(JSON.stringify({ 
