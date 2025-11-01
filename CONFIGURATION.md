@@ -43,6 +43,27 @@ new_classes = ["RealtimeConnection"]
 
 2. Deploy the Durable Object defined in `functions/_realtime.js`
 
+### Optional: Outbound Email (Feedback + Verification)
+```bash
+# Enable/disable email sending via MailChannels
+ENABLE_EMAIL_SENDING=1
+
+# From address and name (must be an email at your domain)
+MAIL_FROM=no-reply@tylerstechtips.com
+MAIL_FROM_NAME="Tyler's Tech Tips"
+
+# Where feedback emails are delivered (default falls back to feedback@tylerstechtips.com)
+MAIL_TO_FEEDBACK=feedback@tylerstechtips.com
+
+# Site URL used in email links
+SITE_URL=https://tylerstechtips.com
+```
+
+Notes:
+- Email delivery uses MailChannels’ Transactions API from Cloudflare Workers (no extra provider needed).
+- Ensure your domain’s DNS is managed by Cloudflare. MailChannels will align SPF/DKIM automatically when sent from Workers.
+- Use a valid from address at your domain (e.g., no-reply@yourdomain.com).
+
 ### Required for File Attachments
 ```bash
 # Cloudflare R2

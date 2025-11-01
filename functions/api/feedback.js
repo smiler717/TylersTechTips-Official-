@@ -2,6 +2,32 @@
 // Handles user feedback submissions with rate limiting
 import { sanitizeFeedbackInput, validateDeviceId } from './_sanitize.js';
 
+// Lightweight MailChannels sender (same pattern as auth/resend-verification)
+async function sendMailchannels(env, toEmail, subject, html, text) {
+  try {
+    const fromEmail = env.MAIL_FROM;
+    const fromName = env.MAIL_FROM_NAME || "Tyler's Tech Tips";
+    if (!fromEmail) return { sent: false, reason: 'MAIL_FROM not configured' };
+    const payload = {
+      personalizations: [{ to: [{ email: toEmail }] }],
+      from: { email: fromEmail, name: fromName },
+      subject,
+      content: [
+        { type: 'text/plain', value: text || '' },
+        { type: 'text/html', value: html || '' }
+      ]
+    };
+    const res = await fetch('https://api.mailchannels.net/tx/v1/send', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    return { sent: res.ok };
+  } catch (e) {
+    return { sent: false, reason: e?.message || 'send failed' };
+  }
+}
+
 // Handle CORS preflight
 export async function onRequestOptions() {
   return new Response(null, {
@@ -94,9 +120,40 @@ export async function onRequestPost({ request, env }) {
       });
     }
 
+    // Send notification email (optional)
+    let mail = { sent: false };
+    try {
+      if (env.ENABLE_EMAIL_SENDING) {
+        const to = env.MAIL_TO_FEEDBACK || 'feedback@tylerstechtips.com';
+        const site = env.SITE_URL || 'https://tylerstechtips.com';
+        const subject = `New Feedback: ${type}${name ? ` from ${name}` : ''}`;
+        const safeName = name || 'Anonymous';
+        const safeEmail = email || 'N/A';
+        const created = new Date().toISOString();
+        const html = `
+          <h2>New Feedback Received</h2>
+          <p><strong>Type:</strong> ${type}</p>
+          <p><strong>Name:</strong> ${safeName}</p>
+          <p><strong>Email:</strong> ${safeEmail}</p>
+          <p><strong>Submitted:</strong> ${created}</p>
+          <hr />
+          <p><strong>Message:</strong></p>
+          <pre style="white-space:pre-wrap;font-family:system-ui,Segoe UI,Roboto,Arial">${message}</pre>
+          <hr />
+          <p>View site: <a href="${site}">${site}</a></p>
+        `;
+        const text = `New Feedback\nType: ${type}\nName: ${safeName}\nEmail: ${safeEmail}\nSubmitted: ${created}\n\nMessage:\n${message}\n\nSite: ${site}`;
+        mail = await sendMailchannels(env, to, subject, html, text);
+      }
+    } catch (e) {
+      // Don't fail the request if email fails; just log
+      console.error('Feedback email send failed', e);
+    }
+
     return new Response(JSON.stringify({ 
       success: true, 
-      id: result.meta.last_row_id 
+      id: result.meta.last_row_id,
+      mail
     }), {
       status: 201,
       headers: { 'Content-Type': 'application/json' }
