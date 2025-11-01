@@ -64,6 +64,35 @@ Notes:
 - Ensure your domain’s DNS is managed by Cloudflare. MailChannels will align SPF/DKIM automatically when sent from Workers.
 - Use a valid from address at your domain (e.g., no-reply@yourdomain.com).
 
+### Optional: Use Microsoft 365 (Graph API) for email
+If you want emails to be sent from your O365 tenant (e.g., no-reply@tylerstechtips.com), configure Microsoft Graph app-only auth:
+
+```bash
+# Azure AD / Entra ID App
+MS_TENANT_ID=<your-tenant-id>
+MS_CLIENT_ID=<your-app-client-id>
+MS_CLIENT_SECRET=<your-app-client-secret>
+
+# Mailbox to send as (UPN or SMTP address)
+MS_SENDER=no-reply@tylerstechtips.com
+```
+
+With these set, the app will use Graph to send emails; otherwise it falls back to MailChannels.
+
+Required setup (summary):
+1) Register an app in Entra ID → App registrations
+2) Add API permissions: Microsoft Graph → Application → Mail.Send → Grant admin consent
+3) Create a client secret and store it as MS_CLIENT_SECRET
+4) (Recommended) Restrict app access to specific mailbox with an Application Access Policy in Exchange Online PowerShell:
+   - Connect-ExchangeOnline
+   - New-ApplicationAccessPolicy -AppId <MS_CLIENT_ID> -PolicyScopeGroupId <security-group-with-mailbox> -AccessRight RestrictAccess -Description "Limit Graph mail send"
+   - Test-ApplicationAccessPolicy -AppId <MS_CLIENT_ID> -Identity no-reply@tylerstechtips.com
+5) Ensure MS_SENDER exists as a user/shared mailbox in your tenant
+
+The code uses the client credentials flow to call:
+- Token: https://login.microsoftonline.com/${MS_TENANT_ID}/oauth2/v2.0/token
+- Graph:  https://graph.microsoft.com/v1.0/users/${MS_SENDER}/sendMail
+
 ### Required for File Attachments
 ```bash
 # Cloudflare R2

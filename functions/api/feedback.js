@@ -29,6 +29,59 @@ async function sendMailchannels(env, toEmail, subject, html, text) {
   }
 }
 
+// Microsoft 365 (Graph API) sender using client credentials
+async function sendMicrosoftGraphMail(env, toEmail, subject, html, text) {
+  const tenant = env.MS_TENANT_ID;
+  const clientId = env.MS_CLIENT_ID;
+  const clientSecret = env.MS_CLIENT_SECRET;
+  const sender = env.MS_SENDER || env.MAIL_FROM; // no-reply@tylerstechtips.com
+  if (!tenant || !clientId || !clientSecret || !sender) {
+    return { sent: false, reason: 'Missing MS_* config (MS_TENANT_ID, MS_CLIENT_ID, MS_CLIENT_SECRET, MS_SENDER)' };
+  }
+  try {
+    const scope = 'https://graph.microsoft.com/.default';
+    const tokenRes = await fetch(`https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: clientId,
+        client_secret: clientSecret,
+        scope,
+        grant_type: 'client_credentials'
+      })
+    });
+    const tokenBody = await tokenRes.json().catch(() => ({}));
+    if (!tokenRes.ok || !tokenBody.access_token) {
+      return { sent: false, status: tokenRes.status, reason: 'Token error', body: JSON.stringify(tokenBody).slice(0, 500) };
+    }
+
+    const message = {
+      message: {
+        subject,
+        body: { contentType: html ? 'HTML' : 'Text', content: html || text || '' },
+        toRecipients: [{ emailAddress: { address: toEmail } }]
+      },
+      saveToSentItems: false
+    };
+
+    // Send as specific user/mailbox
+    const sendRes = await fetch(`https://graph.microsoft.com/v1.0/users/${encodeURIComponent(sender)}/sendMail`, {
+      method: 'POST',
+      headers: {
+        'authorization': `Bearer ${tokenBody.access_token}`,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify(message)
+    });
+
+    // Graph returns 202 on success with empty body
+    const sendText = await sendRes.text().catch(() => '');
+    return { sent: sendRes.ok, status: sendRes.status, body: sendText?.slice(0, 500) };
+  } catch (e) {
+    return { sent: false, reason: e?.message || 'graph send failed' };
+  }
+}
+
 // Handle CORS preflight
 export async function onRequestOptions() {
   return new Response(null, {
@@ -144,7 +197,12 @@ export async function onRequestPost({ request, env }) {
           <p>View site: <a href="${site}">${site}</a></p>
         `;
         const text = `New Feedback\nType: ${type}\nName: ${safeName}\nEmail: ${safeEmail}\nSubmitted: ${created}\n\nMessage:\n${message}\n\nSite: ${site}`;
-        mail = await sendMailchannels(env, to, subject, html, text);
+        // Prefer Microsoft Graph if configured, else MailChannels
+        if (env.MS_TENANT_ID && env.MS_CLIENT_ID && env.MS_CLIENT_SECRET && (env.MS_SENDER || env.MAIL_FROM)) {
+          mail = await sendMicrosoftGraphMail(env, to, subject, html, text);
+        } else {
+          mail = await sendMailchannels(env, to, subject, html, text);
+        }
       }
     } catch (e) {
       // Don't fail the request if email fails; just log
