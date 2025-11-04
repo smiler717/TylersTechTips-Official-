@@ -204,7 +204,14 @@
                 <h1><i class="fas fa-shield-alt"></i> Admin Dashboard</h1>
                 <p style="margin: 0.5rem 0 0 0; color: var(--secondary-text);">Manage users, content, and monitor activity</p>
             </div>
-            <div>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <!-- System Health Badges -->
+                <div id="health-badges" title="Runs a live diagnostic. Email test sends one message to feedback@tylerstechtips.com.">
+                    <span class="badge badge-warning" id="health-email">Email: checking…</span>
+                </div>
+                <button id="health-retest" class="action-btn" style="background: var(--secondary-bg); color: var(--text-color);">
+                    <i class="fas fa-sync-alt"></i> Retest
+                </button>
                 <button onclick="window.location.href='index.html'" class="action-btn btn-primary">
                     <i class="fas fa-home"></i> Back to Site
                 </button>

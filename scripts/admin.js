@@ -29,6 +29,41 @@ document.querySelectorAll('.admin-tab').forEach(tab => {
 // Load stats on page load
 loadStats();
 loadPanelData('users');
+checkEmailHealth();
+
+// Health re-test
+document.getElementById('health-retest')?.addEventListener('click', () => {
+    checkEmailHealth(true);
+});
+
+/**
+ * Check email delivery health by invoking the admin test endpoint.
+ * Note: This will send one test message to MAIL_TO_FEEDBACK.
+ */
+async function checkEmailHealth(force = false) {
+    const badge = document.getElementById('health-email');
+    if (!badge) return;
+    try {
+        badge.className = 'badge badge-warning';
+        badge.textContent = 'Email: checking…';
+        const res = await fetch('/api/feedback?action=test-email' + (force ? '&force=1' : ''), {
+            headers: { 'x-admin-key': ADMIN_KEY }
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data?.email?.sent) {
+            badge.className = 'badge badge-success';
+            badge.textContent = 'Email: OK';
+        } else {
+            badge.className = 'badge badge-danger';
+            const reason = data?.email?.reason || data?.email?.status || res.status || 'error';
+            badge.textContent = `Email: fail (${reason})`;
+        }
+    } catch (e) {
+        badge.className = 'badge badge-danger';
+        badge.textContent = 'Email: error';
+        console.error('Email health check error:', e);
+    }
+}
 
 /**
  * Load overall statistics
