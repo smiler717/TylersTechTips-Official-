@@ -174,8 +174,8 @@ export async function onRequestPost({ request, env }) {
       });
     }
 
-    // Send notification email (optional)
-    let mail = { sent: false };
+  // Send notification email (optional)
+  let mail = { sent: false };
     try {
       if (env.ENABLE_EMAIL_SENDING) {
         const to = env.MAIL_TO_FEEDBACK || 'feedback@tylerstechtips.com';
@@ -203,6 +203,8 @@ export async function onRequestPost({ request, env }) {
         } else {
           mail = await sendMailchannels(env, to, subject, html, text);
         }
+      } else {
+        mail = { sent: false, reason: 'ENABLE_EMAIL_SENDING not set' };
       }
     } catch (e) {
       // Don't fail the request if email fails; just log
@@ -259,7 +261,13 @@ export async function onRequestGet({ request, env }) {
       const subject = 'Test: Feedback email delivery check';
       const html = '<p>This is a test email from /api/feedback?action=test-email</p>';
       const text = 'This is a test email from /api/feedback?action=test-email';
-      const mail = await sendMailchannels(env, to, subject, html, text);
+      // Prefer Microsoft Graph if configured, else MailChannels
+      let mail;
+      if (env.MS_TENANT_ID && env.MS_CLIENT_ID && env.MS_CLIENT_SECRET && (env.MS_SENDER || env.MAIL_FROM)) {
+        mail = await sendMicrosoftGraphMail(env, to, subject, html, text);
+      } else {
+        mail = await sendMailchannels(env, to, subject, html, text);
+      }
       return new Response(JSON.stringify({ ok: true, email: mail, to }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' }
